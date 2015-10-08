@@ -1,5 +1,4 @@
-#ifndef BLACKFIN_PARAMETERS_HPP
-#define BLACKFIN_PARAMETERS_HPP
+#pragma once
 
 const bool DEBUG_LOGGING_ENABLED
 #if defined(DEBUG)
@@ -8,4 +7,4 @@ const bool DEBUG_LOGGING_ENABLED
 = false;
 #endif
 
-#endif
+

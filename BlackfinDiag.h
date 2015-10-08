@@ -1,5 +1,5 @@
-#ifndef BLACKFIN_DIAG_H
-#define BLACKFIN_DIAG_H
+#pragma once
+
 #include "BlackfinParameters.h"
 #include "Defs.h"
 #include <time.h>
@@ -8,11 +8,42 @@
 namespace BlackfinDiagnosticGlobals {
 	const UINT32 DGN_INTERVAL_US = 50000;      // Resolution of microseconds
 
+	const UINT32 DiagnosticSlicePeriod_Microseconds = 50000;  // Resolution of microseconds
 
+	const UINT32 DiagnosticSlicePeriod_Milleseconds = DiagnosticSlicePeriod_Microseconds / 1000;
+	
+	const UINT8 * const pRAMDataStart = reinterpret_cast<UINT8 *>(0xff900000);
+
+	const UINT8 TestPatternsForRamTesting[] = { 0xff,0, 0x55, 0xaa, 0xf, 0xf0, 0xa0, 0xa, 0x50, 0x5, 0x5a, 0xa5 };
+
+	const UINT32 NumberOfTestingPatterns = sizeof(TestPatternsForRamTesting) / sizeof(UINT8);
+
+    //
+    // Requirement:  All Diagnostic Tests Complete in 4 Hours.
+    //
+    static const UINT32 MaxCyclePeriodAllTestsHoursComponent        = 4;
+    static const UINT32 MaxCyclePeriodAllTestsMinutesComponent      = 0;
+    static const UINT32 MaxCyclePeriodAllTestsSecondsComponent      = 0;
+    static const UINT32 MaxCyclePeriodAllTestsMillesecondsComponent = 0;
+    static const UINT32 MillesecondsInAnHour = 3600000;  //60 minutes/per hour * 60 seconds per minute * 1000 milleseconds per second
+
+    static const UINT32 dcbSliceTriggerVal_Default                  = 0;
+    static const UINT32 dcbSliceStepVal_Default                     = 1;
+    static const UINT32 dcbSliceLastComplete_Default                = 0;
+    static const UINT32 dcbTestDurationInSlices_Default             = 0;	
+    static const UINT32 dcbTestExecutionMaxSlices_Default           = 0;
+    static const BOOL   dcbTestComplete_Default                     = FALSE;
+    static const UINT32 dcbTestExecutionTimeoutPeriodSlices_Default = (  ( MaxCyclePeriodAllTestsHoursComponent * MillesecondsInAnHour )
+                                                                         + ( MaxCyclePeriodAllTestsMinutesComponent * 60 * 1000 )
+                                                                         + ( MaxCyclePeriodAllTestsSecondsComponent * 100 )
+                                                                         + ( MaxCyclePeriodAllTestsMillesecondsComponent ))
+                                                                         /DiagnosticSlicePeriod_Milleseconds;
+ 
 	enum TestState
 	{
 		TEST_LOOP_COMPLETE = 0,
-		TEST_IN_PROGRESS = 1
+		TEST_IN_PROGRESS = 1,
+		TEST_FAILURE = 2
 	};
 
  /*   enum RuntimeTestList
@@ -26,11 +57,9 @@ namespace BlackfinDiagnosticGlobals {
     }; */
 	struct DiagControlBlock
 	{
-		// Pointer to the relevant diagnostic function
-		TestState(*diagFunc) (DiagControlBlock *diagControlBlock);
-		UINT64 triggerValueTimeslice;       // Timeslice number for next trigger
+		UINT32 triggerValueTimeslice;       // Timeslice number for next trigger
 		UINT32 stepValueTimeslice;          // Number of diag timeslices between activations
-		UINT64 lastCompleteTimeslice;       // Timeslice number of the previous test completion
+		UINT32 lastCompleteTimeslice;       // Timeslice number of the previous test completion
 		UINT32 durationUs;                  // Time spent in diag function
 		UINT32 maxTimeslices;               // Max number of timeslices ever seen between triggers
 		bool   oneComplete;                 // True if diag has completed at least once. This is used to decide
@@ -38,37 +67,48 @@ namespace BlackfinDiagnosticGlobals {
 											//      should indicate a completion-to-completion time
 		UINT32 timeoutTimeslice;            // Max number of timeslices that test
 											// can wait to be completed in
-
-		UINT32 priorityRelative;            // Relative prioirty to other diagnostic tests. lower number == higher priority so a priority of 0 is highest priority.
-
-		BOOL operator<(const DiagControlBlock & val) const {
-			return (priorityRelative < val.priorityRelative);
-		}
+		
+		DiagControlBlock( UINT32 TriggerValueTimeslice, 
+		                  UINT32 StepValue, 
+		                  UINT32 LastComplete, 
+		                  UINT32 Duration, 
+		                  UINT32 MaxSlices,
+		                  BOOL   OneComplete,
+		                  UINT32 TimeoutSlice ) : triggerValueTimeslice(TriggerValueTimeslice),
+		                                          stepValueTimeslice(StepValue),
+		                                          lastCompleteTimeslice(LastComplete),
+		                                          durationUs(Duration),
+		                                          maxTimeslices(MaxSlices),
+		                                          oneComplete(OneComplete),
+		                                          timeoutTimeslice(TimeoutSlice) {}
+		DiagControlBlock(){}
+	          
 	};
 	typedef struct DiagControlBlock DGN_CTL_BLK;
 
-
+	template<typename T, size_t N>
+	T * end(T (&ra)[N]) {
+		return ra + N;
+	}
+	
 	class BlackfinDiagTest {
 	public:
-		BlackfinDiagTest( UINT64 TrgrValTmeSlce,
-			              UINT32 StpValTmeSlce,
-			              UINT64 LstCmplteTmeslce,
-			              UINT32 DrtnUS,
-			              UINT32 MxTmeSlce,
-			              BOOL   OneCmplte,
-			              UINT32 TmeoutTmeslce,
-			              UINT32 PrtyRltve,
-			              UINT32 mxdrtn,
-			              UINT32 mndrtn ) : triggerValueTimeslice(TrgrValTmeSlce),
-			                                stepValueTimeslice(MsToDgnSlices(StpValTmeSlce)),
-				                            lastCompleteTimeslice(LstCmplteTmeslce),
-				                            durationUs(DrtnUS),
-				                            maxTimeslices(MxTmeSlce),
-				                            oneComplete(FALSE),
-				                            timeoutTimeslice(OneCmplte),
-				                            maxduration(mxdrtn),
-			                                minduration(mndrtn)
+		//BlackfinDiagTest( DGN_CTL_BLK dgn ) : dgnParams(dgn){}
+		
+		BlackfinDiagTest( UINT32  PeriodBetweenIterations_Milleseconds, 
+		                  UINT32  MaxTestDuration_Milleseconds 
+		                            = (dcbTestExecutionTimeoutPeriodSlices_Default * DiagnosticSlicePeriod_Milleseconds) ) 
+		: dgnParams( dcbSliceTriggerVal_Default, 
+		             (PeriodBetweenIterations_Milleseconds/DiagnosticSlicePeriod_Milleseconds),
+		             dcbSliceLastComplete_Default,
+		             dcbTestDurationInSlices_Default,
+		             dcbTestExecutionMaxSlices_Default,
+                     dcbTestComplete_Default,
+                     MaxTestDuration_Milleseconds / DiagnosticSlicePeriod_Milleseconds ) // Seems crazy to do this,
+                                                                                        // Probably will be constant for all tests
 		{}
+		
+			
 		virtual ~BlackfinDiagTest()  {}
 
 		/// Check if test are completing on time.
@@ -80,33 +120,14 @@ namespace BlackfinDiagnosticGlobals {
 		/////////////////////////////////////////////////////////////////////////////
 		UINT32 MsToDgnSlices(UINT32 value)
 		{
-			static const UINT32 DGN_INTERVAL_US = 50000;      // Resolution of microseconds
-
-			if ((value / (DGN_INTERVAL_US / 1000)) >= 1)
-			{
-				return value / (DGN_INTERVAL_US / 1000);
-			}
-			else
-			{
-				return 1;
-			}
+			return ((value > BlackfinDiagnosticGlobals::DiagnosticSlicePeriod_Milleseconds) 
+						? value/BlackfinDiagnosticGlobals::DiagnosticSlicePeriod_Milleseconds : 1);
+			
 		}
+		
 		virtual TestState RunTest() = 0;
 
-		UINT32 triggerValueTimeslice;       // Timeslice number for next trigger
-		UINT32 stepValueTimeslice;          // Number of diag timeslices between activations
-		UINT32 lastCompleteTimeslice;       // Timeslice number of the previous test completion
-		UINT32 durationUs;                  // Time spent in diag function
-		UINT32 maxTimeslices;               // Max number of timeslices ever seen between triggers
-		BOOL   oneComplete;                 // True if diag has completed at least once. This is used to decide
-											//      whether or not maxTimeslices is valid, since  maxTimeslices
-											//      should indicate a completion-to-completion time
-		UINT32 timeoutTimeslice;            // Max number of timeslices that test
-											// can wait to be completed in
-//#ifdef HI_APEX_DIAGNOSTICS
-		UINT32 maxduration;                 // Max time spent in diag function
-		UINT32 minduration;                 // Min time spent in diag function
-//#endif		
+		DGN_CTL_BLK  dgnParams;
 
 	private:
 		BlackfinDiagTest() {}
@@ -115,12 +136,6 @@ namespace BlackfinDiagnosticGlobals {
 		const BlackfinDiagTest & operator = (const BlackfinDiagTest &);
 	};
 
-
-
-    
-	std::vector <DGN_CTL_BLK> DiagRuntimeTests;
-
-	std::vector <BlackfinDiagTest *> DiagRuntimeObs;
 
     #define firmExcept();//(__FILE__, __LINE__)
 
@@ -154,10 +169,10 @@ namespace BlackfinDiagnosticGlobals {
 			return (clock() / DGN_CONVERSION_FACTOR_CYCLES_uS);
 		}
 		else {
-			return (clock() * 1000);
+			return clock();
 		}
     }      
-}
+};
 
 
-#endif
+

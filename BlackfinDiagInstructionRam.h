@@ -1,19 +1,19 @@
-#ifndef BLACKFINDIAG_INSTRUCTION_RAM_TEST
-#define BLACKFINDIAG_INSTRUCTION_RAM_TEST
-#include "BlackfinDiagInstructionRam.h"
+#pragma once
+
 #include "BlackfinDiag.h"
-#include "BlackfinDiagnostic.h"
+//#include "BlackfinDiagnostic.h"
 #include <vector>
 
+using namespace BlackfinDiagnosticGlobals;
 
-class BlackfinDiagInstructionRam {
+class BlackfinDiagInstructionRam : public BlackfinDiagTest {
 	
 public:
-	BlackfinDiagInstructionRam() : bScaffoldingActive(TRUE), bEmulationActive(TRUE) {}
+	BlackfinDiagInstructionRam() : BlackfinDiagTest(PeriodPerTestIteration_Milleseconds), bScaffoldingActive(TRUE), bEmulationActive(TRUE) {}
 	
-	~BlackfinDiagInstructionRam(){}
+	virtual ~BlackfinDiagInstructionRam(){}
 
-    TestState RunTest(DiagControlBlock *);
+    virtual TestState RunTest();
 		
 private:
 
@@ -21,6 +21,8 @@ private:
     
     static const UINT32 EMUEXCEPT_OPCODE = 0x25;
     
+	static const UINT32 PeriodPerTestIteration_Milleseconds = 2000;
+
     typedef struct InstructionComparisonParams { 
 	    UINT8          pInstrMemRead[DMA_BFR_SZ]; // Instruction Memory Read via DMA
         UINT32         HeaderOffset;              // Offset from begining of Current Bootstream Header
@@ -62,7 +64,7 @@ private:
 	// Inhibit copy construction and assignments of this class by putting the declarations in private portion.
 	// If using C++ 11 and later use the delete keyword to do this.
 	//
-	BlackfinDiagInstructionRam( const BlackfinDiagInstructionRam & other );
+	BlackfinDiagInstructionRam(const BlackfinDiagInstructionRam & other);
 	
 	const BlackfinDiagInstructionRam & operator = (const BlackfinDiagInstructionRam & );
 	
@@ -79,7 +81,8 @@ private:
 
     void GetBootStreamStartAddr( const UINT8 * &pBootStreamStartAddr );
 
-    BOOL StartEnumeratingInstructionBootStreamHeaders(UINT32 & header_offset);
-};
+	BOOL RunInstructionRamTestIteration(InstructionCompareParams & icpCompare, BOOL & bError);
+	
+	BOOL StartEnumeratingInstructionBootStreamHeaders(UINT32 & header_offset);
+	};
 
-#endif

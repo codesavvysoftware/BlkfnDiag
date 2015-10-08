@@ -6,7 +6,7 @@
 #include "Nvs_Obj.h"
 #include <bfrom.h>
 
-TestState BlackfinDiagInstructionRam::RunTest(DiagControlBlock * dcb) {
+TestState BlackfinDiagInstructionRam::RunTest() {
     static InstructionCompareParams icpCompare;
 
     icpCompare.HeaderOffset          = 0;
@@ -241,13 +241,13 @@ BOOL BlackfinDiagInstructionRam::EnumerateNextInstructionBootStreamHeader( UINT3
         }
         else if ( (header->dBlockCode & BFLAG_FINAL) ) 
         {
-            bSuccess = FALSE;
-            
             break;
         }
         else if ( ( (UINT32)header->pTargetAddress >= 0xffa00000 ) && (header->dByteCount > 0))
         {
-        	break;
+			bSuccess = TRUE;
+			
+			break;
         }
     } 	 
     
@@ -466,5 +466,31 @@ void BlackfinDiagInstructionRam::EnumerateMismatched( UINT32 & NumberOfMismatche
     }
     
     UINT32 ui32 = NumberOfMismatches; 
+}
+
+BOOL BlackfinDiagInstructionRam::RunInstructionRamTestIteration(InstructionCompareParams & icpCompare, BOOL & bError) {
+	BOOL bPartialDMABuffer = ConfigureDMAReadOfInstructionMemory(icpCompare);
+
+	DMA_Xfer_MDMA0(icpCompare.pReadFromAddr, icpCompare.pInstrMemRead);
+
+	bError = !CompareInstructMemToBootStream(icpCompare);
+
+	if (bError && !icpCompare.bScaffoldingActive) return TRUE;
+
+	BOOL bRetval = FALSE;
+
+	bError = FALSE;
+
+	icpCompare.CurrentBfrOffset += DMA_BFR_SZ;
+
+	if (bPartialDMABuffer) {
+		BOOL bNoMoreHeaders = !EnumerateNextInstructionBootStreamHeader(icpCompare.HeaderOffset, bError);
+
+		if (bNoMoreHeaders) bRetval = TRUE;
+
+		icpCompare.CurrentBfrOffset = 0;
+	}
+
+	return bRetval;
 }
 

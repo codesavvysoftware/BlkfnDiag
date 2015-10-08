@@ -6,7 +6,7 @@
 #include "Nvs_Obj.h"
 #include <bfrom.h>
 
-TestState BlackfinDiagInstructionRam::RunTest(DiagControlBlock * dcb) {
+TestState BlackfinDiagInstructionRam::RunTest() {
     static InstructionCompareParams icpCompare;
 
     icpCompare.HeaderOffset          = 0;
