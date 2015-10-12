@@ -2,7 +2,7 @@
 #include "BlackfinDiag.h"
 #include "BlackfinDiagInstructionRam.h"
 #include "BlackfinDiagDataRam.h"
-#include "BlackfinDiagRegister.h"
+#include "BlackfinDiagRegistersTest.h"
 
 
 using namespace BlackfinDiagnosticGlobals;
@@ -16,7 +16,7 @@ private:
 	
     static BlackfinDiagDataRam DataRamTest;
     
-//    static BlackfinDiagRegister RegisterTest;
+    static BlackfinDiagRegistersTest RegisterTest;
     
     // Define the array of tests to run for the diagnostics
     static BlackfinDiagTest * DiagnosticTests[];// = {&DataRamTest, &InstructionRamTest };

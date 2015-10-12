@@ -26,13 +26,21 @@ class BlackfinDiagExecution
 public:
 
 	BlackfinDiagExecution(std::vector <BlackfinDiagTest *> * Diagnostics) : RunTimeDiagnostics(Diagnostics) {
-
+		if ( !Diagnostics ) firmExcept();
+		
 		UINT32 ui = 0;
 		
 		for (std::vector<BlackfinDiagTest *>::iterator it = RunTimeDiagnostics->begin(); it != RunTimeDiagnostics->end(); ++it) {
-			BlackfinDiagTest * pdt = (*it);
 
-			pdt->dgnParams.triggerValueTimeslice = pdt->dgnParams.stepValueTimeslice + ui++;
+			if ( !(*it) ) {
+				
+				firmExcept();
+			}
+			else {
+				BlackfinDiagTest * pdt = (*it);
+			
+				pdt->dgnParams.triggerValueTimeslice = pdt->dgnParams.stepValueTimeslice + ui++;
+			}
 		}
 	}
 
@@ -54,13 +62,13 @@ public:
 		// End Fault Injection Point 2
 
 		// Check if it's time for Io shutdown test
-		if (false)//ApexDiagIoShutdown::IsTimeToRun(HI_ApexReg.SystemTime))
-		{
+		//if (false)//ApexDiagIoShutdown::IsTimeToRun(HI_ApexReg.SystemTime))
+		//{
 			//ApexDiagIoShutdown::RunTest(HI_ApexReg.SystemTime);
-		}
+		//}
 		// Then check if it's time for generic diagnostic test (unsigned math handles roll-over)
-		else if ((GetSystemTime() - m_LastDiagTime) > DGN_INTERVAL_US)
-		{
+		//else if ((GetSystemTime() - m_LastDiagTime) > DGN_INTERVAL_US)
+		if ((GetSystemTime() - m_LastDiagTime) > DGN_INTERVAL_US) {
 			// Execute a runtime diagnostic if it's time for one. Scheduling of the various tests is
 			// handled within ExecuteSlice(), and is guided by the m_LastDiagTime variable, which
 			// increments each time through.
@@ -82,10 +90,6 @@ public:
 
 private:
 
-//	friend class ApexWatchdog;      // for access to LogDgnTrace
-//	friend class ApexDiagTimer;     // for access to DGN_TIMER_STEP_MS
-
-									/// Default constructor.
 	struct TraceLog
 	{
 		UINT32 timestamp;
@@ -108,11 +112,6 @@ private:
 	
 	UINT32 DgnTrace[32];
 
-	// Start Fault Injection Point 2
-	// Declaration of DGN_FI_DELAY_SEC constant which determines
-	// when InjectFaultFlag is set will be injected here.
-	// End Fault Injection Point 2
-	/// Copy constructor and assignment operator not implemented.
 	BlackfinDiagExecution(const BlackfinDiagExecution &);
 	BlackfinDiagExecution &operator=(const BlackfinDiagExecution &);
 
@@ -120,17 +119,16 @@ private:
 	{
 		for (std::vector<BlackfinDiagTest *>::iterator it = RunTimeDiagnostics->begin(); it != RunTimeDiagnostics->end(); ++it) {
 		
-			if ((m_SliceNumber - (*it)->dgnParams.lastCompleteTimeslice) > (*it)->dgnParams.timeoutTimeslice)
-			{
+			if ( *it ) {
+				if ((m_SliceNumber - (*it)->dgnParams.lastCompleteTimeslice) > (*it)->dgnParams.timeoutTimeslice)
+				{
+					firmExcept();
+				}
+			}
+			else {
 				firmExcept();
 			}
 		}
-
-		if (false)//!ApexDiagIoShutdown::CheckCompletionTime())
-		{
-			firmExcept();
-		}
-		return;
 	}
 
 	BOOL FindTestIndexForThisSlice(BlackfinDiagTest * & pbdtNextDiag)
@@ -138,15 +136,20 @@ private:
 		BOOL bSuccess = FALSE;
 
 		for (std::vector<BlackfinDiagTest *>::iterator it = RunTimeDiagnostics->begin(); it != RunTimeDiagnostics->end(); ++it) {
-			BlackfinDiagTest * pdt = (*it);
-			
-			if (m_SliceNumber == pdt->dgnParams.triggerValueTimeslice)
-			{
-				pbdtNextDiag = pdt;
+			if ( !(*it)) {
+				firmExcept();
+			} 
+			else {
 
-				bSuccess = TRUE;
-
-				break;
+				BlackfinDiagTest * pdt = (*it);
+				
+				if (m_SliceNumber == pdt->dgnParams.triggerValueTimeslice) {
+					pbdtNextDiag = pdt;
+					
+					bSuccess = TRUE;
+					
+					break;
+				}
 			}
 		}
 		return bSuccess;
@@ -172,10 +175,6 @@ private:
 		
 		//LogDgnTrace(testIndex);
 
-																   // Schedule next trigger slice for this diag. UINT math handles
-																   // rollover. In some cases, this trigger value will be overwritten
-																   // from within the test function that is called.  That's why we do the
-																   // reschedule before we enter the function.
 		pCurrentDiagTest->dgnParams.triggerValueTimeslice += pCurrentDiagTest->dgnParams.stepValueTimeslice;
 
 		// Record the entry time before calling diag
@@ -272,6 +271,9 @@ private:
 		BlackfinDiagTest * pdbtCurrent = NULL;
 
 		for (std::vector<BlackfinDiagTest *>::iterator it = (RunTimeDiagnostics->begin() + 1); it != RunTimeDiagnostics->end(); ++it) {
+			
+			//if ( !(it - 1) || !(*(it-1)) || !it || !(*(it)) ) firmExcept();
+			
 			pdbtPrev = *(&(*(it-1)));
 
 			pdbtCurrent = *(&(*it));

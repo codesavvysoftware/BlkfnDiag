@@ -1,14 +1,18 @@
 #include "BlackfinDiagExecution.h"
 #include "BlackfinRuntimeDiagnostics.h"
 
-//BlackfinDiagRegister BlackfinRuntimeDiagnostics::RegisterTest;
- 
 BlackfinDiagInstructionRam BlackfinRuntimeDiagnostics::InstructionRamTest;
 	
 BlackfinDiagDataRam BlackfinRuntimeDiagnostics::DataRamTest;
     
-BlackfinDiagTest * BlackfinRuntimeDiagnostics::DiagnosticTests[] = {&BlackfinRuntimeDiagnostics::DataRamTest, 
-                                                                    &BlackfinRuntimeDiagnostics::InstructionRamTest };
+BlackfinDiagRegistersTest BlackfinRuntimeDiagnostics::RegisterTest;
+ 
+BlackfinDiagTest * BlackfinRuntimeDiagnostics::DiagnosticTests[] 
+	= {
+		&BlackfinRuntimeDiagnostics::RegisterTest,
+		&BlackfinRuntimeDiagnostics::DataRamTest, 
+		&BlackfinRuntimeDiagnostics::InstructionRamTest
+	  };
 
 std::vector <BlackfinDiagTest *> BlackfinRuntimeDiagnostics::Diagnostics(DiagnosticTests, end(DiagnosticTests));
 

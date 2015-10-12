@@ -2,22 +2,34 @@
 
 #include "BlackfinParameters.h"
 #include "Defs.h"
+#include "BlackfinDiagRegTestCommon.h"
+
 #include <time.h>
 #include <vector>
 
 namespace BlackfinDiagnosticGlobals {
-	const UINT32 DGN_INTERVAL_US = 50000;      // Resolution of microseconds
 
-	const UINT32 DiagnosticSlicePeriod_Microseconds = 50000;  // Resolution of microseconds
+	//
+	// Blackfin Diagnostic constants.  Variable names are intended to describe with they are use for.
+	// 
+	static const UINT32 DGN_INTERVAL_US                    = 50000;      // Resolution of microseconds
 
-	const UINT32 DiagnosticSlicePeriod_Milleseconds = DiagnosticSlicePeriod_Microseconds / 1000;
+	static const UINT32 DiagnosticSlicePeriod_Microseconds = 50000;  // Resolution of microseconds
+
+	static const UINT32 DiagnosticSlicePeriod_Milleseconds = DiagnosticSlicePeriod_Microseconds / 1000;
 	
-	const UINT8 * const pRAMDataStart = reinterpret_cast<UINT8 *>(0xff900000);
+	static const UINT8 * const pRAMDataStart               = reinterpret_cast<UINT8 *>(0xff900000);
 
-	const UINT8 TestPatternsForRamTesting[] = { 0xff,0, 0x55, 0xaa, 0xf, 0xf0, 0xa0, 0xa, 0x50, 0x5, 0x5a, 0xa5 };
+	static const UINT8 TestPatternsForRamTesting[]         = { 0xff,0, 0x55, 0xaa, 0xf, 0xf0, 0xa0, 0xa, 0x50, 0x5, 0x5a, 0xa5 };
 
-	const UINT32 NumberOfTestingPatterns = sizeof(TestPatternsForRamTesting) / sizeof(UINT8);
+	static const UINT32 NumberOfTestingPatterns            = sizeof(TestPatternsForRamTesting) / sizeof(UINT8);
 
+	static const UINT32 TestPatternsForRegisterTesting[]   = { 0xffffffff, 0xaaaaaaaa, 0x55555555, 0 };
+	
+	static const UINT32 NumberOfRegisterPatterns           = sizeof(TestPatternsForRegisterTesting)/sizeof(UINT32);
+	
+	static const UINT32 InvalidRegTestPattern              = 1;
+	
     //
     // Requirement:  All Diagnostic Tests Complete in 4 Hours.
     //
@@ -38,23 +50,127 @@ namespace BlackfinDiagnosticGlobals {
                                                                          + ( MaxCyclePeriodAllTestsSecondsComponent * 100 )
                                                                          + ( MaxCyclePeriodAllTestsMillesecondsComponent ))
                                                                          /DiagnosticSlicePeriod_Milleseconds;
- 
+    
+	//
+	// For linkage to c callable assembly language register tests
+	//
+	extern "C" UINT32  BlackfinDiagRegSanityChk( const UINT32 *, UINT32);
+	extern "C" UINT32  BlackfinDiagRegDataReg7Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegDataReg6Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegDataReg5Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegDataReg4Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegDataReg3Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegPointerReg5Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegPointerReg4Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegPointerReg3Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegPointerReg2Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegPointerReg0Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagAccum0Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagAccum1Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegModifyReg3Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegModifyReg2Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegModifyReg1Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegModifyReg0Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegLengthReg3Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegLengthReg2Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegLengthReg1Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegLengthReg0Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegIndexReg3Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegIndexReg2Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegIndexReg1Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegIndexReg0Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegBaseReg3Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegBaseReg2Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegBaseReg1Chk( const UINT32 *, UINT32 );
+	extern "C" UINT32  BlackfinDiagRegBaseReg0Chk( const UINT32 *, UINT32 );	
+
+	typedef UINT32 (* const REGISTER_TEST)(const UINT32 *, UINT32);
+	
+	static const REGISTER_TEST DataRegisters[]      
+		= {
+			BlackfinDiagRegDataReg7Chk, 
+            BlackfinDiagRegDataReg6Chk,
+            BlackfinDiagRegDataReg5Chk,
+            BlackfinDiagRegDataReg4Chk,
+            BlackfinDiagRegDataReg3Chk
+          };
+
+    static const UINT32 NumberOfDataRegTests = sizeof(DataRegisters)/sizeof( REGISTER_TEST );
+    
+    static const REGISTER_TEST PointerRegisters[] 
+    	= {
+    		BlackfinDiagRegPointerReg5Chk, 
+            BlackfinDiagRegPointerReg4Chk,
+            BlackfinDiagRegPointerReg3Chk,
+            BlackfinDiagRegPointerReg2Chk,
+            BlackfinDiagRegPointerReg0Chk
+          };
+    static const UINT32 NumberOfPointerRegTests = sizeof(PointerRegisters)/sizeof( REGISTER_TEST );
+
+
+    static const REGISTER_TEST Accumulators[]     
+    	= {
+    		BlackfinDiagAccum0Chk, 
+    		BlackfinDiagAccum1Chk
+    	  };
+	static const UINT32 NumberOfAccumulatorRegTests = sizeof(Accumulators)/sizeof( REGISTER_TEST );
+	
+	static const REGISTER_TEST ModifyRegisters[]  
+		= {
+			BlackfinDiagRegModifyReg3Chk,
+            BlackfinDiagRegModifyReg2Chk,
+            BlackfinDiagRegModifyReg1Chk,
+            BlackfinDiagRegModifyReg0Chk
+          };
+	static const UINT32 NumberOfModifyRegTests = sizeof(ModifyRegisters)/sizeof( REGISTER_TEST );
+
+	static const REGISTER_TEST LengthRegisters[]  
+		= {
+			BlackfinDiagRegLengthReg3Chk,
+            BlackfinDiagRegLengthReg2Chk,
+            BlackfinDiagRegLengthReg1Chk,
+            BlackfinDiagRegLengthReg0Chk
+          };
+	static const UINT32 NumberOfLengthRegTests = sizeof(LengthRegisters)/sizeof( REGISTER_TEST );
+
+	static const REGISTER_TEST IndexRegisters[]   
+		= {
+			BlackfinDiagRegIndexReg3Chk,
+            BlackfinDiagRegIndexReg2Chk,
+            BlackfinDiagRegIndexReg1Chk,
+            BlackfinDiagRegIndexReg0Chk
+          };
+	static const UINT32 NumberOfIndexRegTests = sizeof(IndexRegisters)/sizeof( REGISTER_TEST );
+
+	static const REGISTER_TEST BaseRegisters[]    
+		= {
+			BlackfinDiagRegBaseReg3Chk,
+    	    BlackfinDiagRegBaseReg2Chk,
+            BlackfinDiagRegBaseReg1Chk,
+            BlackfinDiagRegBaseReg0Chk
+          };
+	static const UINT32 NumberOfBaseRegTests = sizeof(BaseRegisters)/sizeof( REGISTER_TEST );
+
+	typedef struct {
+		UINT32         FailureNumber;
+		UINT32         TestType;
+		UINT32         FailurePatternIdx;
+	} RegisterFailureData;
+	
+	
 	enum TestState
 	{
-		TEST_LOOP_COMPLETE = 0,
-		TEST_IN_PROGRESS = 1,
-		TEST_FAILURE = 2
+		TEST_LOOP_COMPLETE,
+		TEST_IN_PROGRESS,
+		TEST_FAILURE
 	};
 
- /*   enum RuntimeTestList
-    {
-        DGN_SAFE_RAM_NUM,            // Safe RAM data test
-        DGN_INSTRUCTION_RAM,
-        DGN_TIMER,                   // Timer diagnostic
-        DGN_EXE_CRC_NUM,             // Executable RAM checksum
-        DGN_RAM_DATA_NUM,            // RAM data test
-        DGN_NUM_RUNTIME_TESTS        // Total entries in runtime test list
-    }; */
+	typedef enum DiagnosticTestTypes {
+		DiagDataRam,
+		DiagInstructionRam,
+		DiagRegisterTest,
+		DiagInstuctionTest } DiagnosticTestTypes;
+	
 	struct DiagControlBlock
 	{
 		UINT32 triggerValueTimeslice;       // Timeslice number for next trigger
@@ -91,6 +207,8 @@ namespace BlackfinDiagnosticGlobals {
 		return ra + N;
 	}
 	
+    static const UINT32 DataRegisterTestPatterns[] = {0xffffffff, 0, 0xaaaaaaaa, 0x55555555};
+    
 	class BlackfinDiagTest {
 	public:
 		//BlackfinDiagTest( DGN_CTL_BLK dgn ) : dgnParams(dgn){}
@@ -137,7 +255,7 @@ namespace BlackfinDiagnosticGlobals {
 	};
 
 
-    #define firmExcept();//(__FILE__, __LINE__)
+    #define firmExcept( uiError );//OS_Assert( uiError, __FILE__, __LINE__ );           
 
 	const UINT32 DGN_CODE_SPACE_START            = 0x20000;    // Code RAM begin addr
 
@@ -151,7 +269,7 @@ namespace BlackfinDiagnosticGlobals {
 
     const UINT32 DGN_INT_SHR_RAM_END             = 0x30000;    // Internal shared RAM end+1
 
-	const UINT32 DGN_INTERVALS_PER_MINUTE       = 12000;      // (60 * 1000000) / 50000;
+	const UINT32 DGN_INTERVALS_PER_MINUTE        = 12000;      // (60 * 1000000) / 50000;
 
     const UINT32 SLICE_TIME_LIMIT_US             = 10;         // Max allowed time (us)
 

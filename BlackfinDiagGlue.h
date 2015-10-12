@@ -1,7 +1,0 @@
-#ifndef BLACKFIN_TO_APEX_GLUE_DEF
-#define BLACKFIN_TO_APEX_GLUE_DEF
-
-#define BLACKFIN_BUILD
-
-#endif
-

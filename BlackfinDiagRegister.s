@@ -1,38 +1,5 @@
 #include <asm_sprt.h>                              /* Added for ssync( ), cli/sti( ) */
-
-#define AllOnesPattern       0xffff
-#define AllZerosPattern      0
-#define AlternatingOnesZeros 0xaaaa
-#define AlternatingZerosOnes 0x5555
-
-#define FirstSanityCheckFail        1
-#define SecondSanityCheckFail       2
-#define ThirdSanityCheckFail        3
-#define FourthSanityCheckFail       4
-#define FifthSanityCheckFail        5
-#define SixthSanityCheckFail        6
-#define SeventhSanityCheckFail      7
-#define EighthSanityCheckFail       8
-#define NinethSanityCheckFail       9
-#define TenthSanityCheckFail       10
-#define EleventhSanityCheckFail    11
-#define TwelthSanityCheckFail      12
-#define ThirteenthSanityCheckFail  13
-#define FourteenthSanityCheckFail  14
-#define FifteenthSanityCheckFail   15
-#define SixteenthSanityCheckFail   16
-#define DataRegFailure             1
-#define PointerRegFailure          2
-#define R7Failure                  4
-#define R6Failure                  3
-#define R5Failure                  2
-#define R4Failure                  1
-#define R3Failure                  0
-#define P5Failure                  5    
-#define P4Failure                  4    
-#define P3Failure                  3    
-#define P2Failure                  2    
-#define P0Failure                  0    
+#include "BlackfinDiagRegTestCommon.h"
 
 	.section/DOUBLEANY program;
 	.align 4;
@@ -52,133 +19,145 @@ _BlackfinDiagRegSanityChk:
     r1.h = AllOnesPattern;
     r1.l = AllOnesPattern;
     cc = r0 == r1;
-    if cc jump FirstSanityCheckPassed;
+    if cc jump R0R1AllOnesPassed;
     //
     // First Sanity Check Failure Indicate as such upon return.
     //
-    r0 = FirstSanityCheckFail;
-    jump Exit;
+    r0.l = SanityCheckFailure | R0R1SanityCheckFail;
+    // r0.h Already has the FailurePattern
+    jump.s Exit;
 
-FirstSanityCheckPassed:
+R0R1AllOnesPassed:
 	r2.h = AllOnesPattern;
 	r2.l = AllOnesPattern;
 	
     cc = r0 == r2;
-    if cc jump SecondSanityCheckPassed;
+    if cc jump R0R2AllOnesPassed;
     //
     // Second Sanity Check Failure Indicate as such upon return.
     //
-    r0 = SecondSanityCheckFail;
-    jump Exit;
+    r0.l = SanityCheckFailure | R0R2SanityCheckFail;
+    // r0.h Already has the FailurePattern
+    jump.s Exit;
 
-SecondSanityCheckPassed:
+R0R2AllOnesPassed:
     cc = r1 == r2;
-    if cc jump ThirdSanityCheckPassed;
+    if cc jump R1R2AllOnesPassed;
     //
     // Third Sanity Check Failure Indicate as such upon return.
     //
-    r0 = ThirdSanityCheckFail;
-    jump Exit;
+    r0.l = SanityCheckFailure | R1R2SanityCheckFail;
+    // r0.h Already has the FailurePattern
+    jump.s Exit;
 
-ThirdSanityCheckPassed:
+R1R2AllOnesPassed:
     r0.h = AllZerosPattern;
     r0.l = AllZerosPattern;  // All zeros
     r1.h = AllZerosPattern;
     r1.l = AllZerosPattern;
     cc = r0 == r1;
-    if cc jump FourthSanityCheckPassed;
+    if cc jump R0R1AllZerosPassed;
     //
     // Fourth Sanity Check Failure Indicate as such upon return.
     //
-    r0 = FourthSanityCheckFail;
-    jump Exit;
+    r0.l = SanityCheckFailure | R0R1SanityCheckFail;
+    // r0.h Already has the FailurePattern
+    jump.s Exit;
 
-FourthSanityCheckPassed:
+R0R1AllZerosPassed:
 	r2.h = AllZerosPattern;
 	r2.l = AllZerosPattern;
     cc = r0 == r2;
-    if cc jump FifthSanityCheckPassed;
+    if cc jump R0R2AllZerosPassed;
     //
     // Fifth Sanity Check Failure Indicate as such upon return.
     //
-    r0 = FifthSanityCheckFail;
-    jump Exit;
+    r0.l = SanityCheckFailure | R0R2SanityCheckFail;
+    // r0.h Already has the FailurePattern
+    jump.s Exit;
 
-FifthSanityCheckPassed:
+R0R2AllZerosPassed:
     cc = r1 == r2;
-    if cc jump SixthSanityCheckPassed;
+    if cc jump R1R2AllZerosPassed;
     //
     // Sixth Sanity Check Failure Indicate as such upon return.
     //
-    r0 = SixthSanityCheckFail;
+    r0.l = SanityCheckFailure | R1R2SanityCheckFail;
+    // r0.h Already has the FailurePattern
 Exit:
     unlink;
     rts;
-SixthSanityCheckPassed:
+R1R2AllZerosPassed:
     r0.h = AlternatingOnesZeros;
     r0.l = AlternatingOnesZeros;  // Alternating ones, zeros
     r1.h = AlternatingOnesZeros;
     r1.l = AlternatingOnesZeros;
     cc = r0 == r1;
-    if cc jump SeventhSanityCheckPassed;
+    if cc jump R0R1AltOnesZerosPassed;
     //
     // Seventh Sanity Check Failure Indicate as such upon return.
     //
-    r0 = SeventhSanityCheckFail;
-    jump Exit;
+    r0.l = SanityCheckFailure | R0R1SanityCheckFail;
+    // r0.h Already has the FailurePattern
+    jump.s Exit;
 
-SeventhSanityCheckPassed:
+R0R1AltOnesZerosPassed:
 	r2.h = AlternatingOnesZeros;
 	r2.l = AlternatingOnesZeros;
     cc = r0 == r2;
-    if cc jump EighthSanityCheckPassed;
+    if cc jump R0R2AltOnesZerosPassed;
     //
     // Eighth Sanity Check Failure Indicate as such upon return.
     //
-    r0 = EighthSanityCheckFail;
-    jump Exit;
+    r0.l = SanityCheckFailure | R0R2SanityCheckFail;
+    // r0.h Already has the FailurePattern
+    jump.s Exit;
 
-EighthSanityCheckPassed:
+R0R2AltOnesZerosPassed:
     cc = r1 == r2;
-    if cc jump NinethSanityCheckPassed;
+    if cc jump R1R2AltOnesZerosPassed;
     //
     // Nineth Sanity Check Failure Indicate as such upon return.
     //
-    r0 = NinethSanityCheckFail;
-    jump Exit;
-NinethSanityCheckPassed:
+    r0.l = SanityCheckFailure | R1R2SanityCheckFail;
+    // r0.h Already has the FailurePattern
+    jump.s Exit;
+R1R2AltOnesZerosPassed:
     r0.h = AlternatingZerosOnes;
     r0.l = AlternatingZerosOnes;  // Alternating ones, zeros
     r1.h = AlternatingZerosOnes;
     r1.l = AlternatingZerosOnes;
     cc = r0 == r1;
-    if cc jump TenthSanityCheckPassed;
+    if cc jump R0R1AltZerosOnesPassed;
     //
     // Tenth Sanity Check Failure Indicate as such upon return.
     //
-    r0 = TenthSanityCheckFail;
-    jump Exit;
+    r0.l = SanityCheckFailure | R0R1SanityCheckFail;
+    // r0.h Already has the FailurePattern
+    jump.s Exit;
 
-TenthSanityCheckPassed:
+R0R1AltZerosOnesPassed:
 	r2.h = AlternatingZerosOnes;
 	r2.l = AlternatingZerosOnes;
     cc = r0 == r2;
-    if cc jump EleventhSanityCheckPassed;
+    if cc jump R0R2AltZerosOnesPassed;
     //
     // Eleventh Sanity Check Failure Indicate as such upon return.
     //
-    r0 = EleventhSanityCheckFail;
-    jump Exit;
+    r0.l = SanityCheckFailure | R0R2SanityCheckFail;
+    // r0.h Already has the FailurePattern
+    jump.s Exit;
 
-EleventhSanityCheckPassed:
+R0R2AltZerosOnesPassed:
     cc = r1 == r2;
-    if cc jump TwelthSanityCheckPassed;
+    if cc jump R1R2AltZerosOnesPassed;
     //
     // Twelth Sanity Check Failure Indicate as such upon return.
     //
-    r0 = TwelthSanityCheckFail;
-    jump Exit;
-TwelthSanityCheckPassed:
+    r0.l = SanityCheckFailure | R1R2SanityCheckFail;
+    // r0.h Already has the FailurePattern
+    jump.s Exit;
+R1R2AltZerosOnesPassed:
 //
 // At this point we know that r0-r2 are at least comparing inverting pattens correctly.
 // So we'll assume they are working based on the results.  We need P1 to loop through
@@ -190,55 +169,61 @@ TwelthSanityCheckPassed:
     p1.l = AllOnesPattern;
     r1 = p1;
     cc = r0 == r1;
-    if cc jump ThirteenthSanityCheckPassed;
+    if cc jump P0AllOnesPassed;
     //
     // Thirteenth Sanity Check Failure Indicate as such upon return.
     //
-    r0 = ThirteenthSanityCheckFail;
-    jump Exit;
-ThirteenthSanityCheckPassed:
+    r0.l = SanityCheckFailure | P0SanityCheckFail;
+    // r0.h Already has the FailurePattern
+    jump.s Exit;
+P0AllOnesPassed:
     r0.h = AllZerosPattern;
     r0.l = AllZerosPattern;
     p1.h = AllZerosPattern;
     p1.l = AllZerosPattern;
     r1 = p1;
     cc = r0 == r1;
-    if cc jump FourteenthSanityCheckPassed;
+    if cc jump P0AllZerosPassed;
     //
     // Fourteenth Sanity Check Failure Indicate as such upon return.
     //
-    r0 = FourteenthSanityCheckFail;
-    jump Exit;
-FourteenthSanityCheckPassed:
+    r0.l = SanityCheckFailure | P0SanityCheckFail;
+    // r0.h Already has the FailurePattern
+    jump.s Exit;
+P0AllZerosPassed:
     r0.h = AlternatingOnesZeros;
     r0.l = AlternatingOnesZeros;
     p1.h = AlternatingOnesZeros;
     p1.l = AlternatingOnesZeros;
     r1 = p1;
     cc = r0 == r1;
-    if cc jump FifteenthSanityCheckPassed;
+    if cc jump P0AltOnesZerosPassed;
     //
     // Fifteenth Sanity Check Failure Indicate as such upon return.
     //
-    r0 = FifteenthSanityCheckFail;
-    jump Exit;
-FifteenthSanityCheckPassed:
+    r0.l = SanityCheckFailure | P0SanityCheckFail;
+    // r0.h Already has the FailurePattern
+    jump.s Exit;
+P0AltOnesZerosPassed:
     r0.h = AlternatingZerosOnes;
     r0.l = AlternatingZerosOnes;
     p1.h = AlternatingZerosOnes;
     p1.l = AlternatingZerosOnes;
     r1 = p1;
     cc = r0 == r1;
-    if cc jump SixteenthSanityCheckPassed;
+    if cc jump P0AltZerosOnesPassed;
     //
     // Sixteenth Sanity Check Failure Indicate as such upon return.
     //
-    r0 = SixteenthSanityCheckFail;
-    jump Exit;
-SixteenthSanityCheckPassed:
+    r0.l = SanityCheckFailure | P0SanityCheckFail;
+    // r0.h Already has the FailurePattern
+    jump.s Exit;
+P0AltZerosOnesPassed:
     r0 = 0;              // Test passed
-    jump Exit;
+    jump.s Exit;
+_BlackfinDiagRegSanityChk.end:
 
+	
 _BlackfinDiagRegDataReg7Chk:
 	link 0;
 //
@@ -281,17 +266,19 @@ NextR7Pattern:
 	
 	if cc jump R7Continue;     // Yes try for another pattern to test against
 	
-    r0.h = DataRegFailure;     // No
-    r0.l = R7Failure;          // Indicated error type to the caller
+	r0 = r2;                           // Save index of pattern failure in upper 16 bits
+    r0 <<= 16;
+    r0.l = DataRegFailure | R7Failure; // Indicated error type to the caller
     
-    jump R7Exit;               
+    jump.s R7Exit;               
 
 R7Continue:
 	r2 += 1;
 	
 	p1 += 4;
 	
-	jump CheckR7;
+	jump.s CheckR7;
+_BlackfinDiagRegDataReg7Chk.end:
 
 _BlackfinDiagRegDataReg6Chk:
 	link 0;
@@ -335,17 +322,19 @@ NextR6Pattern:
 	
 	if cc jump R6Continue;     // Yes try for another pattern to test against
 	
-    r0.h = DataRegFailure;     // No
-    r0.l = R6Failure;          // Indicated error type to the caller
+	r0 = r2;                           // Save index of pattern failure in upper 16 bits
+    r0 <<= 16;                         // 
+    r0.l = DataRegFailure | R6Failure; // Indicated error type to the caller
     
-    jump R6Exit;               
+    jump.s R6Exit;               
 
 R6Continue:
 	r2 += 1;
 	
 	p1 += 4;
 	
-	jump CheckR6;
+	jump.s CheckR6;
+_BlackfinDiagRegDataReg6Chk.end:
 
 _BlackfinDiagRegDataReg5Chk:
 	link 0;
@@ -389,17 +378,20 @@ NextR5Pattern:
 	
 	if cc jump R5Continue;     // Yes try for another pattern to test against
 	
-    r0.h = DataRegFailure;     // No
-    r0.l = R5Failure;          // Indicated error type to the caller
+	r0 = r2;                           // Save index of pattern failure in upper 16 bits
+    r0 <<= 16;                         // 
+    r0.l = DataRegFailure | R5Failure; // Indicated error type to the caller    
     
-    jump R5Exit;               
+    jump.s R5Exit;               
 
 R5Continue:
 	r2 += 1;
 	
 	p1 += 4;
 	
-	jump CheckR5;
+	jump.s CheckR5;
+
+_BlackfinDiagRegDataReg5Chk.end:
 
 _BlackfinDiagRegDataReg4Chk:
 	link 0;
@@ -443,17 +435,21 @@ NextR4Pattern:
 	
 	if cc jump R4Continue;     // Yes try for another pattern to test against
 	
-    r0.h = DataRegFailure;     // No
-    r0.l = R4Failure;          // Indicated error type to the caller
+	r0 = r2;                           // Save index of pattern failure in upper 16 bits
+    r0 <<= 16;                         // 
+    r0.l = DataRegFailure | R4Failure; // Indicated error type to the caller
     
-    jump R6Exit;               
+    
+    jump.s R4Exit;               
 
 R4Continue:
 	r2 += 1;
 	
 	p1 += 4;
 	
-	jump CheckR4;
+	jump.s CheckR4;
+
+_BlackfinDiagRegDataReg4Chk.end:
 
 _BlackfinDiagRegDataReg3Chk:
 	link 0;
@@ -497,17 +493,19 @@ NextR3Pattern:
 	
 	if cc jump R3Continue;     // Yes try for another pattern to test against
 	
-    r0.h = DataRegFailure;     // No
-    r0.l = R3Failure;          // Indicated error type to the caller
-    
-    jump R6Exit;               
+	r0 = r2;                           // Save index of pattern failure in upper 16 bits
+    r0 <<= 16;                         // 
+    r0.l = DataRegFailure | R3Failure; // Indicated error type to the caller
+    jump.s R3Exit;               
 
 R3Continue:
 	r2 += 1;
 	
 	p1 += 4;
 	
-	jump CheckR3;
+	jump.s CheckR3;
+
+_BlackfinDiagRegDataReg3Chk.end:
 
 _BlackfinDiagRegPointerReg5Chk:
 	link 8;
@@ -561,16 +559,16 @@ NextP5Pattern:
 	
 	nop;
 
-		r2 = p5;
+	r2 = p5;
 			
 	cc = r0 == r2;             // Patterns Match?
 	
 	if cc jump P5Continue;     // Yes try for another pattern to test against
 	
-    r0.h = PointerRegFailure;  // No
-    r0.l = P5Failure;          // Indicated error type to the caller
-    
-    jump P5Exit;               
+    r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                            // 
+    r0.l = PointerRegFailure | P5Failure; // Indicated error type to the caller
+    jump.s P5Exit;               
 
 P5Continue:
 	r2 = [fp+4];
@@ -579,7 +577,8 @@ P5Continue:
 	
 	p1 += 4;
 	
-	jump CheckP5;
+	jump.s CheckP5;
+_BlackfinDiagRegPointerReg5Chk.end:
 
 _BlackfinDiagRegPointerReg4Chk:
 	link 8;
@@ -639,10 +638,11 @@ NextP4Pattern:
 	
 	if cc jump P4Continue;     // Yes try for another pattern to test against
 	
-    r0.h = PointerRegFailure;  // No
-    r0.l = P4Failure;          // Indicated error type to the caller
+    r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                            // 
+    r0.l = PointerRegFailure | P4Failure; // Indicated error type to the caller
     
-    jump P4Exit;               
+    jump.s P4Exit;               
 
 P4Continue:
 	r2 = [fp+4];
@@ -651,7 +651,8 @@ P4Continue:
 	
 	p1 += 4;
 	
-	jump CheckP4;
+	jump.s CheckP4;
+_BlackfinDiagRegPointerReg4Chk.end:
 
 _BlackfinDiagRegPointerReg3Chk:
 	link 8;
@@ -710,10 +711,12 @@ NextP3Pattern:
 	
 	if cc jump P3Continue;     // Yes try for another pattern to test against
 	
-    r0.h = PointerRegFailure;  // No
-    r0.l = P3Failure;          // Indicated error type to the caller
+    r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                            // 
+    r0.l = PointerRegFailure | P3Failure; // Indicated error type to the caller
     
-    jump P3Exit;               
+    
+    jump.s P3Exit;               
 
 P3Continue:
 	r2 = [fp+4];
@@ -722,7 +725,8 @@ P3Continue:
 	
 	p1 += 4;
 	
-	jump CheckP3;
+	jump.s CheckP3;
+_BlackfinDiagRegPointerReg3Chk.end:
 
 _BlackfinDiagRegPointerReg2Chk:
 	link 8;
@@ -782,10 +786,12 @@ NextP2Pattern:
 	
 	if cc jump P2Continue;     // Yes try for another pattern to test against
 	
-    r0.h = PointerRegFailure;  // No
-    r0.l = P2Failure;          // Indicated error type to the caller
+    r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                            //
+    r0.l = PointerRegFailure | P2Failure; // Indicated error type to the caller
     
-    jump P2Exit;               
+    
+    jump.s P2Exit;               
 
 P2Continue:
 	r2 = [fp+4];
@@ -794,7 +800,8 @@ P2Continue:
 	
 	p1 += 4;
 	
-	jump CheckP2;
+	jump.s CheckP2;
+_BlackfinDiagRegPointerReg2Chk.end:
 
 _BlackfinDiagRegPointerReg0Chk:
 	link 8;
@@ -854,10 +861,12 @@ NextP0Pattern:
 	
 	if cc jump P0Continue;     // Yes try for another pattern to test against
 	
-    r0.h = PointerRegFailure;  // No
-    r0.l = P0Failure;          // Indicated error type to the caller
+    r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                            // 
+    r0.l = PointerRegFailure | P0Failure; // Indicated error type to the caller
     
-    jump P0Exit;               
+    
+    jump.s P0Exit;               
 
 P0Continue:
 	r2 = [fp+4];
@@ -866,9 +875,1388 @@ P0Continue:
 	
 	p1 += 4;
 	
-	jump CheckP0;
+	jump.s CheckP0;
+_BlackfinDiagRegPointerReg0Chk.end:
 
+_BlackfinDiagAccum0Chk:
+	link 8;
+//
+// Preserve Callers p0 register
+//
+ 	[--sp] = a0.w;
+ 	[--sp] = a0.x;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckA0:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextA0Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Accum0Exit:
+//
+// Restore caller's a0
+//
+	a0.x = [sp++];
+	a0.w = [sp++];
+	
+	unlink;
+	rts;    
+
+NextA0Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                 // Load next pattern
+	
+	a0.x = r0.l;
+	
+	a0.w = r0;
+	
+	r2 = a0.w;
+				
+	cc = r0 == r2;             // Patterns Match?
+	
+	if cc jump Accum0ContinueWithX;     // Yes try for another pattern to test against
+	
+Accum0Failure:
+    r0 = [fp+4];                       // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                         // 
+    r0.l = AccumFailure | A0Failure32; // Indicated error type to the caller
+    
+    
+    jump.s Accum0Exit;  
+                 
+Accum0ContinueWithX:
+
+	r2 = 0xff;
+	
+	r0 = r0 & r2;
+	
+	r2.l = a0.x;
+	
+	cc = r0 == r2;
+
+	if cc jump Accum0Continue;     // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                       // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                         // 
+    r0.l = AccumFailure | A0Failure8;  // Indicated error type to the caller
+    
+    
+    jump.s Accum0Exit;  
+	
+Accum0Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckA0;
+_BlackfinDiagAccum0Chk.end:
+
+_BlackfinDiagAccum1Chk:
+	link 8;
+//
+// Preserve Callers p0 register
+//
+ 	[--sp] = a1.w;
+ 	[--sp] = a1.x;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckA1:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextA1Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Accum1Exit:
+//
+// Restore caller's a1
+//
+	a1.x = [sp++];
+	a1.w = [sp++];
+	
+	unlink;
+	rts;    
+
+NextA1Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                 // Load next pattern
+	
+	a1.x = r0.l;
+	
+	a1.w = r0;
+	
+	r2 = a1.w;
+				
+	cc = r0 == r2;             // Patterns Match?
+	
+	if cc jump Accum1ContinueWithX;     // Yes try for another pattern to test against
+	
+Accum1Failure:
+    r0 = [fp+4];                       // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                         // 
+    r0.l = AccumFailure | A1Failure32; // Indicated error type to the caller
+    jump.s Accum1Exit;  
+                 
+Accum1ContinueWithX:
+
+	r2 = 0xff;
+	
+	r0 = r0 & r2;
+	
+	r2.l = a1.x;
+	
+	cc = r0 == r2;
+
+	if cc jump Accum1Continue;     // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                       // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                         // 
+    r0.l = AccumFailure | A1Failure8;  // Indicated error type to the caller
+    jump.s Accum1Exit;  
+	
+Accum1Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckA1;
+_BlackfinDiagAccum1Chk.end:
+
+_BlackfinDiagRegIndexReg0Chk:
+	link 8;
+//
+// Preserve Callers i0 register
+//
+ 	[--sp] = i0;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckIdx0:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextIdx0Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Idx0Exit:
+//
+// Restore caller's i0
+//
+	i0 = [sp++];
+	unlink;
+	rts;    
+
+NextIdx0Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                 // Load next pattern
+	
+	i0 = r0;
+	
+	nop;                       // Assembler warning need extra cycles for read after right
+	                           // Could change the order but I think this is more indicative
+	                           // of the requirement.
+	
+	nop;
+	
+	nop;
+	
+	nop;
+
+	r2 = i0;
+			
+	cc = r0 == r2;             // Patterns Match?
+	
+	if cc jump Idx0Continue;     // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                            // 
+    r0.l = IndexRegFailure | Idx0Failure; // Indicated error type to the caller
+    
+    
+    jump.s Idx0Exit;               
+
+Idx0Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckIdx0;
+_BlackfinDiagRegIndexReg0Chk.end:
+
+_BlackfinDiagRegIndexReg1Chk:
+	link 8;
+//
+// Preserve Callers i1 register
+//
+ 	[--sp] = i1;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckIdx1:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextIdx1Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Idx1Exit:
+//
+// Restore caller's i1
+//
+	i1 = [sp++];
+	unlink;
+	rts;    
+
+NextIdx1Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                 // Load next pattern
+	
+	i1 = r0;
+	
+	nop;                       // Assembler warning need extra cycles for read after right
+	                           // Could change the order but I think this is more indicative
+	                           // of the requirement.
+	
+	nop;
+	
+	nop;
+	
+	nop;
+
+	r2 = i1;
+			
+	cc = r0 == r2;             // Patterns Match?
+	
+	if cc jump Idx1Continue;     // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                            // 
+    r0.l = IndexRegFailure | Idx1Failure; // Indicated error type to the caller
+    
+    
+    jump.s Idx1Exit;               
+
+Idx1Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckIdx1;
+	
+_BlackfinDiagRegIndexReg1Chk.end:
+
+_BlackfinDiagRegIndexReg2Chk:
+	link 8;
+//
+// Preserve Callers i2 register
+//
+ 	[--sp] = i2;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckIdx2:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextIdx0Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Idx2Exit:
+//
+// Restore caller's i2
+//
+	i2 = [sp++];
+	unlink;
+	rts;    
+
+NextIdx2Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                 // Load next pattern
+	
+	i2 = r0;
+	
+	nop;                       // Assembler warning need extra cycles for read after right
+	                           // Could change the order but I think this is more indicative
+	                           // of the requirement.
+	
+	nop;
+	
+	nop;
+	
+	nop;
+
+	r2 = i2;
+			
+	cc = r0 == r2;             // Patterns Match?
+	
+	if cc jump Idx2Continue;     // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                            // 
+    r0.l = IndexRegFailure | Idx2Failure; // Indicated error type to the caller
+    
+    
+    jump.s Idx2Exit;               
+
+Idx2Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckIdx2;
+_BlackfinDiagRegIndexReg2Chk.end:
+
+_BlackfinDiagRegIndexReg3Chk:
+	link 8;
+//
+// Preserve Callers i3 register
+//
+ 	[--sp] = i3;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckIdx3:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextIdx3Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Idx3Exit:
+//
+// Restore caller's i3
+//
+	i3 = [sp++];
+	unlink;
+	rts;    
+
+NextIdx3Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                 // Load next pattern
+	
+	i3 = r0;
+	
+	nop;                       // Assembler warning need extra cycles for read after right
+	                           // Could change the order but I think this is more indicative
+	                           // of the requirement.
+	
+	nop;
+	
+	nop;
+	
+	nop;
+
+	r2 = i3;
+			
+	cc = r0 == r2;             // Patterns Match?
+	
+	if cc jump Idx3Continue;     // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                            // 
+    r0.l = IndexRegFailure | Idx3Failure; // Indicated error type to the caller
+    
+    
+    jump.s Idx3Exit;               
+
+Idx3Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckIdx3;
+	
+_BlackfinDiagRegIndexReg3Chk.end:
+
+_BlackfinDiagRegModifyReg0Chk:
+	link 8;
+//
+// Preserve Callers m0 register
+//
+ 	[--sp] = m0;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckMdfy0:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextMdfy0Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Mdfy0Exit:
+//
+// Restore caller's m0
+//
+	m0 = [sp++];
+	unlink;
+	rts;    
+
+NextMdfy0Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                                // Load next pattern
+	
+	m0 = r0;
+	
+	nop;                                     // Assembler warning need extra cycles for read after right
+	                                         // Could change the order but I think this is more indicative
+	                                         // of the requirement.
+	
+	nop;
+	
+	nop;
+	
+	nop;
+
+	r2 = m0;
+			
+	cc = r0 == r2;                            // Patterns Match?
+	
+	if cc jump Mdfy0Continue;                 // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                              // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                                // 
+    r0.l = ModifyRegFailure | Modify0Failure; // Indicated error type to the caller
+    
+    
+    jump.s Mdfy0Exit;               
+
+Mdfy0Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckMdfy0;
+_BlackfinDiagRegModifyReg0Chk.end:
+
+_BlackfinDiagRegModifyReg1Chk:
+	link 8;
+//
+// Preserve Callers m1 register
+//
+ 	[--sp] = m1;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckMdfy1:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextMdfy1Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Mdfy1Exit:
+//
+// Restore caller's m1
+//
+	m1 = [sp++];
+	unlink;
+	rts;    
+
+NextMdfy1Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                 // Load next pattern
+	
+	m1 = r0;
+	
+	nop;                       // Assembler warning need extra cycles for read after right
+	                           // Could change the order but I think this is more indicative
+	                           // of the requirement.
+	
+	nop;
+	
+	nop;
+	
+	nop;
+
+	r2 = m1;
+			
+	cc = r0 == r2;             // Patterns Match?
+	
+	if cc jump Mdfy1Continue;     // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                              // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                                // 
+    r0.l = ModifyRegFailure | Modify1Failure; // Indicated error type to the caller
+    
+    
+    jump.s Mdfy1Exit;               
+
+Mdfy1Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckMdfy1;
+_BlackfinDiagRegModifyReg1Chk.end:
+
+_BlackfinDiagRegModifyReg2Chk:
+	link 8;
+//
+// Preserve Callers m2 register
+//
+ 	[--sp] = m2;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckMdfy2:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextMdfy2Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Mdfy2Exit:
+//
+// Restore caller's m2
+//
+	m2 = [sp++];
+	unlink;
+	rts;    
+
+NextMdfy2Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                                // Load next pattern
+	
+	m2 = r0;
+	
+	nop;                                      // Assembler warning need extra cycles for read after right
+	                                          // Could change the order but I think this is more indicative
+	                                          // of the requirement.
+	
+	nop;
+	
+	nop;
+	
+	nop;
+
+	r2 = m2;
+			
+	cc = r0 == r2;                            // Patterns Match?
+	
+	if cc jump Mdfy2Continue;                 // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                              // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                                // 
+    r0.l = ModifyRegFailure | Modify2Failure; // Indicated error type to the caller
+    
+    
+    jump.s Mdfy2Exit;               
+
+Mdfy2Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckMdfy2;
+_BlackfinDiagRegModifyReg2Chk.end:
+
+_BlackfinDiagRegModifyReg3Chk:
+	link 8;
+//
+// Preserve Callers m3 register
+//
+ 	[--sp] = m3;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckMdfy3:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextMdfy3Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Mdfy3Exit:
+//
+// Restore caller's i0
+//
+	m3 = [sp++];
+	unlink;
+	rts;    
+
+NextMdfy3Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                 // Load next pattern
+	
+	m3 = r0;
+	
+	nop;                       // Assembler warning need extra cycles for read after right
+	                           // Could change the order but I think this is more indicative
+	                           // of the requirement.
+	
+	nop;
+	
+	nop;
+	
+	nop;
+
+	r2 = m3;
+			
+	cc = r0 == r2;             // Patterns Match?
+	
+	if cc jump Mdfy3Continue;     // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                              // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                                // 
+    r0.l = ModifyRegFailure | Modify3Failure; // Indicated error type to the caller
+    
+    
+    jump.s Mdfy3Exit;               
+
+Mdfy3Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckMdfy3;
+_BlackfinDiagRegModifyReg3Chk.end:
+
+_BlackfinDiagRegLengthReg0Chk:
+	link 8;
+//
+// Preserve Callers l0 register
+//
+ 	[--sp] = l0;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckLength0:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextLength0Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Length0Exit:
+//
+// Restore caller's l0
+//
+	l0 = [sp++];
+	unlink;
+	rts;    
+
+NextLength0Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                 // Load next pattern
+	
+	l0 = r0;
+	
+	nop;                       // Assembler warning need extra cycles for read after right
+	                           // Could change the order but I think this is more indicative
+	                           // of the requirement.
+	
+	nop;
+	
+	nop;
+	
+	nop;
+
+	r2 = l0;
+			
+	cc = r0 == r2;             // Patterns Match?
+	
+	if cc jump Length0Continue;     // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                              // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                                // 
+    r0.l = LengthRegFailure | Length0Failure; // Indicated error type to the caller
+    
+    
+    jump.s Length0Exit;               
+
+Length0Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckLength0;
+_BlackfinDiagRegLengthReg0Chk.end:
+
+_BlackfinDiagRegLengthReg1Chk:
+	link 8;
+//
+// Preserve Callers l1 register
+//
+ 	[--sp] = l1;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckLength1:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextLength1Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Length1Exit:
+//
+// Restore caller's l1
+//
+	l1 = [sp++];
+	unlink;
+	rts;    
+
+NextLength1Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                 // Load next pattern
+	
+	l1 = r0;
+	
+	nop;                       // Assembler warning need extra cycles for read after right
+	                           // Could change the order but I think this is more indicative
+	                           // of the requirement.
+	
+	nop;
+	
+	nop;
+	
+	nop;
+
+	r2 = l1;
+			
+	cc = r0 == r2;             // Patterns Match?
+	
+	if cc jump Length1Continue;     // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                              // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                                // 
+    r0.l = LengthRegFailure | Length1Failure; // Indicated error type to the caller
+    
+    
+    jump.s Length1Exit;               
+
+Length1Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckLength1;
+_BlackfinDiagRegLengthReg1Chk.end:
+
+_BlackfinDiagRegLengthReg2Chk:
+	link 8;
+//
+// Preserve Callers l2 register
+//
+ 	[--sp] = l2;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckLength2:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextLength2Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Length2Exit:
+//
+// Restore caller's l2
+//
+	l2 = [sp++];
+	unlink;
+	rts;    
+
+NextLength2Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                 // Load next pattern
+	
+	l2 = r0;
+	
+	nop;                       // Assembler warning need extra cycles for read after right
+	                           // Could change the order but I think this is more indicative
+	                           // of the requirement.
+	
+	nop;
+	
+	nop;
+	
+	nop;
+
+	r2 = l2;
+			
+	cc = r0 == r2;             // Patterns Match?
+	
+	if cc jump Length2Continue;     // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                              // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                                // 
+    r0.l = LengthRegFailure | Length2Failure; // Indicated error type to the caller
+    
+    
+    jump.s Length2Exit;               
+
+Length2Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckLength2;
+_BlackfinDiagRegLengthReg2Chk.end:
+
+_BlackfinDiagRegLengthReg3Chk:
+	link 8;
+//
+// Preserve Callers l3 register
+//
+ 	[--sp] = l3;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckLength3:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextLength3Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Length3Exit:
+//
+// Restore caller's l3
+//
+	l3 = [sp++];
+	unlink;
+	rts;    
+
+NextLength3Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                 // Load next pattern
+	
+	l3 = r0;
+	
+	nop;                       // Assembler warning need extra cycles for read after right
+	                           // Could change the order but I think this is more indicative
+	                           // of the requirement.
+	
+	nop;
+	
+	nop;
+	
+	nop;
+
+	r2 = l3;
+			
+	cc = r0 == r2;                            // Patterns Match?
+	
+	if cc jump Length3Continue;               // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                              // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                                // 
+    r0.l = LengthRegFailure | Length3Failure; // Indicated error type to the caller
+    
+    
+    jump.s Length3Exit;               
+
+Length3Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckLength3;
+_BlackfinDiagRegLengthReg3Chk.end:
+
+_BlackfinDiagRegBaseReg0Chk:
+	link 8;
+//
+// Preserve Callers l0 register
+//
+ 	[--sp] = b0;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckBase0:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextBase0Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Base0Exit:
+//
+// Restore caller's b0
+//
+	b0 = [sp++];
+	unlink;
+	rts;    
+
+NextBase0Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                 // Load next pattern
+	
+	b0 = r0;
+	
+	nop;                       // Assembler warning need extra cycles for read after right
+	                           // Could change the order but I think this is more indicative
+	                           // of the requirement.
+	
+	nop;
+	
+	nop;
+	
+	nop;
+
+	r2 = b0;
+			
+	cc = r0 == r2;             // Patterns Match?
+	
+	if cc jump Base0Continue;     // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                            // 
+    r0.l = BaseRegFailure | Base0Failure; // Indicated error type to the caller
+    
+    
+    jump.s Base0Exit;               
+
+Base0Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckBase0;
+_BlackfinDiagRegBaseReg0Chk.end:
+
+_BlackfinDiagRegBaseReg1Chk:
+	link 8;
+//
+// Preserve Callers b1 register
+//
+ 	[--sp] = b1;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckBase1:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextBase1Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Base1Exit:
+//
+// Restore caller's b1
+//
+	b1 = [sp++];
+	unlink;
+	rts;    
+
+NextBase1Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                 // Load next pattern
+	
+	b1 = r0;
+	
+	nop;                       // Assembler warning need extra cycles for read after right
+	                           // Could change the order but I think this is more indicative
+	                           // of the requirement.
+	
+	nop;
+	
+	nop;
+	
+	nop;
+
+	r2 = b1;
+			
+	cc = r0 == r2;             // Patterns Match?
+	
+	if cc jump Base1Continue;     // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                            // 
+    r0.l = BaseRegFailure | Base1Failure; // Indicated error type to the caller
+    
+    
+    jump.s Base1Exit;               
+
+Base1Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckBase1;
+_BlackfinDiagRegBaseReg1Chk.end:
+
+_BlackfinDiagRegBaseReg2Chk:
+	link 8;
+//
+// Preserve Callers b2 register
+//
+ 	[--sp] = b2;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckBase2:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextBase2Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Base2Exit:
+//
+// Restore caller's b2
+//
+	b2 = [sp++];
+	unlink;
+	rts;    
+
+NextBase2Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                 // Load next pattern
+	
+	b2 = r0;
+	
+	nop;                       // Assembler warning need extra cycles for read after right
+	                           // Could change the order but I think this is more indicative
+	                           // of the requirement.
+	
+	nop;
+	
+	nop;
+	
+	nop;
+
+	r2 = b2;
+			
+	cc = r0 == r2;             // Patterns Match?
+	
+	if cc jump Base2Continue;     // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                            // 
+    r0.l = BaseRegFailure | Base2Failure; // Indicated error type to the caller
+    
+    
+    jump.s Base2Exit;               
+
+Base2Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckBase2;
+_BlackfinDiagRegBaseReg2Chk.end:
+
+_BlackfinDiagRegBaseReg3Chk:
+	link 8;
+//
+// Preserve Callers b3 register
+//
+ 	[--sp] = b3;
+    
+//
+// r0 == pointer to array of patterns to try.
+//
+// r1 == number of patterns;
+//
+// r2 == current patter index iterations
+//
+	p1 = r0;
+		
+	r2 = 0;
+	
+CheckBase3:
+    [fp+4] = r2;
+    	
+	cc = r2 < r1 (iu);
+	
+	if cc jump NextBase3Pattern;  // More patterns to try
+	
+	r0 = 0;                    // 0 indicates no errors
+							   // No more patterns to try		
+Base3Exit:
+//
+// Restore caller's b3
+//
+	b3 = [sp++];
+	unlink;
+	rts;    
+
+NextBase3Pattern:
+	[fp+4] = r2;
+	
+	r0 = [p1];                 // Load next pattern
+	
+	b3 = r0;
+	
+	nop;                       // Assembler warning need extra cycles for read after right
+	                           // Could change the order but I think this is more indicative
+	                           // of the requirement.
+	
+	nop;
+	
+	nop;
+	
+	nop;
+
+	r2 = b3;
+			
+	cc = r0 == r2;             // Patterns Match?
+	
+	if cc jump Base3Continue;     // Yes try for another pattern to test against
+	
+    r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
+    r0 <<= 16;                            // 
+    r0.l = BaseRegFailure | Base3Failure; // Indicated error type to the caller
+    
+    
+    jump.s Length3Exit;               
+
+Base3Continue:
+	r2 = [fp+4];
+	
+	r2 += 1;
+	
+	p1 += 4;
+	
+	jump.s CheckBase3;
+_BlackfinDiagRegBaseReg3Chk.end:
 .GLOBAL _BlackfinDiagRegSanityChk;
+
 .GLOBAL _BlackfinDiagRegDataReg7Chk;
 .GLOBAL _BlackfinDiagRegDataReg6Chk;
 .GLOBAL _BlackfinDiagRegDataReg5Chk;
@@ -879,3 +2267,21 @@ P0Continue:
 .GLOBAL _BlackfinDiagRegPointerReg3Chk;
 .GLOBAL _BlackfinDiagRegPointerReg2Chk;
 .GLOBAL _BlackfinDiagRegPointerReg0Chk;
+.GLOBAL _BlackfinDiagAccum0Chk;
+.GLOBAL _BlackfinDiagAccum1Chk;
+.GLOBAL _BlackfinDiagRegModifyReg3Chk;
+.GLOBAL _BlackfinDiagRegModifyReg2Chk;
+.GLOBAL _BlackfinDiagRegModifyReg1Chk;
+.GLOBAL _BlackfinDiagRegModifyReg0Chk;
+.GLOBAL _BlackfinDiagRegLengthReg3Chk;
+.GLOBAL _BlackfinDiagRegLengthReg2Chk;
+.GLOBAL _BlackfinDiagRegLengthReg1Chk;
+.GLOBAL _BlackfinDiagRegLengthReg0Chk;
+.GLOBAL _BlackfinDiagRegIndexReg3Chk;
+.GLOBAL _BlackfinDiagRegIndexReg2Chk;
+.GLOBAL _BlackfinDiagRegIndexReg1Chk;
+.GLOBAL _BlackfinDiagRegIndexReg0Chk;
+.GLOBAL _BlackfinDiagRegBaseReg3Chk;
+.GLOBAL _BlackfinDiagRegBaseReg2Chk;
+.GLOBAL _BlackfinDiagRegBaseReg1Chk;
+.GLOBAL _BlackfinDiagRegBaseReg0Chk;
