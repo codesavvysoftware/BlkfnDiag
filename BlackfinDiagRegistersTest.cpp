@@ -1,77 +1,80 @@
 #include "BlackfinDiagRegistersTest.h"
 
-TestState BlackfinDiagRegistersTest::RunTest() {
-	TestState ts = TEST_IN_PROGRESS;
+BlackfinDiagTest::TestState BlackfinDiagRegistersTest::RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime ) {
 
-    UINT32 CurrentResult = BlackfinDiagRegSanityChk(NULL, 0 );
-    
-    if (CurrentResult) {
-    	rfdCurrentFailure.FailureNumber = CurrentResult & 0xff;
-    	rfdCurrentFailure.TestType      = (CurrentResult & 0xff00 ) >> 8;
-    	
-    	// No need to store pattern on sanity test.
-    
-    	return TEST_FAILURE;
-    }
-    
+	if ( !RegisterTestSuite	) return TEST_FAILURE;
+	
+	TestState tsReturned = TEST_IN_PROGRESS;
+
     //
     // Test the data registers next.
     //
-    TestState  tsReturned = RunRegisterTests( PointerRegisters, NumberOfDataRegTests );
+    tsReturned = RunRegisterTests(  RegisterTestSuite->SanityRegTestDiag );
+    
+    if ( TEST_FAILURE == tsReturned ) return tsReturned;
+   
+    //
+    // Test the data registers next.
+    //
+    tsReturned = RunRegisterTests( RegisterTestSuite->DataRegTestDiag );
     
     if ( TEST_FAILURE == tsReturned ) return tsReturned;
 
     //
     // Test the pointer registers next.
     //
-    tsReturned = RunRegisterTests( PointerRegisters, NumberOfPointerRegTests );
+    tsReturned = RunRegisterTests( RegisterTestSuite->PointerRegTestDiag );
     
     if ( TEST_FAILURE == tsReturned ) return tsReturned;
     
     //
     // Test the accumulator registers next.
     //
-    tsReturned = RunRegisterTests( Accumulators, NumberOfAccumulatorRegTests );
-    
-    if ( TEST_FAILURE == tsReturned ) return tsReturned;
+    tsReturned = RunRegisterTests( RegisterTestSuite->AccumRegTestDiag );
     
     //
     // Test the modify registers next.
     //
-    tsReturned = RunRegisterTests( ModifyRegisters, NumberOfModifyRegTests );
+    tsReturned = RunRegisterTests( RegisterTestSuite->ModifyRegTestDiag );
     
     if ( TEST_FAILURE == tsReturned ) return tsReturned;
 
     //
     // Test the length registers next.
     //
-    tsReturned = RunRegisterTests( LengthRegisters, NumberOfLengthRegTests );
+    tsReturned = RunRegisterTests( RegisterTestSuite->LengthRegTestDiag );
     
     if ( TEST_FAILURE == tsReturned ) return tsReturned;
 
     //
     // Test the index registers next.
     //
-    tsReturned = RunRegisterTests( IndexRegisters, NumberOfIndexRegTests );
+    tsReturned = RunRegisterTests( RegisterTestSuite->IndexRegTestDiag );
     
     if ( TEST_FAILURE == tsReturned ) return tsReturned;
 
     //
     // Test the base registers next.
     //
-    return RunRegisterTests( BaseRegisters, NumberOfBaseRegTests );
+    return RunRegisterTests( RegisterTestSuite->BaseRegTestDiag );
     
 }
 
-TestState BlackfinDiagRegistersTest::RunRegisterTests( REGISTER_TEST * RegTestArray, UINT32 NumberOfRegisterTests )
+BlackfinDiagTest::TestState BlackfinDiagRegistersTest::RunRegisterTests( BlackfinDiagTest::RegisterTestDescriptor rtdTests)
 {
     TestState ts = TEST_LOOP_COMPLETE;
     
     //
     // Test the modify registers next.
     //
-    for ( UINT32 ui = 0; ui < NumberOfRegisterTests; ui++ ) {
-    	UINT32 CurrentResult = (RegTestArray [ui])(TestPatternsForRegisterTesting,NumberOfRegisterPatterns);
+    for ( UINT32 ui = 0; ui < rtdTests.NumberOfRegisterTests; ui++ ) {
+    	if ( !rtdTests.RegisterTests[ui] ) {
+    		ts = TEST_FAILURE;
+    		
+    		break;
+    	}
+    	
+    	UINT32 CurrentResult = ( rtdTests.RegisterTests[ui])(TestPatternsForRegisterTesting,NumberOfRegisterPatterns);
     	
     	if ( CurrentResult ) {
     		DecodeFailureResult( CurrentResult, rfdCurrentFailure );
@@ -87,6 +90,9 @@ TestState BlackfinDiagRegistersTest::RunRegisterTests( REGISTER_TEST * RegTestAr
 
 
 void BlackfinDiagRegistersTest::DecodeFailureResult( UINT32 Result, RegisterFailureData & rfdDecodedData ) {
+
+	static const UINT32 InvalidRegTestPattern              = 1;
+	
 	
 	rfdDecodedData.FailureNumber = Result & 0xff;
 	
