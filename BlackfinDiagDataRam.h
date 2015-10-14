@@ -10,11 +10,12 @@ using namespace BlackfinDiagnosticGlobals;
 class BlackfinDiagDataRam : public BlackfinDiagTest {
 
 public:
-	BlackfinDiagDataRam(       UINT8 *       pStartRamAddress, 
-	                     const UINT8 *       TestPatternsForRamTesting,
-	                           UINT32        NumberOfRamTestingPatterns,
+	BlackfinDiagDataRam( BlackfinDataRamTestSuite * DataRamTestSuite;
+	                     const UINT8 *              TestPatternsForRamTesting,
+	                     UINT32                     NumberOfRamTestingPatterns,
 	                     DiagnosticTestTypes TestType = DiagDataRamTestType   ) 
-	                     : 	BlackfinDiagTest       ( TestType, PeriodPerTestIteration_Milleseconds ), 
+	                     : 	DataRamTestSuite       ( DataRamTestSuite ),
+	                        BlackfinDiagTest       ( TestType, PeriodPerTestIteration_Milleseconds ), 
 	                     	pCurrentRamAddress     ( pStartRamAddress ),
 							pFirstRamAddressToTest ( pStartRamAddress),
 							NumberOfBytesTested    ( 0 ),
@@ -27,25 +28,19 @@ public:
 	virtual TestState RunTest(UINT32 & ErrorCode, DiagTime_t TimeTestStarted_microseconds = GetSystemTime()  );
 
 private:
-	const UINT8 *       RamTestPatterns;
+	static const UINT32        NumberOfBytesToTestPerIteration     = 0x400;
 
-	const UINT32        NumberOfTestPatterns;
+	static const UINT32        TotalNumberOfRamBytesToTest         = 0x10000;
 	
-	DiagnosticTestTypes TestType;
+	static const UINT32        PeriodPerTestIteration_Milleseconds = 500;
 
-	UINT8 *             pFirstRamAddressToTest;
+	const UINT8 *              RamTestPatterns;
 
-	static const UINT32 NumberOfBytesToTestPerIteration = 0x400;
-
-	static const UINT32 TotalNumberOfRamBytesToTest = 0x10000;
+	UINT32                     NumberOfTestPatterns;
 	
-	static const UINT32 PeriodPerTestIteration_Milleseconds = 500;
+	BlackfinDataRamTestSuite * DataRamTestSuite;
 
-	UINT8 *             pCurrentRamAddress;
-
-	UINT32              NumberOfBytesTested;
-
-	INT                 Critical;                    
+	INT                        Critical;                    
 
 	void DisableInterrupts() {
 		Critical = cli();

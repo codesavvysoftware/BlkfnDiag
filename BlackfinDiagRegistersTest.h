@@ -26,12 +26,6 @@ public:
 	virtual TestState RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime = GetSystemTime() );
 
 private:
-   typedef struct {
-		UINT32         FailureNumber;
-		UINT32         TestType;
-		UINT32         FailurePatternIdx;
-	} RegisterFailureData;
-	
 	static const UINT32 PeriodPerTestIteration_Milleseconds = 500;
 
     const UINT32 * TestPatternsForRegisterTesting;
@@ -44,8 +38,6 @@ private:
 	
 	INT                           Critical;                    /* Temp to allow disabling interrupts around critical sections */
 
-    void DecodeFailureResult( UINT32 Result, RegisterFailureData & rfdDecodedData );
-    
 	void DisableInterrupts() {
 		Critical = cli();
 	}

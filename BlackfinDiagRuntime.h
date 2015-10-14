@@ -49,7 +49,7 @@ private:
 	static const BlackfinDiagTest::REGISTER_TEST BaseRegisters[];   
 	static const UINT32 NumberOfBaseRegTests;
 
-    static const BlackfinDiagTest::BlackfinRegisterTestSuite AppTestSuite;
+    static const BlackfinDiagTest::BlackfinRegisterTestSuite RegisterTestSuite;
     
 	// Define Tests Here
 	static BlackfinDiagInstructionRam InstructionRamTest;

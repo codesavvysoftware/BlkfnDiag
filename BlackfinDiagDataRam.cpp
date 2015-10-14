@@ -7,8 +7,12 @@ BlackfinDiagTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & ErrorCode, Di
 	BOOL bTestNotPassed = FALSE;
 
 	TestState ts = TEST_IN_PROGRESS;
+	
+	
 
-	while ((NumberOfBytesTested < TotalNumberOfRamBytesToTest) && (NumberOfBytesTestedThisIteration < NumberOfBytesToTestPerIteration)) {
+	while (    (NumberOfBytesTested < TotalNumberOfRamBytesToTest) 
+	        && (NumberOfBytesTestedThisIteration < NumberOfBytesToTestPerIteration)
+	      ) {
 
 		UINT8 FailurePattern = 0x77;
 		
@@ -24,6 +28,9 @@ BlackfinDiagTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & ErrorCode, Di
 	};
 
 	if (bTestNotPassed) {
+		
+		
+		
 		ts = TEST_FAILURE;
 	}
 	else if (NumberOfBytesTested >= TotalNumberOfRamBytesToTest) {

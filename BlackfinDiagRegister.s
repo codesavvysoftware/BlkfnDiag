@@ -23,7 +23,7 @@ _BlackfinDiagRegSanityChk:
     //
     // First Sanity Check Failure Indicate as such upon return.
     //
-    r0.l = SanityCheckFailure | R0R1SanityCheckFail;
+    r0.l = ( SanityCheckFailure << TestFailurePos ) | R0R1SanityCheckFail;
     // r0.h Already has the FailurePattern
     jump.s Exit;
 
@@ -36,7 +36,7 @@ R0R1AllOnesPassed:
     //
     // Second Sanity Check Failure Indicate as such upon return.
     //
-    r0.l = SanityCheckFailure | R0R2SanityCheckFail;
+    r0.l = ( SanityCheckFailure << TestFailurePos ) | R0R2SanityCheckFail;
     // r0.h Already has the FailurePattern
     jump.s Exit;
 
@@ -46,7 +46,7 @@ R0R2AllOnesPassed:
     //
     // Third Sanity Check Failure Indicate as such upon return.
     //
-    r0.l = SanityCheckFailure | R1R2SanityCheckFail;
+    r0.l = ( SanityCheckFailure << TestFailurePos ) | R1R2SanityCheckFail;
     // r0.h Already has the FailurePattern
     jump.s Exit;
 
@@ -60,7 +60,7 @@ R1R2AllOnesPassed:
     //
     // Fourth Sanity Check Failure Indicate as such upon return.
     //
-    r0.l = SanityCheckFailure | R0R1SanityCheckFail;
+    r0.l = ( SanityCheckFailure << TestFailurePos ) | R0R1SanityCheckFail;
     // r0.h Already has the FailurePattern
     jump.s Exit;
 
@@ -72,7 +72,7 @@ R0R1AllZerosPassed:
     //
     // Fifth Sanity Check Failure Indicate as such upon return.
     //
-    r0.l = SanityCheckFailure | R0R2SanityCheckFail;
+    r0.l = ( SanityCheckFailure << TestFailurePos ) | R0R2SanityCheckFail;
     // r0.h Already has the FailurePattern
     jump.s Exit;
 
@@ -82,7 +82,7 @@ R0R2AllZerosPassed:
     //
     // Sixth Sanity Check Failure Indicate as such upon return.
     //
-    r0.l = SanityCheckFailure | R1R2SanityCheckFail;
+    r0.l = ( SanityCheckFailure << TestFailurePos ) | R1R2SanityCheckFail;
     // r0.h Already has the FailurePattern
 Exit:
     unlink;
@@ -97,7 +97,7 @@ R1R2AllZerosPassed:
     //
     // Seventh Sanity Check Failure Indicate as such upon return.
     //
-    r0.l = SanityCheckFailure | R0R1SanityCheckFail;
+    r0.l = ( SanityCheckFailure << TestFailurePos ) | R0R1SanityCheckFail;
     // r0.h Already has the FailurePattern
     jump.s Exit;
 
@@ -109,7 +109,7 @@ R0R1AltOnesZerosPassed:
     //
     // Eighth Sanity Check Failure Indicate as such upon return.
     //
-    r0.l = SanityCheckFailure | R0R2SanityCheckFail;
+    r0.l = ( SanityCheckFailure << TestFailurePos ) | R0R2SanityCheckFail;
     // r0.h Already has the FailurePattern
     jump.s Exit;
 
@@ -119,7 +119,7 @@ R0R2AltOnesZerosPassed:
     //
     // Nineth Sanity Check Failure Indicate as such upon return.
     //
-    r0.l = SanityCheckFailure | R1R2SanityCheckFail;
+    r0.l = ( SanityCheckFailure << TestFailurePos ) | R1R2SanityCheckFail;
     // r0.h Already has the FailurePattern
     jump.s Exit;
 R1R2AltOnesZerosPassed:
@@ -132,7 +132,7 @@ R1R2AltOnesZerosPassed:
     //
     // Tenth Sanity Check Failure Indicate as such upon return.
     //
-    r0.l = SanityCheckFailure | R0R1SanityCheckFail;
+    r0.l = ( SanityCheckFailure << TestFailurePos ) | R0R1SanityCheckFail;
     // r0.h Already has the FailurePattern
     jump.s Exit;
 
@@ -144,7 +144,7 @@ R0R1AltZerosOnesPassed:
     //
     // Eleventh Sanity Check Failure Indicate as such upon return.
     //
-    r0.l = SanityCheckFailure | R0R2SanityCheckFail;
+    r0.l = ( SanityCheckFailure << TestFailurePos ) | R0R2SanityCheckFail;
     // r0.h Already has the FailurePattern
     jump.s Exit;
 
@@ -154,7 +154,7 @@ R0R2AltZerosOnesPassed:
     //
     // Twelth Sanity Check Failure Indicate as such upon return.
     //
-    r0.l = SanityCheckFailure | R1R2SanityCheckFail;
+    r0.l = ( SanityCheckFailure << TestFailurePos ) | R1R2SanityCheckFail;
     // r0.h Already has the FailurePattern
     jump.s Exit;
 R1R2AltZerosOnesPassed:
@@ -173,7 +173,7 @@ R1R2AltZerosOnesPassed:
     //
     // Thirteenth Sanity Check Failure Indicate as such upon return.
     //
-    r0.l = SanityCheckFailure | P0SanityCheckFail;
+    r0.l = ( SanityCheckFailure << TestFailurePos ) | P0SanityCheckFail;
     // r0.h Already has the FailurePattern
     jump.s Exit;
 P0AllOnesPassed:
@@ -187,7 +187,7 @@ P0AllOnesPassed:
     //
     // Fourteenth Sanity Check Failure Indicate as such upon return.
     //
-    r0.l = SanityCheckFailure | P0SanityCheckFail;
+    r0.l = ( SanityCheckFailure << TestFailurePos ) | P0SanityCheckFail;
     // r0.h Already has the FailurePattern
     jump.s Exit;
 P0AllZerosPassed:
@@ -201,7 +201,7 @@ P0AllZerosPassed:
     //
     // Fifteenth Sanity Check Failure Indicate as such upon return.
     //
-    r0.l = SanityCheckFailure | P0SanityCheckFail;
+    r0.l = ( SanityCheckFailure << TestFailurePos ) | P0SanityCheckFail;
     // r0.h Already has the FailurePattern
     jump.s Exit;
 P0AltOnesZerosPassed:
@@ -215,7 +215,7 @@ P0AltOnesZerosPassed:
     //
     // Sixteenth Sanity Check Failure Indicate as such upon return.
     //
-    r0.l = SanityCheckFailure | P0SanityCheckFail;
+    r0.l = ( SanityCheckFailure << TestFailurePos ) | P0SanityCheckFail;
     // r0.h Already has the FailurePattern
     jump.s Exit;
 P0AltZerosOnesPassed:
@@ -267,8 +267,8 @@ NextR7Pattern:
 	if cc jump R7Continue;     // Yes try for another pattern to test against
 	
 	r0 = r2;                           // Save index of pattern failure in upper 16 bits
-    r0 <<= 16;
-    r0.l = DataRegFailure | R7Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( DataRegFailure << TestFailurePos ) | R7Failure; // Indicated error type to the caller
     
     jump.s R7Exit;               
 
@@ -323,8 +323,8 @@ NextR6Pattern:
 	if cc jump R6Continue;     // Yes try for another pattern to test against
 	
 	r0 = r2;                           // Save index of pattern failure in upper 16 bits
-    r0 <<= 16;                         // 
-    r0.l = DataRegFailure | R6Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( DataRegFailure << TestFailurePos ) | R6Failure; // Indicated error type to the caller
     
     jump.s R6Exit;               
 
@@ -379,8 +379,8 @@ NextR5Pattern:
 	if cc jump R5Continue;     // Yes try for another pattern to test against
 	
 	r0 = r2;                           // Save index of pattern failure in upper 16 bits
-    r0 <<= 16;                         // 
-    r0.l = DataRegFailure | R5Failure; // Indicated error type to the caller    
+    r0 <<= TestIdxBitPos;
+    r0.l = ( DataRegFailure << TestFailurePos ) | R5Failure; // Indicated error type to the caller
     
     jump.s R5Exit;               
 
@@ -437,7 +437,8 @@ NextR4Pattern:
 	
 	r0 = r2;                           // Save index of pattern failure in upper 16 bits
     r0 <<= 16;                         // 
-    r0.l = DataRegFailure | R4Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( DataRegFailure << TestFailurePos ) | R4Failure; // Indicated error type to the caller
     
     
     jump.s R4Exit;               
@@ -494,8 +495,8 @@ NextR3Pattern:
 	if cc jump R3Continue;     // Yes try for another pattern to test against
 	
 	r0 = r2;                           // Save index of pattern failure in upper 16 bits
-    r0 <<= 16;                         // 
-    r0.l = DataRegFailure | R3Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( DataRegFailure << TestFailurePos ) | R3Failure; // Indicated error type to the caller
     jump.s R3Exit;               
 
 R3Continue:
@@ -566,8 +567,8 @@ NextP5Pattern:
 	if cc jump P5Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                            // 
-    r0.l = PointerRegFailure | P5Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( PointerRegFailure<< TestFailurePos ) | P5Failure; // Indicated error type to the caller
     jump.s P5Exit;               
 
 P5Continue:
@@ -639,8 +640,8 @@ NextP4Pattern:
 	if cc jump P4Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                            // 
-    r0.l = PointerRegFailure | P4Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( PointerRegFailure<< TestFailurePos ) | P4Failure; // Indicated error type to the caller
     
     jump.s P4Exit;               
 
@@ -712,8 +713,8 @@ NextP3Pattern:
 	if cc jump P3Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                            // 
-    r0.l = PointerRegFailure | P3Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( PointerRegFailure<< TestFailurePos ) | P3Failure; // Indicated error type to the caller
     
     
     jump.s P3Exit;               
@@ -787,8 +788,8 @@ NextP2Pattern:
 	if cc jump P2Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                            //
-    r0.l = PointerRegFailure | P2Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( PointerRegFailure<< TestFailurePos ) | P2Failure; // Indicated error type to the caller
     
     
     jump.s P2Exit;               
@@ -862,8 +863,8 @@ NextP0Pattern:
 	if cc jump P0Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                            // 
-    r0.l = PointerRegFailure | P0Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( PointerRegFailure<< TestFailurePos ) | P0Failure; // Indicated error type to the caller
     
     
     jump.s P0Exit;               
@@ -933,8 +934,8 @@ NextA0Pattern:
 	
 Accum0Failure:
     r0 = [fp+4];                       // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                         // 
-    r0.l = AccumFailure | A0Failure32; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( AccumFailure << TestFailurePos ) | A0Failure32; // Indicated error type to the caller
     
     
     jump.s Accum0Exit;  
@@ -952,8 +953,8 @@ Accum0ContinueWithX:
 	if cc jump Accum0Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                       // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                         // 
-    r0.l = AccumFailure | A0Failure8;  // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( AccumFailure << TestFailurePos ) | A0Failure8; // Indicated error type to the caller
     
     
     jump.s Accum0Exit;  
@@ -1023,8 +1024,8 @@ NextA1Pattern:
 	
 Accum1Failure:
     r0 = [fp+4];                       // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                         // 
-    r0.l = AccumFailure | A1Failure32; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( AccumFailure << TestFailurePos ) | A1Failure32; // Indicated error type to the caller
     jump.s Accum1Exit;  
                  
 Accum1ContinueWithX:
@@ -1040,8 +1041,8 @@ Accum1ContinueWithX:
 	if cc jump Accum1Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                       // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                         // 
-    r0.l = AccumFailure | A1Failure8;  // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( AccumFailure << TestFailurePos ) | A0Failure8; // Indicated error type to the caller
     jump.s Accum1Exit;  
 	
 Accum1Continue:
@@ -1113,8 +1114,8 @@ NextIdx0Pattern:
 	if cc jump Idx0Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                            // 
-    r0.l = IndexRegFailure | Idx0Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( IndexRegFailure << TestFailurePos ) | Idx0Failure; // Indicated error type to the caller
     
     
     jump.s Idx0Exit;               
@@ -1188,8 +1189,8 @@ NextIdx1Pattern:
 	if cc jump Idx1Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                            // 
-    r0.l = IndexRegFailure | Idx1Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( IndexRegFailure << TestFailurePos ) | Idx1Failure; // Indicated error type to the caller
     
     
     jump.s Idx1Exit;               
@@ -1264,8 +1265,8 @@ NextIdx2Pattern:
 	if cc jump Idx2Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                            // 
-    r0.l = IndexRegFailure | Idx2Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( IndexRegFailure << TestFailurePos ) | Idx2Failure; // Indicated error type to the caller
     
     
     jump.s Idx2Exit;               
@@ -1339,8 +1340,8 @@ NextIdx3Pattern:
 	if cc jump Idx3Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                            // 
-    r0.l = IndexRegFailure | Idx3Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( IndexRegFailure << TestFailurePos ) | Idx3Failure; // Indicated error type to the caller
     
     
     jump.s Idx3Exit;               
@@ -1415,8 +1416,8 @@ NextMdfy0Pattern:
 	if cc jump Mdfy0Continue;                 // Yes try for another pattern to test against
 	
     r0 = [fp+4];                              // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                                // 
-    r0.l = ModifyRegFailure | Modify0Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( ModifyRegFailure << TestFailurePos ) | Modify0Failure; // Indicated error type to the caller
     
     
     jump.s Mdfy0Exit;               
@@ -1490,8 +1491,9 @@ NextMdfy1Pattern:
 	if cc jump Mdfy1Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                              // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                                // 
-    r0.l = ModifyRegFailure | Modify1Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( ModifyRegFailure << TestFailurePos ) | Modify1Failure; // Indicated error type to the caller
+    
     
     
     jump.s Mdfy1Exit;               
@@ -1565,8 +1567,9 @@ NextMdfy2Pattern:
 	if cc jump Mdfy2Continue;                 // Yes try for another pattern to test against
 	
     r0 = [fp+4];                              // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                                // 
-    r0.l = ModifyRegFailure | Modify2Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( ModifyRegFailure << TestFailurePos ) | Modify2Failure; // Indicated error type to the caller
+    
     
     
     jump.s Mdfy2Exit;               
@@ -1640,9 +1643,8 @@ NextMdfy3Pattern:
 	if cc jump Mdfy3Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                              // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                                // 
-    r0.l = ModifyRegFailure | Modify3Failure; // Indicated error type to the caller
-    
+    r0 <<= TestIdxBitPos;
+    r0.l = ( ModifyRegFailure << TestFailurePos ) | Modify3Failure; // Indicated error type to the caller
     
     jump.s Mdfy3Exit;               
 
@@ -1715,8 +1717,8 @@ NextLength0Pattern:
 	if cc jump Length0Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                              // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                                // 
-    r0.l = LengthRegFailure | Length0Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( LengthRegFailure << TestFailurePos ) | Length0Failure; // Indicated error type to the caller
     
     
     jump.s Length0Exit;               
@@ -1790,8 +1792,8 @@ NextLength1Pattern:
 	if cc jump Length1Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                              // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                                // 
-    r0.l = LengthRegFailure | Length1Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( LengthRegFailure << TestFailurePos ) | Length1Failure; // Indicated error type to the caller
     
     
     jump.s Length1Exit;               
@@ -1865,8 +1867,8 @@ NextLength2Pattern:
 	if cc jump Length2Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                              // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                                // 
-    r0.l = LengthRegFailure | Length2Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( LengthRegFailure << TestFailurePos ) | Length2Failure; // Indicated error type to the caller
     
     
     jump.s Length2Exit;               
@@ -1940,8 +1942,8 @@ NextLength3Pattern:
 	if cc jump Length3Continue;               // Yes try for another pattern to test against
 	
     r0 = [fp+4];                              // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                                // 
-    r0.l = LengthRegFailure | Length3Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( LengthRegFailure << TestFailurePos ) | Length3Failure; // Indicated error type to the caller
     
     
     jump.s Length3Exit;               
@@ -2015,8 +2017,8 @@ NextBase0Pattern:
 	if cc jump Base0Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                            // 
-    r0.l = BaseRegFailure | Base0Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( BaseRegFailure << TestFailurePos ) | Base0Failure; // Indicated error type to the caller
     
     
     jump.s Base0Exit;               
@@ -2090,8 +2092,8 @@ NextBase1Pattern:
 	if cc jump Base1Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                            // 
-    r0.l = BaseRegFailure | Base1Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( BaseRegFailure << TestFailurePos ) | Base1Failure; // Indicated error type to the caller
     
     
     jump.s Base1Exit;               
@@ -2165,8 +2167,8 @@ NextBase2Pattern:
 	if cc jump Base2Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                            // 
-    r0.l = BaseRegFailure | Base2Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( BaseRegFailure << TestFailurePos ) | Base2Failure; // Indicated error type to the caller
     
     
     jump.s Base2Exit;               
@@ -2240,8 +2242,8 @@ NextBase3Pattern:
 	if cc jump Base3Continue;     // Yes try for another pattern to test against
 	
     r0 = [fp+4];                          // Put failure pattern idx in upper 16 bits  	
-    r0 <<= 16;                            // 
-    r0.l = BaseRegFailure | Base3Failure; // Indicated error type to the caller
+    r0 <<= TestIdxBitPos;
+    r0.l = ( BaseRegFailure << TestFailurePos ) | Base3Failure; // Indicated error type to the caller
     
     
     jump.s Length3Exit;               

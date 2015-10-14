@@ -56,3 +56,14 @@
 #define A0Failure8                 2
 #define A1Failure32                3
 #define A1Failure8                 4
+
+#define TestIdxBitPos              16
+#define TestIdxBitMask             0xff0000
+
+#define TestFailurePos             8
+#define TestFailureMask            0xff00
+
+#define RegFailurePos              0
+#define RegFailureMask             0xff
+
+#define REGISTER_TEST_POINTER_NULL 0xffffff

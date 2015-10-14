@@ -117,22 +117,22 @@ BlackfinDiagTest::REGISTER_TEST BaseRegisters[]
           };
 UINT32 NumberOfBaseRegTests = sizeof(BaseRegisters)/sizeof( BlackfinDiagTest::REGISTER_TEST );
 
-BlackfinDiagTest::BlackfinRegisterTestSuite AppTestSuite = 
+BlackfinDiagTest::BlackfinRegisterTestSuite RegisterTestSuite = 
            							{ 
-           								{ ::DataRegisters,    ::NumberOfDataRegTests },
-           								{ ::PointerRegisters, ::NumberOfPointerRegTests },
-           								{ ::Accumulators,     ::NumberOfAccumulatorRegTests },
-           								{ ::BaseRegisters,    ::NumberOfBaseRegTests },
-           								{ ::IndexRegisters,   ::NumberOfIndexRegTests },
-           								{ ::LengthRegisters,  ::NumberOfLengthRegTests },
-           								{ ::ModifyRegisters,  ::NumberOfModifyRegTests },
-           								{ ::SanityCheck,      ::NumberOfSanityChecks }
+										{ ::SanityCheck,      ::NumberOfSanityChecks,        FALSE  },
+										{ ::DataRegisters,    ::NumberOfDataRegTests,        FALSE  },
+           								{ ::PointerRegisters, ::NumberOfPointerRegTests,     FALSE  },
+           								{ ::Accumulators,     ::NumberOfAccumulatorRegTests, FALSE  },
+           								{ ::BaseRegisters,    ::NumberOfBaseRegTests,        FALSE  },
+           								{ ::IndexRegisters,   ::NumberOfIndexRegTests,       FALSE  },
+           								{ ::LengthRegisters,  ::NumberOfLengthRegTests,      FALSE  },
+           								{ ::ModifyRegisters,  ::NumberOfModifyRegTests,      FALSE  }
            							};
 BlackfinDiagInstructionRam BlackfinDiagRuntime::InstructionRamTest;
 	
 BlackfinDiagDataRam BlackfinDiagRuntime::DataRamTest( ::pRAMDataStart, ::TestPatternsForRamTesting, ::NumberOfRamTestingPatterns );
     
-BlackfinDiagRegistersTest BlackfinDiagRuntime::RegisterTest( &::AppTestSuite, ::TestPatternsForRegisterTesting, ::NumberOfRegisterPatterns );
+BlackfinDiagRegistersTest BlackfinDiagRuntime::RegisterTest( &::RegisterTestSuite, ::TestPatternsForRegisterTesting, ::NumberOfRegisterPatterns );
  
 BlackfinDiagTest * BlackfinDiagRuntime::DiagnosticTests[] 
 	= {

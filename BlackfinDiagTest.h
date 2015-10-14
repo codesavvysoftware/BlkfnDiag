@@ -10,6 +10,7 @@ typedef UINT32 DiagTime_t;
 
 
 class BlackfinDiagTest {
+
 public:
 	enum TestState {
 		TEST_LOOP_COMPLETE,
@@ -28,6 +29,7 @@ public:
     typedef struct {
     	const REGISTER_TEST * RegisterTests;
     	UINT32                NumberOfRegisterTests;
+		BOOL                  testsCompleted;
     }  RegisterTestDescriptor;
     
 		
@@ -41,6 +43,19 @@ public:
     	RegisterTestDescriptor ModifyRegTestDiag;
     	RegisterTestDescriptor SanityRegTestDiag;
     } BlackfinRegisterTestSuite;
+    
+    typedef struct {
+    	UINT8 * pDataRamAddressStart;
+    	UINT32  NumberOfContiguousBytesToTest;
+    	UINT32  NumberOfBytesTested;
+    	BOOL    testCompleted;
+    } DataRamTestDescriptor;
+    
+    typedef struct {
+    	DataRamTestDescriptor  BankA;
+    	DataRamTestDescriptor  BankB;
+    	DataRamTestDescriptor  BancC;
+    } BlackfinDataRamTestSuite;
     
 	BlackfinDiagTest( 	DiagnosticTestTypes TestType,
 						UINT32              PeriodBetweenIterations_Milleseconds, 

@@ -2,7 +2,7 @@
 
 //#include "BlackfinParameters.h"
 #include "Defs.h"
-#include "BlackfinDiagRegTestCommon.h"
+//#include "BlackfinDiagRegTestCommon.h"
 
 #include <time.h>
 #include <vector>
@@ -13,7 +13,11 @@ namespace BlackfinDiagnosticGlobals {
 	// Blackfin Diagnostic constants.  Variable names are intended to describe with they are use for.
 	// 
 
-	#define firmExcept( uiError ) OS_Assert( uiError );//, __FILE__, __LINE__ );           
+	static const UINT32 DiagnosticErrorNumberMask = 0x7fffffff;
+
+	static const UINT32 DiagnosticErrorTestTypeBitPos = 26;
+
+#define firmExcept( uiError ) OS_Assert( uiError );//, __FILE__, __LINE__ );           
 
 static UINT32 GetSystemTime() {
 		

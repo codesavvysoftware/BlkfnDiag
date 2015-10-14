@@ -46,10 +46,6 @@ private:
 	
 	static const UINT32  DiagTestTooLongToComplete = 3;
 	
-    static const UINT32 DiagnosticErrorNumberMask          = 0x7fffffff;
-    
-    static const UINT32 DiagnosticErrorTestTypeBitPos      = 26;
-    
 	struct TraceLog
 	{
 		DiagTime_t   timestamp;
