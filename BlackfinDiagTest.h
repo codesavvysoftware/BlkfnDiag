@@ -1,12 +1,7 @@
 #pragma once
 #include "BlackfinDiag.h"
 
-using namespace BlackfinDiagnosticGlobals;
-//
-// Requirement:  All Diagnostic Tests Complete in 4 Hours.
-//
-typedef UINT32 DiagSlices_t;
-typedef UINT32 DiagTime_t;
+using namespace DiagnosticCommon;
 
 
 class BlackfinDiagTest {
@@ -34,17 +29,6 @@ public:
     
 		
     typedef struct {
-    	RegisterTestDescriptor DataRegTestDiag;
-    	RegisterTestDescriptor PointerRegTestDiag;
-    	RegisterTestDescriptor AccumRegTestDiag;
-    	RegisterTestDescriptor BaseRegTestDiag;
-    	RegisterTestDescriptor IndexRegTestDiag;
-    	RegisterTestDescriptor LengthRegTestDiag;
-    	RegisterTestDescriptor ModifyRegTestDiag;
-    	RegisterTestDescriptor SanityRegTestDiag;
-    } BlackfinRegisterTestSuite;
-    
-    typedef struct {
     	UINT8 * pDataRamAddressStart;
     	UINT32  NumberOfContiguousBytesToTest;
     	UINT32  NumberOfBytesTested;
@@ -54,7 +38,7 @@ public:
     typedef struct {
     	DataRamTestDescriptor  BankA;
     	DataRamTestDescriptor  BankB;
-    	DataRamTestDescriptor  BancC;
+    	DataRamTestDescriptor  BankC;
     } BlackfinDataRamTestSuite;
     
 	BlackfinDiagTest( 	DiagnosticTestTypes TestType,
@@ -133,12 +117,14 @@ public:
     	durationUs = CurrentTime_microseconds - TestStartTime_microseconds;
     }
     
+	virtual TestState   RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime = GetSystemTime() ) = 0;
+	virtual BOOL        IsTestComplete() = 0;
+	
+
     virtual void      SetTimesliceForNextTestIteration( DiagSlices_t Adjustment ) { triggerValueTimeslice = stepValueTimeslice + Adjustment; }
 		
 	virtual void      UpdateTimesliceForNextTestIteration() { triggerValueTimeslice += stepValueTimeslice; }
 		
-	virtual TestState RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime = GetSystemTime() ) = 0;
-
 	static  DiagTime_t GetTimeslicePeriod_microseconds() { return DiagnosticSlicePeriod_Microseconds; }
 
 private:

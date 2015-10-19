@@ -1,6 +1,28 @@
 #include "BlackfinDiagScheduler.h"
 #include "BlackfinDiagRuntime.h"
 
+
+//***********************************************************************************************************
+//                                                                                                          *
+// Data RAM testing parameters, structures and definitions.                                                 *
+//                                                                                                          *
+//***********************************************************************************************************
+DataRamTestDescriptor     RamBankA = { reinterpret_cast<UINT8 *>(0xff800000), 0x8000, 0, FALSE };
+DataRamTestDescriptor     RamBankB = { reinterpret_cast<UINT8 *>(0xff900000), 0x8000, 0, FALSE };
+DataRamTestDescriptor     RamBankC = { reinterpret_cast<UINT8 *>(0xffa10000), 0x4000, 0, FALSE };
+BlackfinDataRamTestSuite  DataRamTestInfo = { RamBankA, RamBankB, RamBankC };
+
+UINT8  TestPatternsForRamTesting[]         = { 0xff,0, 0x55, 0xaa, 0xf, 0xf0, 0xa0, 0xa, 0x50, 0x5, 0x5a, 0xa5 };
+UINT32 NumberOfRamTestingPatterns          = sizeof(TestPatternsForRamTesting) / sizeof(UINT8);
+
+BlackfinDiagDataRam BlackfinDiagRuntime::DataRamTest( DataRamTestInfo, ::TestPatternsForRamTesting, ::NumberOfRamTestingPatterns );
+
+
+//***********************************************************************************************************
+//                                                                                                          *
+// Register testing parameters, structures and definitions.                                                 *
+//                                                                                                          *
+//***********************************************************************************************************
 //
 // For linkage to c callable assembly language register tests
 //
@@ -33,13 +55,6 @@ extern "C" UINT32  BlackfinDiagRegBaseReg3Chk( const UINT32 *, UINT32 );
 extern "C" UINT32  BlackfinDiagRegBaseReg2Chk( const UINT32 *, UINT32 );
 extern "C" UINT32  BlackfinDiagRegBaseReg1Chk( const UINT32 *, UINT32 );
 extern "C" UINT32  BlackfinDiagRegBaseReg0Chk( const UINT32 *, UINT32 );	
-
-UINT8 * pRAMDataStart = reinterpret_cast<UINT8 *>(0xff900000);
-
-    
-UINT8  TestPatternsForRamTesting[]         = { 0xff,0, 0x55, 0xaa, 0xf, 0xf0, 0xa0, 0xa, 0x50, 0x5, 0x5a, 0xa5 };
-UINT32 NumberOfRamTestingPatterns          = sizeof(TestPatternsForRamTesting) / sizeof(UINT8);
-
 UINT32 TestPatternsForRegisterTesting[]   = { 0xffffffff, 0xaaaaaaaa, 0x55555555, 0 };
 UINT32 NumberOfRegisterPatterns           = sizeof(TestPatternsForRegisterTesting)/sizeof(UINT32);
 	
@@ -117,23 +132,48 @@ BlackfinDiagTest::REGISTER_TEST BaseRegisters[]
           };
 UINT32 NumberOfBaseRegTests = sizeof(BaseRegisters)/sizeof( BlackfinDiagTest::REGISTER_TEST );
 
-BlackfinDiagTest::BlackfinRegisterTestSuite RegisterTestSuite = 
-           							{ 
-										{ ::SanityCheck,      ::NumberOfSanityChecks,        FALSE  },
-										{ ::DataRegisters,    ::NumberOfDataRegTests,        FALSE  },
-           								{ ::PointerRegisters, ::NumberOfPointerRegTests,     FALSE  },
-           								{ ::Accumulators,     ::NumberOfAccumulatorRegTests, FALSE  },
-           								{ ::BaseRegisters,    ::NumberOfBaseRegTests,        FALSE  },
-           								{ ::IndexRegisters,   ::NumberOfIndexRegTests,       FALSE  },
-           								{ ::LengthRegisters,  ::NumberOfLengthRegTests,      FALSE  },
-           								{ ::ModifyRegisters,  ::NumberOfModifyRegTests,      FALSE  }
-           							};
+BlackfinDiagTest::RegisterTestDescriptor SanityChecks     = { ::SanityCheck,      ::NumberOfSanityChecks,        FALSE  };
+BlackfinDiagTest::RegisterTestDescriptor DataRegChecks    = { ::DataRegisters,    ::NumberOfDataRegTests,        FALSE  };
+BlackfinDiagTest::RegisterTestDescriptor PointerRegChecks = { ::PointerRegisters, ::NumberOfPointerRegTests,     FALSE  };
+BlackfinDiagTest::RegisterTestDescriptor AccumRegChecks   = { ::Accumulators,     ::NumberOfAccumulatorRegTests, FALSE  };
+BlackfinDiagTest::RegisterTestDescriptor BaseRegChecks    = { ::BaseRegisters,    ::NumberOfBaseRegTests,        FALSE  };
+BlackfinDiagTest::RegisterTestDescriptor IndexRegChecks   = { ::IndexRegisters,   ::NumberOfIndexRegTests,       FALSE  };
+BlackfinDiagTest::RegisterTestDescriptor LengthRegChecks  = { ::LengthRegisters,  ::NumberOfLengthRegTests,      FALSE  };
+BlackfinDiagTest::RegisterTestDescriptor ModifyRegChecks  = { ::ModifyRegisters,  ::NumberOfModifyRegTests,      FALSE  };
+
+BlackfinDiagTest::RegisterTestDescriptor * RegisterTestSuite[] = 
+								{
+									&SanityChecks,
+									&DataRegChecks,
+									&PointerRegChecks,
+									&AccumRegChecks,
+									&BaseRegChecks,
+									&IndexRegChecks,
+									&LengthRegChecks,
+									&ModifyRegChecks
+								};
+	 
+UINT32 NumberOfRegisterTestDescriptors = sizeof( RegisterTestSuite ) / sizeof(BlackfinDiagTest::RegisterTestDescriptor *); 
+
+BlackfinDiagRegistersTest BlackfinDiagRuntime::RegisterTest( &::RegisterTestSuite, 
+                                                             ::NumberOfRegisterTestDescriptors, 
+                                                             ::TestPatternsForRegisterTesting, 
+                                                             ::NumberOfRegisterPatterns );
+ 
+
+//***********************************************************************************************************
+//                                                                                                          *
+// Instruction RAM testing parameters, structures and definitions.                                          *
+//                                                                                                          *
+//***********************************************************************************************************
 BlackfinDiagInstructionRam BlackfinDiagRuntime::InstructionRamTest;
 	
-BlackfinDiagDataRam BlackfinDiagRuntime::DataRamTest( ::pRAMDataStart, ::TestPatternsForRamTesting, ::NumberOfRamTestingPatterns );
     
-BlackfinDiagRegistersTest BlackfinDiagRuntime::RegisterTest( &::RegisterTestSuite, ::TestPatternsForRegisterTesting, ::NumberOfRegisterPatterns );
- 
+//***********************************************************************************************************
+//                                                                                                          *
+// Runtime Blackfin Diagnostic Test Data                                                                    *
+//                                                                                                          *
+//***********************************************************************************************************
 BlackfinDiagTest * BlackfinDiagRuntime::DiagnosticTests[] 
 	= {
 		&BlackfinDiagRuntime::RegisterTest,

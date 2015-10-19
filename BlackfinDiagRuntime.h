@@ -13,7 +13,15 @@ class BlackfinDiagRuntime {
 
 private:
 		
-	static UINT8 * pRAMDataStart;
+	//***********************************************************************************************************
+	//                                                                                                          *
+	// Data RAM testing parameters, structures and definitions.                                                 *
+	//                                                                                                          *
+	//***********************************************************************************************************
+	static DataRamTestDescriptor    RamBankA;
+	static DataRamTestDescriptor    RamBankB;
+	static DataRamTestDescriptor    RamBankC;
+	static BlackfinDataRamTestSuite DataRamTestInfo;
 
 	static const UINT8  TestPatternsForRamTesting[];
 	static const UINT32 NumberOfRamTestingPatterns;
@@ -21,6 +29,14 @@ private:
 	static const UINT32 TestPatternsForRegisterTesting[];
 	static const UINT32 NumberOfRegisterPatterns;
 	
+    static BlackfinDiagDataRam DataRamTest;
+    
+	//***********************************************************************************************************
+	//                                                                                                          *
+	// Register testing parameters, structures and definitions.                                                 *
+	//                                                                                                          *
+	//***********************************************************************************************************
+	//
     //
     // Only one test but has flexibility to add more and we may break up current test.
     //
@@ -49,15 +65,19 @@ private:
 	static const BlackfinDiagTest::REGISTER_TEST BaseRegisters[];   
 	static const UINT32 NumberOfBaseRegTests;
 
-    static const BlackfinDiagTest::BlackfinRegisterTestSuite RegisterTestSuite;
+    static const BlackfinDiagTest::RegisterTestDescriptor * RegisterTestSuite[];
     
-	// Define Tests Here
-	static BlackfinDiagInstructionRam InstructionRamTest;
-	
-    static BlackfinDiagDataRam DataRamTest;
-    
+    static const UINT32 NumberOfRegisterTestDescriptors;
+ 
     static BlackfinDiagRegistersTest RegisterTest;
     
+	//***********************************************************************************************************
+	//                                                                                                          *
+	// Instruction RAM testing parameters, structures and definitions.                                          *
+	//                                                                                                          *
+	//***********************************************************************************************************
+	static BlackfinDiagInstructionRam InstructionRamTest;
+	
     // Define the array of tests to run for the diagnostics
     static BlackfinDiagTest * DiagnosticTests[];// = {&DataRamTest, &InstructionRamTest };
 
