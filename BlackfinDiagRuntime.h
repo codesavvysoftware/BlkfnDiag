@@ -18,10 +18,7 @@ private:
 	// Data RAM testing parameters, structures and definitions.                                                 *
 	//                                                                                                          *
 	//***********************************************************************************************************
-	static DataRamTestDescriptor    RamBankA;
-	static DataRamTestDescriptor    RamBankB;
-	static DataRamTestDescriptor    RamBankC;
-	static BlackfinDataRamTestSuite DataRamTestInfo;
+	static BlackfinDiagTest::BlackfinDataRamTestSuite DataRamTestInfo;
 
 	static const UINT8  TestPatternsForRamTesting[];
 	static const UINT32 NumberOfRamTestingPatterns;

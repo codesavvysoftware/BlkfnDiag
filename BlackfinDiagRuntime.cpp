@@ -7,15 +7,16 @@
 // Data RAM testing parameters, structures and definitions.                                                 *
 //                                                                                                          *
 //***********************************************************************************************************
-DataRamTestDescriptor     RamBankA = { reinterpret_cast<UINT8 *>(0xff800000), 0x8000, 0, FALSE };
-DataRamTestDescriptor     RamBankB = { reinterpret_cast<UINT8 *>(0xff900000), 0x8000, 0, FALSE };
-DataRamTestDescriptor     RamBankC = { reinterpret_cast<UINT8 *>(0xffa10000), 0x4000, 0, FALSE };
-BlackfinDataRamTestSuite  DataRamTestInfo = { RamBankA, RamBankB, RamBankC };
+BlackfinDiagTest::BlackfinDataRamTestSuite  DataRamTestInfo = { 
+																{ reinterpret_cast<UINT8 *>(0xff800000), 0x8000, 0, FALSE }, // Bank A
+                                                                { reinterpret_cast<UINT8 *>(0xff900000), 0x8000, 0, FALSE }, // Bank B
+                                                                { reinterpret_cast<UINT8 *>(0xffb00000), 0x1000, 0, FALSE }  // Bank C
+                                                              };
 
 UINT8  TestPatternsForRamTesting[]         = { 0xff,0, 0x55, 0xaa, 0xf, 0xf0, 0xa0, 0xa, 0x50, 0x5, 0x5a, 0xa5 };
 UINT32 NumberOfRamTestingPatterns          = sizeof(TestPatternsForRamTesting) / sizeof(UINT8);
 
-BlackfinDiagDataRam BlackfinDiagRuntime::DataRamTest( DataRamTestInfo, ::TestPatternsForRamTesting, ::NumberOfRamTestingPatterns );
+BlackfinDiagDataRam BlackfinDiagRuntime::DataRamTest( &::DataRamTestInfo, ::TestPatternsForRamTesting, ::NumberOfRamTestingPatterns );
 
 
 //***********************************************************************************************************
@@ -132,30 +133,21 @@ BlackfinDiagTest::REGISTER_TEST BaseRegisters[]
           };
 UINT32 NumberOfBaseRegTests = sizeof(BaseRegisters)/sizeof( BlackfinDiagTest::REGISTER_TEST );
 
-BlackfinDiagTest::RegisterTestDescriptor SanityChecks     = { ::SanityCheck,      ::NumberOfSanityChecks,        FALSE  };
-BlackfinDiagTest::RegisterTestDescriptor DataRegChecks    = { ::DataRegisters,    ::NumberOfDataRegTests,        FALSE  };
-BlackfinDiagTest::RegisterTestDescriptor PointerRegChecks = { ::PointerRegisters, ::NumberOfPointerRegTests,     FALSE  };
-BlackfinDiagTest::RegisterTestDescriptor AccumRegChecks   = { ::Accumulators,     ::NumberOfAccumulatorRegTests, FALSE  };
-BlackfinDiagTest::RegisterTestDescriptor BaseRegChecks    = { ::BaseRegisters,    ::NumberOfBaseRegTests,        FALSE  };
-BlackfinDiagTest::RegisterTestDescriptor IndexRegChecks   = { ::IndexRegisters,   ::NumberOfIndexRegTests,       FALSE  };
-BlackfinDiagTest::RegisterTestDescriptor LengthRegChecks  = { ::LengthRegisters,  ::NumberOfLengthRegTests,      FALSE  };
-BlackfinDiagTest::RegisterTestDescriptor ModifyRegChecks  = { ::ModifyRegisters,  ::NumberOfModifyRegTests,      FALSE  };
-
-BlackfinDiagTest::RegisterTestDescriptor * RegisterTestSuite[] = 
+BlackfinDiagTest::RegisterTestDescriptor RegisterTestSuite[] = 
 								{
-									&SanityChecks,
-									&DataRegChecks,
-									&PointerRegChecks,
-									&AccumRegChecks,
-									&BaseRegChecks,
-									&IndexRegChecks,
-									&LengthRegChecks,
-									&ModifyRegChecks
+									{ ::SanityCheck,      ::NumberOfSanityChecks,        FALSE  },
+									{ ::DataRegisters,    ::NumberOfDataRegTests,        FALSE  },
+									{ ::PointerRegisters, ::NumberOfPointerRegTests,     FALSE  },
+									{ ::Accumulators,     ::NumberOfAccumulatorRegTests, FALSE  },
+									{ ::BaseRegisters,    ::NumberOfBaseRegTests,        FALSE  },
+									{ ::IndexRegisters,   ::NumberOfIndexRegTests,       FALSE  },
+									{ ::LengthRegisters,  ::NumberOfLengthRegTests,      FALSE  },
+									{ ::ModifyRegisters,  ::NumberOfModifyRegTests,      FALSE  }
 								};
 	 
-UINT32 NumberOfRegisterTestDescriptors = sizeof( RegisterTestSuite ) / sizeof(BlackfinDiagTest::RegisterTestDescriptor *); 
+UINT32 NumberOfRegisterTestDescriptors = sizeof( RegisterTestSuite ) / sizeof(BlackfinDiagTest::RegisterTestDescriptor); 
 
-BlackfinDiagRegistersTest BlackfinDiagRuntime::RegisterTest( &::RegisterTestSuite, 
+BlackfinDiagRegistersTest BlackfinDiagRuntime::RegisterTest( ::RegisterTestSuite, 
                                                              ::NumberOfRegisterTestDescriptors, 
                                                              ::TestPatternsForRegisterTesting, 
                                                              ::NumberOfRegisterPatterns );
@@ -176,9 +168,9 @@ BlackfinDiagInstructionRam BlackfinDiagRuntime::InstructionRamTest;
 //***********************************************************************************************************
 BlackfinDiagTest * BlackfinDiagRuntime::DiagnosticTests[] 
 	= {
-		&BlackfinDiagRuntime::RegisterTest,
+		//&BlackfinDiagRuntime::RegisterTest,
 		&BlackfinDiagRuntime::DataRamTest, 
-		&BlackfinDiagRuntime::InstructionRamTest
+		//&BlackfinDiagRuntime::InstructionRamTest
 	  };
 
 std::vector <BlackfinDiagTest *> BlackfinDiagRuntime::Diagnostics(DiagnosticTests, end(DiagnosticTests));

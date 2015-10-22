@@ -4,7 +4,6 @@
 
 #include <ccblkfn.h>                              /* Added for ssync( ), cli/sti( ) */
 
-
 using namespace DiagnosticCommon;
 
 class BlackfinDiagDataRam : public BlackfinDiagTest {
@@ -26,6 +25,13 @@ public:
 
 	virtual BOOL IsTestComplete();
 
+ 	typedef struct {
+		      UINT8  * pByteToTest;
+		      UINT8  * pPatternThatFailed;
+		const UINT8  * pTestPatterns;
+		      UINT32   NumberOfTestPatterns;
+	} ByteTestParameters;
+	
 private:
 	static const UINT32        NumberOfBytesToTestPerIteration     = 0x400;
 
@@ -48,6 +54,8 @@ private:
 	
 	BlackfinDataRamTestSuite * DataRamTestSuite;
 
+	ByteTestParameters         btp;
+	
 	INT                        Critical;                    
 
 	void DisableInterrupts() {
@@ -67,9 +75,9 @@ private:
                      UINT32 &                OffsetFromBankStart, 
                      UINT32 &                FailurePattern );
                       
-	BOOL TestAByte(UINT8 * pByteToTest, UINT8 & PatternThatFailed);
+	BOOL TestAByte(ByteTestParameters * pbtp);
 
-	BOOL TestByteForAllTestPatterns(UINT8 * pByteToTest, UINT8 & PatternThatFailed);
+	BOOL TestByteForAllTestPatterns(ByteTestParameters * pbtp);
 };
 
 

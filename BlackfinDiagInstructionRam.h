@@ -12,11 +12,14 @@ public:
 	BlackfinDiagInstructionRam( DiagnosticTestTypes TestType = DiagInstructionRamTestType ) 
 									: BlackfinDiagTest   ( TestType, PeriodPerTestIteration_Milleseconds ), 
 									  bScaffoldingActive ( TRUE ), 
-									  bEmulationActive   ( TRUE ) {}
+									  bEmulationActive   ( TRUE ),
+									  bCompleteForDiagCycle( FALSE ) {}
 	
 	virtual ~BlackfinDiagInstructionRam(){}
 
     virtual TestState RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime = GetSystemTime() );
+
+    virtual BOOL IsTestComplete();
 		
 private:
 
@@ -60,6 +63,8 @@ private:
 	BOOL  bScaffoldingActive;
 	
     UINT8 DMABuffer[DMA_BFR_SZ];
+    
+    BOOL  bCompleteForDiagCycle;
 
     std::vector <MismatchedData> mdDataNotTheSame;
 

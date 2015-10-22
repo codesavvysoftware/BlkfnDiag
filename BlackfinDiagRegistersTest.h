@@ -10,7 +10,7 @@ using namespace DiagnosticCommon;
 class BlackfinDiagRegistersTest : public BlackfinDiagTest {
 
 public:
-	BlackfinDiagRegistersTest( 	const RegisterTestDescriptor ** RegisterTestSuite,
+	BlackfinDiagRegistersTest( 	const RegisterTestDescriptor    RegisterTestSuite[],
 	                            UINT32                            NumberOfDescriptorsInTestSuite, 
 								const UINT32 *                    TestPatterns, 
 								UINT32                            NumberOfPatterns,
@@ -31,15 +31,13 @@ public:
 private:
 	static const UINT32 PeriodPerTestIteration_Milleseconds = 500;
 
-	static const UINT32 CorruptedRegisterTestSuite = 50;
+	static const UINT32 CorruptedRegisterTestSuite = 0xff;
 
-	static const UINT32 RegisterTestPointerIsNull = 25;
-	
     const UINT32 *                    TestPatternsForRegisterTesting;
     
     const UINT32                      NumberOfRegisterPatterns;
 
-	const RegisterTestDescriptor ** RegisterTestSuite;
+	const RegisterTestDescriptor *    RegisterTestSuite;
 	
 	const UINT32                      NumberOfRegisterTests;
 	
@@ -57,7 +55,7 @@ private:
 		sti(Critical);
 	}
     
-    TestState RunRegisterTests( RegisterTestDescriptor  * rtdTests, UINT32 & FailureInfo );
+    BOOL RunRegisterTests( RegisterTestDescriptor  * rtdTests, UINT32 & FailureInfo );
 };
 
 

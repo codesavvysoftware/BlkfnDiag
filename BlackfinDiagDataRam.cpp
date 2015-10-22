@@ -1,5 +1,7 @@
 #include "BlackfinDiagDataRam.h"
 
+extern "C" BOOL TestAByteOfRam( BlackfinDiagDataRam::ByteTestParameters * pbtp );
+
 BlackfinDiagTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & ErrorCode, DiagTime_t StartTime ) {
 	
 	UINT32 ErrorInfo;
@@ -84,13 +86,30 @@ BOOL  BlackfinDiagDataRam::RunRamTest( DataRamTestDescriptor * RamDescriptor,
 
 	while ( NumberOfBytesTestedThisIteration < NumberOfBytesToTestPerIteration) {
 
-		bTestNotPassed = !TestAByte(pCurrentRamAddress, TestPattern);
+		btp.pByteToTest          = pCurrentRamAddress;
+		btp.pPatternThatFailed   = &TestPattern;
+		btp.pTestPatterns        = &RamTestPatterns[0];
+		btp.NumberOfTestPatterns = NumberOfTestPatterns;
+		
+		bTestNotPassed = !TestAByte(&btp);
 		
 		if (bTestNotPassed) break;
 		
 		NumberOfBytesTestedThisIteration++;
 		
 		pCurrentRamAddress++;
+		
+		if (!(NumberOfBytesTestedThisIteration & 0xff))
+		{
+			int i = 0;
+			
+			i++;
+		}
+		else if (!(NumberOfBytesTestedThisIteration & 0xf)) {
+			int i = 0;
+			
+			i++;
+		}
 	};
 
 	if (bTestNotPassed) {
@@ -121,31 +140,41 @@ BOOL BlackfinDiagDataRam::IsTestComplete() {
 }	
 	
 	
-BOOL BlackfinDiagDataRam::TestAByte(UINT8 * pByteToTest, UINT8 & PatternThatFailed) {
+BOOL BlackfinDiagDataRam::TestAByte( ByteTestParameters * pbtp ) {
 	BOOL bTestPassed = FALSE;
 
 	DisableInterrupts();
 
-	bTestPassed = TestByteForAllTestPatterns(pByteToTest, PatternThatFailed);
+		
+	bTestPassed = TestAByteOfRam( pbtp );
+	
+	//TestByteForAllTestPatterns(pbtp);
 
 	EnableInterrupts();
 
 	return bTestPassed; 
 }
-BOOL BlackfinDiagDataRam::TestByteForAllTestPatterns(UINT8 * pByteToTest, UINT8 & PatternThatFailed) {
+BOOL BlackfinDiagDataRam::TestByteForAllTestPatterns(ByteTestParameters * btp) {
+
 	BOOL bTestPassed = TRUE;
 
-	UINT8 SavedValue = *pByteToTest;
+	UINT8 * pTestByte = btp->pByteToTest;
+	
+	UINT8 * pFailurePattern = btp->pPatternThatFailed;
+	
+	const UINT8 * pPatterns = btp->pTestPatterns;
 
-	const UINT8 * pPattern = &RamTestPatterns[0];
-
-	for (UINT32 ui = 0; ui < NumberOfTestPatterns; pPattern++, ui++) {
-		*pByteToTest = *pPattern;
+	UINT8   SavedValue = *pTestByte;
+	
+	UINT32  Patterns   = btp->NumberOfTestPatterns;
 		
-		UINT8 pByteRead = *pByteToTest;
+	for (UINT32 ui = 0; ui < Patterns; pPatterns++, ui++) {
+		*pTestByte = *pPatterns;
 		
-		if (pByteRead != *pPattern) {
-			PatternThatFailed = *pPattern;
+		UINT8 pByteRead = *pTestByte;
+		
+		if (pByteRead != *pPatterns) {
+			*pFailurePattern = *pPatterns;
 			
 			bTestPassed = FALSE;
 			
@@ -153,7 +182,7 @@ BOOL BlackfinDiagDataRam::TestByteForAllTestPatterns(UINT8 * pByteToTest, UINT8 
 		}
 	}
 	
-	*pByteToTest = SavedValue;
+	*pTestByte = SavedValue;
 
 	return bTestPassed;		
 }
