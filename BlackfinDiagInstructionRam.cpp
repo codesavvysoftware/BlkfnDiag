@@ -65,9 +65,7 @@ BlackfinDiagInstructionRam::RunInstructionRamTestIteration(	InstructionComparePa
 	    	if (icpCompare.bScaffoldingActive) {
 	    		EnumerateMismatched(uiNumberMismatched);
 	    	}
-	    	
-	    	SetTestsCompletedForCycle();
-      
+
 	    	ts = TEST_LOOP_COMPLETE;  	
 	    }
 	    else if (bError) {
@@ -433,10 +431,6 @@ void BlackfinDiagInstructionRam::EnumerateMismatched( UINT32 & NumberOfMismatche
     }
     
     UINT32 ui32 = NumberOfMismatches; 
-}
-
-BOOL BlackfinDiagInstructionRam::IsTestComplete() {
-	return AreTestsCompletedFromLastCycle();
 }
 
 void BlackfinDiagInstructionRam::ConfigureForNextTestCycle() {

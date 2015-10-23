@@ -18,7 +18,7 @@ namespace DiagnosticCommon {
 	//
 	// Requirement:  All Diagnostic Tests Complete in 4 Hours.
 	//
-    static const DiagTime_t PeriodForAllDiagnosticsCompleted_microseconds = 4 * 60 * 60 * 1000; // 4 hours
+    static const DiagTime_t PeriodForAllDiagnosticsCompleted_milleseconds = 4 * 60 * 60 * 1000; // 4 hours
 	
 	static const UINT32 DiagnosticErrorNumberMask = 0x7fffffff;
 
@@ -28,10 +28,10 @@ namespace DiagnosticCommon {
 
     static UINT32 GetSystemTime() {
     	
-    	const UINT32 DGN_CONVERSION_FACTOR_CYCLES_uS = CLOCKS_PER_SEC / 1000000;
+    	const UINT32 DGN_CONVERSION_FACTOR_CYCLES_ms = CLOCKS_PER_SEC / 1000000000;
 		
-		if (DGN_CONVERSION_FACTOR_CYCLES_uS) {
-			return (clock() / DGN_CONVERSION_FACTOR_CYCLES_uS);
+		if (DGN_CONVERSION_FACTOR_CYCLES_ms) {
+			return (clock() / DGN_CONVERSION_FACTOR_CYCLES_ms);
 		}
 		else { 
 			return clock();

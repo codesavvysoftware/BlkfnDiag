@@ -10,15 +10,13 @@ class BlackfinDiagInstructionRam : public BlackfinDiagTest {
 	
 public:
 	BlackfinDiagInstructionRam( DiagnosticTestTypes TestType = DiagInstructionRamTestType ) 
-									: BlackfinDiagTest   ( TestType, PeriodPerTestIteration_Milleseconds ), 
+									: BlackfinDiagTest   ( TestType, PeriodPerTestIteration_Milleseconds, ScheduledTime_Milleseconds ), 
 									  bScaffoldingActive ( TRUE ), 
 									  bEmulationActive   ( TRUE ) {}
 	
 	virtual ~BlackfinDiagInstructionRam(){}
 
     virtual TestState RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime = GetSystemTime() );
-
-    virtual BOOL IsTestComplete();
 
 protected:
 
@@ -27,11 +25,13 @@ protected:
 		
 private:
 
-    static const UINT32 DMA_BFR_SZ                          = 256;	
+    static const UINT32 	DMA_BFR_SZ                          = 256;	
     
-    static const UINT32 EMUEXCEPT_OPCODE                    = 0x25;
+    static const UINT32 	EMUEXCEPT_OPCODE                    = 0x25;
     
-	static const UINT32 PeriodPerTestIteration_Milleseconds = 2000;
+	static const DiagTime_t	PeriodPerTestIteration_Milleseconds = 1000;
+	
+	static const DiagTime_t	ScheduledTime_Milleseconds          = 50;
 
 	static const UINT32 Err_UnableToStart                   = 0xfff00000;
 	

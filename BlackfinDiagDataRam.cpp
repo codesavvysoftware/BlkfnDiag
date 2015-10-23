@@ -54,10 +54,6 @@ BlackfinDiagTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & ErrorCode, Di
 		 
 		 ts = TEST_IN_PROGRESS; 			
 	}
-	else {
-
-		SetTestsCompletedForCycle();
-	}
 
 	return ts;
 }
@@ -139,12 +135,6 @@ BOOL  BlackfinDiagDataRam::RunRamTest( DataRamTestDescriptor * RamDescriptor,
 }
 		
 
-BOOL BlackfinDiagDataRam::IsTestComplete() {
-	return ( 	DataRamTestSuite->BankA.testCompleted 
-			 && DataRamTestSuite->BankB.testCompleted
-			 && DataRamTestSuite->BankC.testCompleted );
-}	
-	
 	
 BOOL BlackfinDiagDataRam::TestAByte( ByteTestParameters * pbtp ) {
 	BOOL bTestPassed = FALSE;

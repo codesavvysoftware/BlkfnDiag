@@ -14,16 +14,18 @@ public:
 	                     UINT32                     NumberOfRamTestingPatterns,
 	                     DiagnosticTestTypes TestType = DiagDataRamTestType   ) 
 	                     : 	DataRamTestSuite       ( DataRamTestSuite ),
-	                        BlackfinDiagTest       ( TestType, PeriodPerTestIteration_Milleseconds ), 
+	                        BlackfinDiagTest       ( 
+	                        						  TestType, 
+	                        						  PeriodPerTestIteration_Milleseconds,
+	                        						  ScheduledTime_Milleseconds
+	                        					   ), 
 							RamTestPatterns        ( TestPatternsForRamTesting ),
 							NumberOfTestPatterns   ( NumberOfRamTestingPatterns )
 	{}
 
 	virtual ~BlackfinDiagDataRam() {}
 
-	virtual TestState RunTest(UINT32 & ErrorCode, DiagTime_t TimeTestStarted_microseconds = GetSystemTime()  );
-
-	virtual BOOL IsTestComplete();
+	virtual TestState RunTest(UINT32 & ErrorCode, DiagTime_t TimeTestStarted_milleseconds = GetSystemTime()  );
 
  	typedef struct {
 		      UINT8  * pByteToTest;
@@ -41,7 +43,9 @@ private:
 
 	static const UINT32        TotalNumberOfRamBytesToTest         = 0x10000;
 	
-	static const UINT32        PeriodPerTestIteration_Milleseconds = 500;
+	static const DiagTime_t    PeriodPerTestIteration_Milleseconds = 1000;
+	
+	static const DiagTime_t	   ScheduledTime_Milleseconds          = 20;	
 	
 	static const UINT32        ErrorRegionBitPos = 30;
 	

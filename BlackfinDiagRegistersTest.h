@@ -19,7 +19,11 @@ public:
 									TestPatternsForRegisterTesting ( TestPatterns ),
 									NumberOfRegisterTests(NumberOfDescriptorsInTestSuite),
 									NumberOfRegisterPatterns       ( NumberOfPatterns ), 
-									BlackfinDiagTest               ( TestType, PeriodPerTestIteration_Milleseconds ),
+									BlackfinDiagTest               ( 
+																	 TestType, 
+																	 PeriodPerTestIteration_Milleseconds, 
+																	 ScheduledTime_Milleseconds 
+																   ),
 									RegisterTestSuite              ( RegisterTestSuite ) 
 	{}
 
@@ -27,14 +31,14 @@ public:
 
 	virtual TestState RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime = GetSystemTime() );
 
-	virtual BOOL        IsTestComplete();
-
 protected:
 
 	virtual void ConfigureForNextTestCycle();
 	
 private:
-	static const UINT32 PeriodPerTestIteration_Milleseconds = 500;
+	static const DiagTime_t	PeriodPerTestIteration_Milleseconds = 50;
+	
+	static const DiagTime_t	ScheduledTime_Milleseconds          = 0;	
 
 	static const UINT32 CorruptedRegisterTestSuite = 0xff;
 

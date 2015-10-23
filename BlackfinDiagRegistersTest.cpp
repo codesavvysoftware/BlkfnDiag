@@ -35,8 +35,6 @@ BlackfinDiagTest::TestState BlackfinDiagRegistersTest::RunTest( UINT32 & ErrorCo
 	}
 	else { 
 		
-		SetTestsCompletedForCycle();
-
 		tsReturned = TEST_LOOP_COMPLETE;
 	}
 	
@@ -121,22 +119,5 @@ void BlackfinDiagRegistersTest::ConfigureForNextTestCycle() {
 }
 	
 
-BOOL BlackfinDiagRegistersTest::IsTestComplete() {
-	BOOL bTestsAreComplete = TRUE;
-	
-	for( UINT32 ui = 0; ui < NumberOfRegisterTests; ui++ ) {
-	
-		RegisterTestDescriptor * prtd;
-    	
-	    prtd = const_cast<RegisterTestDescriptor *>(&RegisterTestSuite[ui]);
-		
-	    if ( !prtd->testsCompleted ) {
-	    	
-	    	bTestsAreComplete = FALSE;
 
-	    }
-	}
-	
-	return bTestsAreComplete;
-}
 	
