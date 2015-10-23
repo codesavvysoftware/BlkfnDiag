@@ -4,6 +4,8 @@ extern "C" BOOL TestAByteOfRam( BlackfinDiagDataRam::ByteTestParameters * pbtp )
 
 BlackfinDiagTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & ErrorCode, DiagTime_t StartTime ) {
 	
+	ConfigForAnyNewDiagCycle( this );
+					
 	UINT32 ErrorInfo;
 	
 	BOOL bError = TRUE;
@@ -51,6 +53,10 @@ BlackfinDiagTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & ErrorCode, Di
 		 }
 		 
 		 ts = TEST_IN_PROGRESS; 			
+	}
+	else {
+
+		SetTestsCompletedForCycle();
 	}
 
 	return ts;
@@ -199,4 +205,18 @@ void BlackfinDiagDataRam::EncodeErrorInfo( UINT32 &             ErrorInfo,
 	ErrorInfo |= (FailurePattern << ErrorTestPatternBitPos );
 	
 	ErrorInfo |= OffsetFromBankStart; 
+}
+
+void BlackfinDiagDataRam::ConfigureForNextTestCycle() {
+	DataRamTestSuite->BankA.testCompleted     = FALSE;
+	
+	DataRamTestSuite->BankA.NumberOfBytesTested = 0;
+		
+	DataRamTestSuite->BankB.testCompleted = FALSE;
+		
+	DataRamTestSuite->BankB.NumberOfBytesTested = 0;
+		
+	DataRamTestSuite->BankC.testCompleted = FALSE;
+
+	DataRamTestSuite->BankC.NumberOfBytesTested = 0;		
 }

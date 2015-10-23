@@ -168,9 +168,9 @@ BlackfinDiagInstructionRam BlackfinDiagRuntime::InstructionRamTest;
 //***********************************************************************************************************
 BlackfinDiagTest * BlackfinDiagRuntime::DiagnosticTests[] 
 	= {
-		//&BlackfinDiagRuntime::RegisterTest,
+		&BlackfinDiagRuntime::RegisterTest,
 		&BlackfinDiagRuntime::DataRamTest, 
-		//&BlackfinDiagRuntime::InstructionRamTest
+		&BlackfinDiagRuntime::InstructionRamTest
 	  };
 
 std::vector <BlackfinDiagTest *> BlackfinDiagRuntime::Diagnostics(DiagnosticTests, end(DiagnosticTests));

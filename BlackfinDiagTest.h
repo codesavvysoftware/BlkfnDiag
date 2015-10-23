@@ -43,15 +43,19 @@ public:
     
 	BlackfinDiagTest( 	DiagnosticTestTypes TestType,
 						UINT32              PeriodBetweenIterations_Milleseconds, 
+						UINT32              FrequencyOfExecutionPerDiagCycle = nDefaultTimesToRunPerCycle,
 	                  	UINT32              MaxTestDuration_Milleseconds 
 	                                           = (dcbTestExecutionTimeoutPeriodSlices_Default * DiagnosticSlicePeriod_Milleseconds) ) 
-	:	triggerValueTimeslice( dcbSliceTriggerVal_Default ),
-		stepValueTimeslice(PeriodBetweenIterations_Milleseconds / DiagnosticSlicePeriod_Milleseconds),
-		lastCompleteTimeslice(dcbSliceLastComplete_Default),
-		durationUs(dcbTestDurationInSlices_Default),
-		maxTimeslices(dcbTestExecutionMaxSlices_Default),
-		oneComplete(dcbTestComplete_Default),
-		timeoutTimeslice(MaxTestDuration_Milleseconds / DiagnosticSlicePeriod_Milleseconds)
+	:	triggerValueTimeslice   ( dcbSliceTriggerVal_Default ),
+		stepValueTimeslice      ( PeriodBetweenIterations_Milleseconds / DiagnosticSlicePeriod_Milleseconds ),
+		lastCompleteTimeslice   ( dcbSliceLastComplete_Default ),
+		durationUs              ( dcbTestDurationInSlices_Default ),
+		maxTimeslices           ( dcbTestExecutionMaxSlices_Default ),
+		oneComplete             ( dcbTestComplete_Default ),
+		timeoutTimeslice        ( MaxTestDuration_Milleseconds / DiagnosticSlicePeriod_Milleseconds ),
+		bCompleteForDiagCycle   ( TRUE ),
+		nTimesToRunPerDiagCycle ( FrequencyOfExecutionPerDiagCycle ),
+		nTimesRanThisDiagCycle	( 0 )
                                                                                      // Probably will be constant for all tests
 	{}
 		
@@ -117,15 +121,38 @@ public:
     	durationUs = CurrentTime_microseconds - TestStartTime_microseconds;
     }
     
-	virtual TestState   RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime = GetSystemTime() ) = 0;
-	virtual BOOL        IsTestComplete() = 0;
-	
-
     virtual void      SetTimesliceForNextTestIteration( DiagSlices_t Adjustment ) { triggerValueTimeslice = stepValueTimeslice + Adjustment; }
 		
 	virtual void      UpdateTimesliceForNextTestIteration() { triggerValueTimeslice += stepValueTimeslice; }
 		
+	virtual TestState   RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime = GetSystemTime() ) = 0;
+
 	static  DiagTime_t GetTimeslicePeriod_microseconds() { return DiagnosticSlicePeriod_Microseconds; }
+
+protected:
+
+	virtual BOOL        IsTestComplete() = 0;
+	virtual void 		ConfigureForNextTestCycle() = 0;	
+
+	BOOL AreTestsCompletedFromLastCycle() { return bCompleteForDiagCycle; }
+	
+	void ConfigForAnyNewDiagCycle( BlackfinDiagTest * btd ) {
+		BOOL bTestsCompletedFromLastCycle = AreTestsCompletedFromLastCycle();
+		
+		if ( bTestsCompletedFromLastCycle ) {
+			
+			ResetTestsCompletedForCycle();
+			
+			btd->ConfigureForNextTestCycle();
+		}
+	}
+	
+	void ResetTestsCompletedForCycle() { 
+		bCompleteForDiagCycle  = FALSE;
+		nTimesRanThisDiagCycle = 0;
+	}
+	
+	void SetTestsCompletedForCycle() { bCompleteForDiagCycle = TRUE; }
 
 private:
 	
@@ -150,15 +177,21 @@ private:
         	                                                           + ( MaxCyclePeriodAllTestsSecondsComponent * 100 )
             	                                                       + ( MaxCyclePeriodAllTestsMillesecondsComponent ))
                 	                                                   /DiagnosticSlicePeriod_Milleseconds;
+	static const UINT32       nDefaultTimesToRunPerCycle                  = 1;
+	
+	UINT32       nTimesToRunPerDiagCycle;  // Number of times to run the test per diagnostic cycle
+	UINT32		 nTimesRanThisDiagCycle;   // Times test has run this cycle
 	DiagSlices_t triggerValueTimeslice;    // Timeslice number for next trigger
-	DiagSlices_t stepValueTimeslice;       //  Number of diag timeslices between activationsr
+	DiagSlices_t stepValueTimeslice;       // Number of diag timeslices between activationsr
 	DiagSlices_t lastCompleteTimeslice;    // Timeslice number of the previous test completioN
 	DiagSlices_t durationUs;               // Time spent in diag function
 	DiagSlices_t maxTimeslices;            // Max number of timeslices ever seen between triggers
 	BOOL         oneComplete;              // True if diag has completed at least once. This is used to decide
 										   //      whether or not maxTimeslices is valid, since  maxTimeslices
 										   //      should indicate a completion-to-completion time
-	DiagSlices_t timeoutTimeslice;         // Max number of timeslices that test
+   	BOOL 		bCompleteForDiagCycle;     // When true test configures for executing next cycle;
+
+   	DiagSlices_t timeoutTimeslice;         // Max number of timeslices that test
 										   // can wait to be completed in
 									
 	DiagTime_t TestStartTime_microseconds;	

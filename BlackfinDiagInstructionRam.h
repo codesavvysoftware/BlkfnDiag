@@ -12,23 +12,33 @@ public:
 	BlackfinDiagInstructionRam( DiagnosticTestTypes TestType = DiagInstructionRamTestType ) 
 									: BlackfinDiagTest   ( TestType, PeriodPerTestIteration_Milleseconds ), 
 									  bScaffoldingActive ( TRUE ), 
-									  bEmulationActive   ( TRUE ),
-									  bCompleteForDiagCycle( FALSE ) {}
+									  bEmulationActive   ( TRUE ) {}
 	
 	virtual ~BlackfinDiagInstructionRam(){}
 
     virtual TestState RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime = GetSystemTime() );
 
     virtual BOOL IsTestComplete();
+
+protected:
+
+	virtual void 		ConfigureForNextTestCycle();	
+
 		
 private:
 
-    static const UINT32 DMA_BFR_SZ       = 256;	
+    static const UINT32 DMA_BFR_SZ                          = 256;	
     
-    static const UINT32 EMUEXCEPT_OPCODE = 0x25;
+    static const UINT32 EMUEXCEPT_OPCODE                    = 0x25;
     
 	static const UINT32 PeriodPerTestIteration_Milleseconds = 2000;
 
+	static const UINT32 Err_UnableToStart                   = 0xfff00000;
+	
+	static const UINT32 Err_Mismatch                        = 0xffe00000;
+	
+	static const UINT32 Err_BadBootstream               = 0xffd00000;
+    		
     typedef struct InstructionComparisonParams { 
 	    UINT8          pInstrMemRead[DMA_BFR_SZ]; // Instruction Memory Read via DMA
         UINT32         HeaderOffset;              // Offset from begining of Current Bootstream Header
@@ -64,10 +74,9 @@ private:
 	
     UINT8 DMABuffer[DMA_BFR_SZ];
     
-    BOOL  bCompleteForDiagCycle;
-
     std::vector <MismatchedData> mdDataNotTheSame;
 
+    InstructionCompareParams icpCompare;
 	//
 	// Inhibit copy construction and assignments of this class by putting the declarations in private portion.
 	// If using C++ 11 and later use the delete keyword to do this.
@@ -89,8 +98,10 @@ private:
 
     void GetBootStreamStartAddr( const UINT8 * &pBootStreamStartAddr );
 
-	BOOL RunInstructionRamTestIteration(InstructionCompareParams & icpCompare, BOOL & bError);
-	
+	BlackfinDiagTest::TestState 
+	RunInstructionRamTestIteration(	InstructionCompareParams & icpCompare,
+									UINT32 & ErrorCode	);
+																
 	BOOL StartEnumeratingInstructionBootStreamHeaders(UINT32 & header_offset);
 	};
 

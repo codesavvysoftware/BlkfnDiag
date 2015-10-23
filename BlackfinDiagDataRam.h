@@ -32,6 +32,10 @@ public:
 		      UINT32   NumberOfTestPatterns;
 	} ByteTestParameters;
 	
+protected:
+
+	virtual void ConfigureForNextTestCycle();
+	
 private:
 	static const UINT32        NumberOfBytesToTestPerIteration     = 0x400;
 

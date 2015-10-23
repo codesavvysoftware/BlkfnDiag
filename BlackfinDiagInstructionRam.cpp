@@ -7,72 +7,85 @@
 #include <bfrom.h>
 
 BlackfinDiagTest::TestState BlackfinDiagInstructionRam::RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime ) {
-    static InstructionCompareParams icpCompare;
 
-    icpCompare.HeaderOffset          = 0;
-    icpCompare.CurrentBfrOffset      = 0;
-    icpCompare.NumberOfBytesInBuffer = 0;
-    icpCompare.pReadFromAddr         = NULL;
-    icpCompare.bScaffoldingActive    = bScaffoldingActive;
-    icpCompare.bEmulationActive      = bEmulationActive;
+	ConfigForAnyNewDiagCycle( this );
+	    
+    return RunInstructionRamTestIteration( icpCompare, ErrorCode );
+}
+    
+    
+BlackfinDiagTest::TestState 
+BlackfinDiagInstructionRam::RunInstructionRamTestIteration(	InstructionCompareParams & icpCompare,
+															UINT32 & ErrorCode	) {
  	
-    BOOL bEnumerationNotStarted = !StartEnumeratingInstructionBootStreamHeaders( icpCompare.HeaderOffset );
-	  
-    if (bEnumerationNotStarted) return TEST_LOOP_COMPLETE;
- 	
+	BlackfinDiagTest::TestState ts = TEST_IN_PROGRESS;
+
 	BOOL bError = TRUE;	  
-	  
-	while(TRUE) {
+	
+	BOOL bPartialDMABuffer = ConfigureDMAReadOfInstructionMemory( icpCompare );
+	
+	DMA_Xfer_MDMA0( icpCompare.pReadFromAddr, icpCompare.pInstrMemRead );
+	
+	bError = !CompareInstructMemToBootStream( icpCompare ); 
+
+    if (icpCompare.bScaffoldingActive) {
+    	//
+        // If scaffolding is active record all mismatches. Resetting error will result in reading
+        // all of the instruction RAM.
+        //
+        //if (bError) bError = FALSE;
+    }
+
+    // Miscomparison results in an error return.
+	if (bError) {
 		
- 	  	BOOL bPartialDMABuffer = ConfigureDMAReadOfInstructionMemory( icpCompare );
-	  	
-
-	    DMA_Xfer_MDMA0( icpCompare.pReadFromAddr, icpCompare.pInstrMemRead );
-	    
-	    bError = !CompareInstructMemToBootStream( icpCompare ); 
-
-		icpCompare.CurrentBfrOffset += DMA_BFR_SZ;
+   		ErrorCode  = GetTestType() << DiagnosticErrorTestTypeBitPos;
+    
+   		ErrorCode |= Err_Mismatch;
+   		
+   		void * pCurrentAddress = icpCompare.pReadFromAddr + icpCompare.CurrentBfrOffset;
+   		
+   		ErrorCode |= reinterpret_cast<UINT32>(pCurrentAddress) & 0xffffff;
+   		
+   		ts = TEST_FAILURE;
+	}
+	
+	icpCompare.CurrentBfrOffset += DMA_BFR_SZ;
 		
-        if (icpCompare.bScaffoldingActive) {
-        	//
-        	// If scaffolding is active record all mismatches. Resetting error will result in reading
-        	// all of the instruction RAM.
-        	//
-        	if (bError) bError = FALSE;
-        }
-
-        // Miscomparison results in an error return.
-	    if (bError) break;
-	    
-	    if (bPartialDMABuffer) {
-	    	bError = FALSE;
+	if (bPartialDMABuffer) {
+		
+		bError = FALSE;
 	    	
-	    	BOOL bNoMoreHeaders = 	!EnumerateNextInstructionBootStreamHeader( icpCompare.HeaderOffset, bError );
+	    BOOL bNoMoreHeaders = 	!EnumerateNextInstructionBootStreamHeader( icpCompare.HeaderOffset, bError );
 	    	
-	    	if (bNoMoreHeaders) {
-	    		break;
+	    if (bNoMoreHeaders) {
+	    	
+	    	UINT32 uiNumberMismatched = 0;
+	    	
+	    	if (icpCompare.bScaffoldingActive) {
+	    		EnumerateMismatched(uiNumberMismatched);
 	    	}
 	    	
-	    	if (bError) {
-	    		break;
-	    	}
-	    	
-	    	icpCompare.CurrentBfrOffset = 0;
+	    	SetTestsCompletedForCycle();
+      
+	    	ts = TEST_LOOP_COMPLETE;  	
 	    }
+	    else if (bError) {
+	    	
+	    	ErrorCode  = GetTestType() << DiagnosticErrorTestTypeBitPos;
+	    	
+	    	ErrorCode |= Err_BadBootstream;   		
+	
+	    	ts = TEST_FAILURE;
+	    }
+	    	
+	    icpCompare.CurrentBfrOffset = 0;
 	    
 	}
 	
-   	UINT32 uiNumberMismatched = 0;
-
-   	if (icpCompare.bScaffoldingActive) {
-   		EnumerateMismatched(uiNumberMismatched);
-    }
-    
-    bCompleteForDiagCycle = TRUE;
-      
-	return TEST_LOOP_COMPLETE; 
- 
+	return ts;
 }
+
 
 void BlackfinDiagInstructionRam::DMA_Xfer_MDMA0(void * read_from_address, void * write_to_address)
 {
@@ -181,6 +194,7 @@ BOOL BlackfinDiagInstructionRam::StartEnumeratingInstructionBootStreamHeaders(UI
 BOOL BlackfinDiagInstructionRam::ConfigureDMAReadOfInstructionMemory( InstructionCompareParams & icp ) {
     
     const UINT8     *boot_base = NULL;
+    
     GetBootStreamStartAddr( boot_base );    
     
    	ADI_BOOT_HEADER * header = (ADI_BOOT_HEADER *)(boot_base + icp.HeaderOffset);    	
@@ -422,6 +436,35 @@ void BlackfinDiagInstructionRam::EnumerateMismatched( UINT32 & NumberOfMismatche
 }
 
 BOOL BlackfinDiagInstructionRam::IsTestComplete() {
-	return bCompleteForDiagCycle;
+	return AreTestsCompletedFromLastCycle();
+}
+
+void BlackfinDiagInstructionRam::ConfigureForNextTestCycle() {
+	
+	icpCompare.HeaderOffset          = 0;
+	
+	icpCompare.CurrentBfrOffset      = 0;
+	
+	icpCompare.NumberOfBytesInBuffer = 0;
+	
+	icpCompare.pReadFromAddr         = NULL;
+	
+	icpCompare.bScaffoldingActive    = bScaffoldingActive;
+	
+	icpCompare.bEmulationActive      = bEmulationActive;
+	
+	BOOL bEnumerationNotStarted = !StartEnumeratingInstructionBootStreamHeaders( icpCompare.HeaderOffset );
+	
+	if (bEnumerationNotStarted) {
+		//
+    	// An error report it to scheduler
+    	//
+    	UINT32 ErrorCode  = GetTestType() << DiagnosticErrorTestTypeBitPos;
+    
+    	ErrorCode |= Err_UnableToStart;
+    		
+		firmExcept( ErrorCode );
+   	}
+    	
 }
 

@@ -2,6 +2,8 @@
 
 BlackfinDiagTest::TestState BlackfinDiagRegistersTest::RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime ) {
     
+	ConfigForAnyNewDiagCycle( this );
+					
 	TestState tsReturned = TEST_IN_PROGRESS;
 
 	RegisterTestDescriptor * prtd;
@@ -33,8 +35,8 @@ BlackfinDiagTest::TestState BlackfinDiagRegistersTest::RunTest( UINT32 & ErrorCo
 	}
 	else { 
 		
-		ConfigureForNextTestCycle();
-		
+		SetTestsCompletedForCycle();
+
 		tsReturned = TEST_LOOP_COMPLETE;
 	}
 	
@@ -89,13 +91,32 @@ BOOL BlackfinDiagRegistersTest::FindTestToRun( BlackfinDiagTest::RegisterTestDes
 }
 
 void BlackfinDiagRegistersTest::ConfigureForNextTestCycle() {
+	UINT FailureInfo;
+	
+	if (!RegisterTestSuite ) {
+		FailureInfo  = ( GetTestType() << DiagnosticErrorTestTypeBitPos );
+		
+		FailureInfo |= CorruptedRegisterTestSuite;
+			
+		firmExcept( FailureInfo );
+	}
+	
+	
 	for ( UINT32 ui = 0; ui < NumberOfRegisterTests; ui++ ) {
 		
 		RegisterTestDescriptor * prtd;
     	
 	    prtd = const_cast<RegisterTestDescriptor *>(&RegisterTestSuite[ui]);
 		
-	    prtd->testsCompleted = FALSE;
+		if (!prtd)  {
+			FailureInfo  = ( GetTestType() << DiagnosticErrorTestTypeBitPos );
+			
+			FailureInfo |= CorruptedRegisterTestSuite;
+			
+			firmExcept( FailureInfo );
+		}
+	    
+		prtd->testsCompleted = FALSE;
 	}
 }
 	

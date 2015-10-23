@@ -28,6 +28,11 @@ public:
 	virtual TestState RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime = GetSystemTime() );
 
 	virtual BOOL        IsTestComplete();
+
+protected:
+
+	virtual void ConfigureForNextTestCycle();
+	
 private:
 	static const UINT32 PeriodPerTestIteration_Milleseconds = 500;
 
@@ -43,8 +48,6 @@ private:
 	
 	INT                           Critical;                    /* Temp to allow disabling interrupts around critical sections */
 
-	void ConfigureForNextTestCycle();
-	
 	BOOL FindTestToRun( BlackfinDiagTest::RegisterTestDescriptor * & rtdTests );
 	
 	void DisableInterrupts() {
