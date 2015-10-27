@@ -4,19 +4,24 @@
 #include "BlackfinDiagTest.h"
 #include <vector>
 
-using namespace DiagnosticCommon;
-
+namespace BlackfinDiagTests {
+	
 class BlackfinDiagInstructionRam : public BlackfinDiagTest {
 	
 public:
-	BlackfinDiagInstructionRam( DiagnosticTestTypes TestType = DiagInstructionRamTestType ) 
-									: BlackfinDiagTest   ( TestType, PeriodPerTestIteration_Milleseconds, ScheduledTime_Milleseconds ), 
-									  bScaffoldingActive ( TRUE ), 
-									  bEmulationActive   ( TRUE ) {}
+	BlackfinDiagInstructionRam( BlackfinExecTestData &     testData ) 
+		    		    :	BlackfinDiagTest   ( testData ),
+                            err_BadBootstream_ ( 0xffd00000 ),
+                            err_UnableToStart_ ( 0xfff00000 ),
+                            err_Mismatch_      ( 0xffe00000 ),
+							scaffoldingActive  ( TRUE ), 
+							emulationActive    ( TRUE ) 
+	{}
+	
 	
 	virtual ~BlackfinDiagInstructionRam(){}
 
-    virtual TestState RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime = GetSystemTime() );
+    virtual TestState RunTest( UINT32 & ErrorCode, DiagnosticCommon::DiagTime_t SystemTime );
 
 protected:
 
@@ -26,57 +31,53 @@ protected:
 private:
 
     static const UINT32 	DMA_BFR_SZ                          = 256;	
+    UINT8 * bfrDMA[ DMA_BFR_SZ ];
     
-    static const UINT32 	EMUEXCEPT_OPCODE                    = 0x25;
-    
-	static const DiagTime_t	PeriodPerTestIteration_Milleseconds = 1000;
-	
-	static const DiagTime_t	ScheduledTime_Milleseconds          = 50;
-
-	static const UINT32 Err_UnableToStart                   = 0xfff00000;
-	
-	static const UINT32 Err_Mismatch                        = 0xffe00000;
-	
-	static const UINT32 Err_BadBootstream               = 0xffd00000;
-    		
     typedef struct InstructionComparisonParams { 
-	    UINT8          pInstrMemRead[DMA_BFR_SZ]; // Instruction Memory Read via DMA
-        UINT32         HeaderOffset;              // Offset from begining of Current Bootstream Header
-        UINT32         CurrentBfrOffset;          // Current Offset from begining of bootstream data for Instruction Ram comparisons
-        UINT32         NumberOfBytesInBuffer;     // Number of Bytes to Compare
-        UINT8 *        pReadFromAddr;             // Address instruction RAM start for Current DMA buffer
-        BOOL           bScaffoldingActive;        // Active Status of Scaffolding for debugging.
-        BOOL           bEmulationActive;          // Emulator inserts trap instructions at key places to catch breakpoints and issues.
-                                                  // Instruction memory read from DMA will not compare.  Therefore to continue testing
-                                                  // with the emulator this flag was introduced.
+	    UINT8          ptrInstrMemRead[DMA_BFR_SZ]; // Instruction Memory Read via DMA
+        UINT32         headerOffset;                // Offset from begining of Current Bootstream Header
+        UINT32         currentBfrOffset;            // Current Offset from begining of bootstream data for Instruction Ram comparisons
+        UINT32         nmbrOfBytesInBuffer;         // Number of Bytes to Compare
+        UINT8 *        readFromAddr;                // Address instruction RAM start for Current DMA buffer
+        BOOL           scaffoldingActive;           // Active Status of Scaffolding for debugging.
+        BOOL           emulationActive;             // Emulator inserts trap instructions at key places to catch breakpoints and issues.
+                                                    // Instruction memory read from DMA will not compare.  Therefore to continue testing
+                                                    // with the emulator this flag was introduced.
     } InstructionCompareParams;
     
 	//
 	// For scaffolding.  Will probably be deleted eventually.
 	typedef struct MismatchVals {
-		UINT32  ByteNumberFromBegOfDMARead;
-		UINT8   uiInstrMemRead;
-		UINT8   uiInstrBootStream;
+		UINT32  byteNumberFromBegOfDMARead;
+		UINT8   instrMemRead;
+		UINT8   instrBootStream;
 	} MismatchedVals;
 
 	typedef struct MismatchData {
 		MismatchedVals mv[10];
-		UINT8 *        pInstrMemRead;
-		UINT8 *        pInstrMemBootStream;
-		UINT8 *        BootRecordStart;
-		UINT32         HeaderOffset;
-		UINT32         CurrentBufferOffset;
-		UINT32         CurrentFailureNum;
+		UINT8 *        ptrInstrMemRead;
+		UINT8 *        ptrInstrMemBootStream;
+		UINT8 *        bootRecordStart;
+		UINT32         headerOffset;
+		UINT32         currentBufferOffset;
+		UINT32         currentFailureNum;
 	} MismatchedData;
 	
-	BOOL  bEmulationActive;
-	BOOL  bScaffoldingActive;
-	
-    UINT8 DMABuffer[DMA_BFR_SZ];
+    static const UINT32 EMUEXCEPT_OPCODE                    = 0x25;
     
     std::vector <MismatchedData> mdDataNotTheSame;
 
-    InstructionCompareParams icpCompare;
+	const UINT32 err_BadBootstream_;
+    		
+	const UINT32 err_UnableToStart_;
+	
+	const UINT32 err_Mismatch_;
+	
+	BOOL                     emulationActive;
+	
+	BOOL                     scaffoldingActive;
+	
+    InstructionCompareParams icpCompare_;
 	//
 	// Inhibit copy construction and assignments of this class by putting the declarations in private portion.
 	// If using C++ 11 and later use the delete keyword to do this.
@@ -104,4 +105,6 @@ private:
 																
 	BOOL StartEnumeratingInstructionBootStreamHeaders(UINT32 & header_offset);
 	};
+
+};
 

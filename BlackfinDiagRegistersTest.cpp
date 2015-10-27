@@ -1,123 +1,129 @@
 #include "BlackfinDiagRegistersTest.h"
 
-BlackfinDiagTest::TestState BlackfinDiagRegistersTest::RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime ) {
+using namespace DiagnosticCommon;
+
+namespace BlackfinDiagTests {
+	
+BlackfinDiagTest::TestState BlackfinDiagRegistersTest::RunTest( UINT32 & errorCode, DiagTime_t systemTime ) {
     
 	ConfigForAnyNewDiagCycle( this );
 					
-	TestState tsReturned = TEST_IN_PROGRESS;
+	TestState result = TEST_IN_PROGRESS;
 
 	RegisterTestDescriptor * prtd;
 	
-	BOOL bFoundTestToRun = FindTestToRun( prtd );
+	BOOL foundTestToRun = FindTestToRun( prtd );
 	
-	UINT32 FailureInfo = 0;
+	UINT32 failureInfo = 0;
 		
-	if ( bFoundTestToRun ) {
+	if ( foundTestToRun ) {
 		
-		BOOL bErrorDetected = !RunRegisterTests( prtd, FailureInfo );
+		BOOL errorDetected = !RunRegisterTests( prtd, failureInfo );
 		
 		prtd->testsCompleted = TRUE;
 		
-		if ( bErrorDetected ) {
-			FailureInfo &= DiagnosticErrorNumberMask;
+		if ( errorDetected ) {
+			failureInfo &= DiagnosticErrorNumberMask;
 			
-			FailureInfo = ( GetTestType() << DiagnosticErrorTestTypeBitPos );
+			failureInfo = ( GetTestType() << DiagnosticErrorTestTypeBitPos );
 			
-			firmExcept( FailureInfo );
+			firmExcept( failureInfo );
 		}
 	}
-	else if (!RegisterTestSuite || !prtd)  {
-		FailureInfo  = ( GetTestType() << DiagnosticErrorTestTypeBitPos );
+	else if (!registerTestSuite_ || !prtd)  {
+		failureInfo  = ( GetTestType() << DiagnosticErrorTestTypeBitPos );
 		
-		FailureInfo |= CorruptedRegisterTestSuite;
+		failureInfo |= corruptedRegisterTestSuite_;
 			
-		firmExcept( FailureInfo );
+		firmExcept( failureInfo );
 	}
 	else { 
 		
-		tsReturned = TEST_LOOP_COMPLETE;
+		result = TEST_LOOP_COMPLETE;
 	}
 	
-	return tsReturned;
+	return result;
 }
 
-BOOL BlackfinDiagRegistersTest::RunRegisterTests( BlackfinDiagTest::RegisterTestDescriptor * rtdTests, 
-                                                  UINT32 &                                   FailureInfo )
+BOOL BlackfinDiagRegistersTest::RunRegisterTests( BlackfinDiagTest::RegisterTestDescriptor * registerTests, 
+                                                  UINT32 &                                   failureInfo )
 {
-   	BOOL	bNoErrorsDetected = TRUE;
+   	BOOL	noErrorsDetected = TRUE;
     
     //
     // Test the modify registers next.
     //
-    for ( UINT32 ui = 0; ui < rtdTests->NumberOfRegisterTests; ui++ ) {
+    for ( UINT32 ui = 0; ui < registerTests->nmbrRegisterTests; ++ui ) {
     	
-    	FailureInfo = ( rtdTests->RegisterTests[ui])(TestPatternsForRegisterTesting,NumberOfRegisterPatterns);
+    	failureInfo = ( registerTests->registerTests[ui])(testPatternsForRegisterTesting_,numberOfRegisterPatterns_);
     	
-    	if ( FailureInfo ) {
+    	if ( failureInfo ) {
   		
-    		bNoErrorsDetected = FALSE;
+    		noErrorsDetected = FALSE;
     		
     		break;
     	}
     }
     
-    return bNoErrorsDetected;
+    return noErrorsDetected;
 }
 
-BOOL BlackfinDiagRegistersTest::FindTestToRun( BlackfinDiagTest::RegisterTestDescriptor * & rtdTests ) {
+BOOL BlackfinDiagRegistersTest::FindTestToRun( BlackfinDiagTest::RegisterTestDescriptor * & registerTests ) {
 
-	if ( !RegisterTestSuite ) return FALSE;
+	if ( !registerTestSuite_ ) return FALSE;
     
-    BOOL bFoundTest = FALSE;
+    BOOL foundTest = FALSE;
     
     
     RegisterTestDescriptor * prtd;
     	
-	for ( UINT32 ui = 0; ui < NumberOfRegisterTests; ui++ ) {
-		prtd = const_cast<RegisterTestDescriptor *>(&RegisterTestSuite[ui]);
+	for ( UINT32 ui = 0; ui < numberOfRegisterTests_; ++ui ) {
+		prtd = const_cast<RegisterTestDescriptor *>(&registerTestSuite_[ui]);
 		
-		if ( !RegisterTestSuite[ui].testsCompleted ) {
-			rtdTests = prtd;
+		if ( !registerTestSuite_[ui].testsCompleted ) {
+			registerTests = prtd;
 			
-			bFoundTest = TRUE;
+			foundTest = TRUE;
 			
 			break;
 		}
 	}
 	
-	return bFoundTest;
+	return foundTest;
 }
 
 void BlackfinDiagRegistersTest::ConfigureForNextTestCycle() {
-	UINT FailureInfo;
+	UINT failureInfo;
 	
-	if (!RegisterTestSuite ) {
-		FailureInfo  = ( GetTestType() << DiagnosticErrorTestTypeBitPos );
+	if (!registerTestSuite_ ) {
+		failureInfo  = ( GetTestType() << DiagnosticErrorTestTypeBitPos );
 		
-		FailureInfo |= CorruptedRegisterTestSuite;
+		failureInfo |= corruptedRegisterTestSuite_;
 			
-		firmExcept( FailureInfo );
+		firmExcept( failureInfo );
 	}
 	
 	
-	for ( UINT32 ui = 0; ui < NumberOfRegisterTests; ui++ ) {
+	for ( UINT32 ui = 0; ui < numberOfRegisterTests_; ++ui ) {
 		
 		RegisterTestDescriptor * prtd;
     	
-	    prtd = const_cast<RegisterTestDescriptor *>(&RegisterTestSuite[ui]);
+	    prtd = const_cast<RegisterTestDescriptor *>(&registerTestSuite_[ui]);
 		
 		if (!prtd)  {
-			FailureInfo  = ( GetTestType() << DiagnosticErrorTestTypeBitPos );
+			failureInfo  = ( GetTestType() << DiagnosticErrorTestTypeBitPos );
 			
-			FailureInfo |= CorruptedRegisterTestSuite;
+			failureInfo |= corruptedRegisterTestSuite_;
 			
-			firmExcept( FailureInfo );
+			firmExcept( failureInfo );
 		}
 	    
 		prtd->testsCompleted = FALSE;
 	}
 }
 	
+};
+
 
 
 	

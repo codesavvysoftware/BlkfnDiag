@@ -5,64 +5,68 @@
 #include <ccblkfn.h>                              /* Added for ssync( ), cli/sti( ) */
 
 
-using namespace DiagnosticCommon;
-
+namespace BlackfinDiagTests {
+	
 class BlackfinDiagRegistersTest : public BlackfinDiagTest {
 
 public:
-	BlackfinDiagRegistersTest( 	const RegisterTestDescriptor    RegisterTestSuite[],
-	                            UINT32                            NumberOfDescriptorsInTestSuite, 
-								const UINT32 *                    TestPatterns, 
-								UINT32                            NumberOfPatterns,
-								DiagnosticTestTypes               TestType = DiagRegisterTestType ) 
-								:
-									TestPatternsForRegisterTesting ( TestPatterns ),
-									NumberOfRegisterTests(NumberOfDescriptorsInTestSuite),
-									NumberOfRegisterPatterns       ( NumberOfPatterns ), 
-									BlackfinDiagTest               ( 
-																	 TestType, 
-																	 PeriodPerTestIteration_Milleseconds, 
-																	 ScheduledTime_Milleseconds 
-																   ),
-									RegisterTestSuite              ( RegisterTestSuite ) 
+	BlackfinDiagRegistersTest( 	const RegisterTestDescriptor      registerTestSuite[],
+	                            UINT32                            numberOfDescriptorsInTestSuite, 
+								const UINT32                      testPatterns[], 
+								UINT32                            numberOfPatterns,
+		    		     		BlackfinExecTestData &     testData ) 
+		    		     		:	BlackfinDiagTest             	( testData ),
+									corruptedRegisterTestSuite_  	( 0xff ),
+									numberOfRegisterPatterns_       ( numberOfPatterns ), 
+									testPatternsForRegisterTesting_ ( testPatterns ),
+									numberOfRegisterTests_          ( numberOfDescriptorsInTestSuite),
+									registerTestSuite_              ( registerTestSuite ) 
 	{}
 
 	virtual ~BlackfinDiagRegistersTest() {}
 
-	virtual TestState RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime = GetSystemTime() );
+	virtual TestState RunTest( UINT32 & ErrorCode, DiagnosticCommon::DiagTime_t SystemTime );
 
 protected:
 
 	virtual void ConfigureForNextTestCycle();
 	
 private:
-	static const DiagTime_t	PeriodPerTestIteration_Milleseconds = 50;
+	//
+	// Inhibit copy construction and assignments of this class by putting the declarations in private portion.
+	// If using C++ 11 and later use the delete keyword to do this.
+	//
+	BlackfinDiagRegistersTest(const BlackfinDiagRegistersTest & other);
 	
-	static const DiagTime_t	ScheduledTime_Milleseconds          = 0;	
+	const BlackfinDiagRegistersTest & operator = (const BlackfinDiagRegistersTest & );
+	
 
-	static const UINT32 CorruptedRegisterTestSuite = 0xff;
+	const UINT32                      corruptedRegisterTestSuite_;
 
-    const UINT32 *                    TestPatternsForRegisterTesting;
+    const UINT32                      numberOfRegisterPatterns_;
+
+	const UINT32                      numberOfRegisterTests_;
+	
+	const RegisterTestDescriptor *    registerTestSuite_;
+	
+    const UINT32 *                    testPatternsForRegisterTesting_;
     
-    const UINT32                      NumberOfRegisterPatterns;
-
-	const RegisterTestDescriptor *    RegisterTestSuite;
-	
-	const UINT32                      NumberOfRegisterTests;
-	
-	INT                           Critical;                    /* Temp to allow disabling interrupts around critical sections */
+	INT                               critical_;                    // Temp to allow disabling interrupts around critical sections 
 
 	BOOL FindTestToRun( BlackfinDiagTest::RegisterTestDescriptor * & rtdTests );
 	
 	void DisableInterrupts() {
-		Critical = cli();
+		critical_ = cli();
 	}
 
 	void EnableInterrupts() {
-		sti(Critical);
+		sti(critical_);
 	}
     
     BOOL RunRegisterTests( RegisterTestDescriptor  * rtdTests, UINT32 & FailureInfo );
+};
+
+
 };
 
 

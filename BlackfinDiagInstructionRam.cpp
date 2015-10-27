@@ -1,34 +1,35 @@
 #include "BlackfinDiagInstructionRam.h"
 
 #include <vector>
-
+using namespace DiagnosticCommon;
+namespace BlackfinDiagTests {
 
 #include "Nvs_Obj.h"
 #include <bfrom.h>
 
-BlackfinDiagTest::TestState BlackfinDiagInstructionRam::RunTest( UINT32 & ErrorCode, DiagTime_t SystemTime ) {
+BlackfinDiagTest::TestState BlackfinDiagInstructionRam::RunTest( UINT32 & errorCode, DiagTime_t systemTime ) {
 
 	ConfigForAnyNewDiagCycle( this );
 	    
-    return RunInstructionRamTestIteration( icpCompare, ErrorCode );
+    return RunInstructionRamTestIteration( icpCompare_, errorCode );
 }
     
     
 BlackfinDiagTest::TestState 
 BlackfinDiagInstructionRam::RunInstructionRamTestIteration(	InstructionCompareParams & icpCompare,
-															UINT32 & ErrorCode	) {
+															UINT32 & errorCode	) {
  	
 	BlackfinDiagTest::TestState ts = TEST_IN_PROGRESS;
 
-	BOOL bError = TRUE;	  
+	BOOL hasError = TRUE;	  
 	
-	BOOL bPartialDMABuffer = ConfigureDMAReadOfInstructionMemory( icpCompare );
+	BOOL isPartialDMABuffer = ConfigureDMAReadOfInstructionMemory( icpCompare );
 	
-	DMA_Xfer_MDMA0( icpCompare.pReadFromAddr, icpCompare.pInstrMemRead );
+	DMA_Xfer_MDMA0( icpCompare.readFromAddr, icpCompare.ptrInstrMemRead );
 	
-	bError = !CompareInstructMemToBootStream( icpCompare ); 
+	hasError = !CompareInstructMemToBootStream( icpCompare ); 
 
-    if (icpCompare.bScaffoldingActive) {
+    if (icpCompare.scaffoldingActive) {
     	//
         // If scaffolding is active record all mismatches. Resetting error will result in reading
         // all of the instruction RAM.
@@ -37,47 +38,47 @@ BlackfinDiagInstructionRam::RunInstructionRamTestIteration(	InstructionComparePa
     }
 
     // Miscomparison results in an error return.
-	if (bError) {
+	if (hasError) {
 		
-   		ErrorCode  = GetTestType() << DiagnosticErrorTestTypeBitPos;
+   		errorCode  = GetTestType() << DiagnosticErrorTestTypeBitPos;
     
-   		ErrorCode |= Err_Mismatch;
+   		errorCode |= err_Mismatch_;
    		
-   		void * pCurrentAddress = icpCompare.pReadFromAddr + icpCompare.CurrentBfrOffset;
+   		void * currentAddr= icpCompare.readFromAddr + icpCompare.currentBfrOffset;
    		
-   		ErrorCode |= reinterpret_cast<UINT32>(pCurrentAddress) & 0xffffff;
+   		errorCode |= reinterpret_cast<UINT32>(currentAddr) & 0xffffff;
    		
    		ts = TEST_FAILURE;
 	}
 	
-	icpCompare.CurrentBfrOffset += DMA_BFR_SZ;
+	icpCompare.currentBfrOffset += DMA_BFR_SZ;
 		
-	if (bPartialDMABuffer) {
+	if (isPartialDMABuffer) {
 		
-		bError = FALSE;
+		hasError = FALSE;
 	    	
-	    BOOL bNoMoreHeaders = 	!EnumerateNextInstructionBootStreamHeader( icpCompare.HeaderOffset, bError );
+	    BOOL noMoreHeaders = 	!EnumerateNextInstructionBootStreamHeader( icpCompare.headerOffset, hasError );
 	    	
-	    if (bNoMoreHeaders) {
+	    if ( noMoreHeaders ) {
 	    	
-	    	UINT32 uiNumberMismatched = 0;
+	    	UINT32 nmbrMismatched = 0;
 	    	
-	    	if (icpCompare.bScaffoldingActive) {
-	    		EnumerateMismatched(uiNumberMismatched);
+	    	if (icpCompare.scaffoldingActive) {
+	    		EnumerateMismatched( nmbrMismatched );
 	    	}
 
 	    	ts = TEST_LOOP_COMPLETE;  	
 	    }
-	    else if (bError) {
+	    else if ( hasError ) {
 	    	
-	    	ErrorCode  = GetTestType() << DiagnosticErrorTestTypeBitPos;
+	    	errorCode  = GetTestType() << DiagnosticErrorTestTypeBitPos;
 	    	
-	    	ErrorCode |= Err_BadBootstream;   		
+	    	errorCode |= err_BadBootstream_;   		
 	
 	    	ts = TEST_FAILURE;
 	    }
 	    	
-	    icpCompare.CurrentBfrOffset = 0;
+	    icpCompare.currentBfrOffset = 0;
 	    
 	}
 	
@@ -87,9 +88,9 @@ BlackfinDiagInstructionRam::RunInstructionRamTestIteration(	InstructionComparePa
 
 void BlackfinDiagInstructionRam::DMA_Xfer_MDMA0(void * read_from_address, void * write_to_address)
 {
-    UINT NumberOf16BitUnitsToDMA = (DMA_BFR_SZ >> 1);
+    UINT nmbrOf16BitUnitsToDMA = (DMA_BFR_SZ >> 1);
     
-    *pMDMA_S0_X_COUNT   	= NumberOf16BitUnitsToDMA;
+    *pMDMA_S0_X_COUNT   	= nmbrOf16BitUnitsToDMA;
     *pMDMA_S0_X_MODIFY  	= 2;  // Number of Bytes per DMA Cycle
     *pMDMA_S0_Y_COUNT   	= 0;
     *pMDMA_S0_Y_MODIFY  	= 0;
@@ -98,7 +99,7 @@ void BlackfinDiagInstructionRam::DMA_Xfer_MDMA0(void * read_from_address, void *
     *pMDMA_S0_NEXT_DESC_PTR	= NULL;
     
     
-    *pMDMA_D0_X_COUNT   	= NumberOf16BitUnitsToDMA;
+    *pMDMA_D0_X_COUNT   	= nmbrOf16BitUnitsToDMA;
     *pMDMA_D0_X_MODIFY  	= 2;
     *pMDMA_D0_Y_COUNT   	= 0;
     *pMDMA_D0_Y_MODIFY  	= 0;
@@ -195,22 +196,22 @@ BOOL BlackfinDiagInstructionRam::ConfigureDMAReadOfInstructionMemory( Instructio
     
     GetBootStreamStartAddr( boot_base );    
     
-   	ADI_BOOT_HEADER * header = (ADI_BOOT_HEADER *)(boot_base + icp.HeaderOffset);    	
-	icp.pReadFromAddr        = (UINT8 *)header->pTargetAddress + icp.CurrentBfrOffset; 	
-	BOOL bPartialRead        = TRUE;	
+   	ADI_BOOT_HEADER * header = (ADI_BOOT_HEADER *)(boot_base + icp.headerOffset);    	
+	icp.readFromAddr        = (UINT8 *)header->pTargetAddress + icp.currentBfrOffset; 	
+	BOOL isPartialRead        = TRUE;	
 	INT32 BytesLeft          = header->dByteCount;	
-	BytesLeft               -= (icp.CurrentBfrOffset + DMA_BFR_SZ);
+	BytesLeft               -= (icp.currentBfrOffset + DMA_BFR_SZ);
 	
-	if ( BytesLeft >= 0 ) bPartialRead = FALSE;
+	if ( BytesLeft >= 0 ) isPartialRead = FALSE;
 	
-	if ( bPartialRead ) {
-		icp.NumberOfBytesInBuffer = header->dByteCount - icp.CurrentBfrOffset;
+	if ( isPartialRead ) {
+		icp.nmbrOfBytesInBuffer = header->dByteCount - icp.currentBfrOffset;
 	}
 	else {
-		icp.NumberOfBytesInBuffer = DMA_BFR_SZ;
+		icp.nmbrOfBytesInBuffer = DMA_BFR_SZ;
 	}
 	
-	return bPartialRead;
+	return isPartialRead;
  }	
 		 
 
@@ -220,7 +221,7 @@ BOOL BlackfinDiagInstructionRam::EnumerateNextInstructionBootStreamHeader( UINT3
     GetBootStreamStartAddr( boot_base );    
     
 	UINT32             offset   = 0; 
-    BOOL               bSuccess = FALSE;    
+    BOOL               success = FALSE;    
     bError                      = FALSE;
     
     ADI_BOOT_HEADER * header = (ADI_BOOT_HEADER *)(boot_base + HdrOffst);
@@ -242,7 +243,7 @@ BOOL BlackfinDiagInstructionRam::EnumerateNextInstructionBootStreamHeader( UINT3
         }
         else if ( (header->dBlockCode & BFLAG_FINAL) ) 
         {
-            bSuccess = FALSE;
+            success = FALSE;
             
             break;
         }
@@ -252,7 +253,7 @@ BOOL BlackfinDiagInstructionRam::EnumerateNextInstructionBootStreamHeader( UINT3
         }
     } 	 
     
-    return bSuccess;
+    return success;
 } 
 
 BOOL BlackfinDiagInstructionRam::CompareInstructMemToBootStream(InstructionCompareParams &icp )
@@ -260,19 +261,19 @@ BOOL BlackfinDiagInstructionRam::CompareInstructMemToBootStream(InstructionCompa
 
    	MismatchedData mdr;
     	
-    if (icp.bScaffoldingActive) {
-    	for (UINT32 ui32 = 0; ui32 < 10; ui32++ ) { 
-    		mdr.mv[ui32].ByteNumberFromBegOfDMARead = 0;
-    		mdr.mv[ui32].uiInstrMemRead = 0;
-    		mdr.mv[ui32].uiInstrBootStream = 0;
+    if (icp.scaffoldingActive) {
+    	for (UINT32 ui32 = 0; ui32 < 10; ++ui32 ) { 
+    		mdr.mv[ui32].byteNumberFromBegOfDMARead = 0;
+    		mdr.mv[ui32].instrMemRead = 0;
+    		mdr.mv[ui32].instrBootStream = 0;
     	}
     	
-    	mdr.CurrentFailureNum   = 0;
-    	mdr.CurrentBufferOffset = 0;//CurrentBfrOffset;
-    	mdr.HeaderOffset        = 0;//HeaderOffset;
-    	mdr.BootRecordStart     = NULL;//(const_cast<UINT8 *>(pBootStreamStartAddr));
-    	mdr.pInstrMemBootStream = NULL;//pInstrMemBootStream;
-    	mdr.pInstrMemRead       = NULL;//static_cast<UINT8 *>(pReadFromAddr);
+    	mdr.currentFailureNum   = 0;
+    	mdr.currentBufferOffset = 0;//currentBfrOffset;
+    	mdr.headerOffset        = 0;//headerOffset;
+    	mdr.bootRecordStart     = NULL;//(const_cast<UINT8 *>(pBootStreamStartAddr));
+    	mdr.ptrInstrMemBootStream = NULL;//ptrInstrMemBootStream;
+    	mdr.ptrInstrMemRead       = NULL;//static_cast<UINT8 *>(readFromAddr);
 //    mdr. = {NULL, NULL, NULL, 0, 0, 0, 0, 0, 0 };
                        //   { {
     	               //     (0,0,0),
@@ -288,99 +289,99 @@ BOOL BlackfinDiagInstructionRam::CompareInstructMemToBootStream(InstructionCompa
                        //    }, NULL, NULL, NULL, 0,0,0};
     }
     
-    const UINT8 * pBootStreamStartAddr = NULL;
+    const UINT8 * bootStreamStartAddr = NULL;
     
-    GetBootStreamStartAddr( pBootStreamStartAddr );    
+    GetBootStreamStartAddr( bootStreamStartAddr );    
     
-    UINT8 * pInstrMemBootStream     = (UINT8 *)(pBootStreamStartAddr + icp.HeaderOffset + sizeof(ADI_BOOT_HEADER) + icp.CurrentBfrOffset);
-    UINT8 uiInstrBootStream         = 0;
-    UINT8 uiInstrMemRead            = 0;
-    BOOL bCheckNextByteForEmulation = FALSE;
-    UINT8 * pPrevInstrMemBootStream = NULL;
-	BOOL bSuccess                   = TRUE;
-	UINT8 * pCurrentInstrctnRead    = icp.pInstrMemRead;
+    UINT8 * ptrInstrMemBootStream        = (UINT8 *)(bootStreamStartAddr + icp.headerOffset + sizeof(ADI_BOOT_HEADER) + icp.currentBfrOffset);
+    UINT8   instrBootStream              = 0;
+    UINT8   instrMemRead                 = 0;
+    BOOL    checkNextByteForEmulation    = FALSE;
+    UINT8 * prevInstrMemBootStreamAddr   = NULL;
+	BOOL    success                      = TRUE;
+	UINT8 * currentInstrctnRead          = icp.ptrInstrMemRead;
     
-    for (UINT32 ui32 = 0; ui32 < icp.NumberOfBytesInBuffer; ui32++ ) {
+    for (UINT32 ui32 = 0; ui32 < icp.nmbrOfBytesInBuffer; ++ui32 ) {
     	
-    	uiInstrBootStream = *pInstrMemBootStream;
-    	uiInstrMemRead    = *pCurrentInstrctnRead;
+    	instrBootStream = *ptrInstrMemBootStream;
+    	instrMemRead    = *currentInstrctnRead;
     	
-    	if (uiInstrBootStream == uiInstrMemRead) {
+    	if (instrBootStream == instrMemRead) {
 
-    	    pCurrentInstrctnRead++;    	
-    	    pInstrMemBootStream++;
+    	    ++currentInstrctnRead;    	
+    	    ++ptrInstrMemBootStream;
     		
-			bCheckNextByteForEmulation = FALSE;
+			checkNextByteForEmulation = FALSE;
 
 			continue;
     	}
     	else {
     		
-    		bSuccess = FALSE;
+    		success = FALSE;
     		
-    		if (icp.bEmulationActive) {
-    			if ( EMUEXCEPT_OPCODE == uiInstrMemRead ) {
+    		if (icp.emulationActive) {
+    			if ( EMUEXCEPT_OPCODE == instrMemRead ) {
     				
-    				bSuccess                   = TRUE;
-    				bCheckNextByteForEmulation = TRUE;
-    				pPrevInstrMemBootStream    = pInstrMemBootStream;
-    				bSuccess                   = TRUE;
+    				success                    = TRUE;
+    				checkNextByteForEmulation  = TRUE;
+    				prevInstrMemBootStreamAddr = ptrInstrMemBootStream;
+    				success                    = TRUE;
     				
-    	            pCurrentInstrctnRead++;
-             	    pInstrMemBootStream++;
+    	            ++currentInstrctnRead;
+             	    ++ptrInstrMemBootStream;
     		
     				continue;
     			}
-    			else if (bCheckNextByteForEmulation) {
-    				if ( ( pPrevInstrMemBootStream + 1 ) == (pInstrMemBootStream) ) {
+    			else if (checkNextByteForEmulation) {
+    				if ( ( prevInstrMemBootStreamAddr + 1 ) == (ptrInstrMemBootStream) ) {
     					
-    					bCheckNextByteForEmulation = FALSE;
-    					bSuccess                   = TRUE;
+    					checkNextByteForEmulation = FALSE;
+    					success                   = TRUE;
     					
-    	                pCurrentInstrctnRead++;
-             	        pInstrMemBootStream++;
+    	                ++currentInstrctnRead;
+             	        ++ptrInstrMemBootStream;
     		
     					continue;
     				}
     			}   			
     		}
     		
-    		if ( icp.bScaffoldingActive ) {
+    		if ( icp.scaffoldingActive ) {
 
-    			mdr.CurrentBufferOffset = icp.CurrentBfrOffset;
-    			mdr.HeaderOffset        = icp.HeaderOffset;
-    			mdr.BootRecordStart     = (const_cast<UINT8 *>(pBootStreamStartAddr));
-    			mdr.pInstrMemBootStream = pInstrMemBootStream;
-    			mdr.pInstrMemRead       = pCurrentInstrctnRead;
+    			mdr.currentBufferOffset = icp.currentBfrOffset;
+    			mdr.headerOffset        = icp.headerOffset;
+    			mdr.bootRecordStart     = (const_cast<UINT8 *>(bootStreamStartAddr));
+    			mdr.ptrInstrMemBootStream = ptrInstrMemBootStream;
+    			mdr.ptrInstrMemRead       = currentInstrctnRead;
     			
-    			if ( mdr.CurrentFailureNum < 10 ) {
+    			if ( mdr.currentFailureNum < 10 ) {
 
-    				mdr.mv[ mdr.CurrentFailureNum ].ByteNumberFromBegOfDMARead = ui32;
-    				mdr.mv[ mdr.CurrentFailureNum ].uiInstrMemRead             = uiInstrMemRead;
-    				mdr.mv[ mdr.CurrentFailureNum ].uiInstrBootStream          = uiInstrBootStream;
+    				mdr.mv[ mdr.currentFailureNum ].byteNumberFromBegOfDMARead = ui32;
+    				mdr.mv[ mdr.currentFailureNum ].instrMemRead             = instrMemRead;
+    				mdr.mv[ mdr.currentFailureNum ].instrBootStream          = instrBootStream;
     			}
     			
-    			mdr.CurrentFailureNum++; 
+    			++mdr.currentFailureNum; 
     			
-    			bSuccess = FALSE;
+    			success = FALSE;
      	
-        	    pCurrentInstrctnRead++;
+        	    ++currentInstrctnRead;
     	
-        	    pInstrMemBootStream++;
+        	    ++ptrInstrMemBootStream;
    		    }
    		    
    		    else break;
     	}
     }
     
-    if ( icp.bScaffoldingActive && !bSuccess ) mdDataNotTheSame.push_back(mdr);    			    		
+    if ( icp.scaffoldingActive && !success ) mdDataNotTheSame.push_back(mdr);    			    		
 
-    return bSuccess; 
+    return success; 
 }
 
-void BlackfinDiagInstructionRam::GetBootStreamStartAddr( const UINT8 * &pBootStreamStartAddr ) {
+void BlackfinDiagInstructionRam::GetBootStreamStartAddr( const UINT8 * &bootStreamStartAddr ) {
 	
-	pBootStreamStartAddr = (UINT8 *)0x20040000L;
+	bootStreamStartAddr = (UINT8 *)0x20040000L;
 }
    
 void BlackfinDiagInstructionRam::EnumerateMismatched( UINT32 & NumberOfMismatches ) {
@@ -392,7 +393,7 @@ void BlackfinDiagInstructionRam::EnumerateMismatched( UINT32 & NumberOfMismatche
    	void * puiInstr            = NULL;
    	void * puiInstrBootStream  = NULL;
    	void * BootRecStart        = NULL;
-   	UINT32 HeaderOffset        = 0;
+   	UINT32 headerOffset        = 0;
    	UINT32 BufferOffset        = 0;
    	UINT32 CurrentFailureNum   = 0;
 	UINT32 byte_num            = 0;
@@ -405,18 +406,18 @@ void BlackfinDiagInstructionRam::EnumerateMismatched( UINT32 & NumberOfMismatche
     	
 	for(std::vector<MismatchedData>::iterator it = mdDataNotTheSame.begin(); it != mdDataNotTheSame.end(); ++it) {
     	
-    	puiInstr            = it->pInstrMemRead;
-    	puiInstrBootStream  = it->pInstrMemBootStream;
-    	BootRecStart        = it->BootRecordStart;
-    	HeaderOffset        = it->HeaderOffset;
-    	BufferOffset        = it->CurrentBufferOffset;
-    	CurrentFailureNum   = it->CurrentFailureNum;
-    	NumberOfMismatches += CurrentFailureNum;
+    	puiInstr            = it->ptrInstrMemRead;
+    	puiInstrBootStream  = it->ptrInstrMemBootStream;
+    	BootRecStart        = it->bootRecordStart;
+    	headerOffset        = it->headerOffset;
+    	BufferOffset        = it->currentBufferOffset;
+    	CurrentFailureNum   = it->currentFailureNum;
+    	NumberOfMismatches += it->currentFailureNum;
     	
-    	for ( UINT32 ui32 = 0; (ui32 < 10) && (ui32 < CurrentFailureNum ); ui32++ ) {
-    		byte_num        = it->mv[ ui32 ].ByteNumberFromBegOfDMARead;
+    	for ( UINT32 ui32 = 0; (ui32 < 10) && (ui32 < CurrentFailureNum ); ++ui32 ) {
+    		byte_num        = it->mv[ ui32 ].byteNumberFromBegOfDMARead;
 
-    		DMABufferAddress  =  reinterpret_cast<UINT8 *>(DMABuffer);
+    		DMABufferAddress  =  reinterpret_cast<UINT8 *>(bfrDMA);
     		DMABufferAddress  += byte_num;
     		
     		BootStreamAddress =  reinterpret_cast<UINT8 *>(puiInstrBootStream);
@@ -425,8 +426,8 @@ void BlackfinDiagInstructionRam::EnumerateMismatched( UINT32 & NumberOfMismatche
     		InstrctMemAddress =  reinterpret_cast<UINT8 *>(puiInstr);
     		InstrctMemAddress += byte_num;
     	
-    		InstrMemRead    = it->mv[ ui32 ].uiInstrMemRead;
-    		BootStreamInstr = it->mv[ ui32 ].uiInstrBootStream;
+    		InstrMemRead    = it->mv[ ui32 ].instrMemRead;
+    		BootStreamInstr = it->mv[ ui32 ].instrBootStream;
     	}
     }
     
@@ -435,30 +436,32 @@ void BlackfinDiagInstructionRam::EnumerateMismatched( UINT32 & NumberOfMismatche
 
 void BlackfinDiagInstructionRam::ConfigureForNextTestCycle() {
 	
-	icpCompare.HeaderOffset          = 0;
+	icpCompare_.headerOffset          = 0;
 	
-	icpCompare.CurrentBfrOffset      = 0;
+	icpCompare_.currentBfrOffset      = 0;
 	
-	icpCompare.NumberOfBytesInBuffer = 0;
+	icpCompare_.nmbrOfBytesInBuffer   = 0;
 	
-	icpCompare.pReadFromAddr         = NULL;
+	icpCompare_.readFromAddr          = NULL;
 	
-	icpCompare.bScaffoldingActive    = bScaffoldingActive;
+	icpCompare_.scaffoldingActive      = scaffoldingActive;
 	
-	icpCompare.bEmulationActive      = bEmulationActive;
+	icpCompare_.emulationActive        = emulationActive;
 	
-	BOOL bEnumerationNotStarted = !StartEnumeratingInstructionBootStreamHeaders( icpCompare.HeaderOffset );
+	BOOL enumerationNotStarted = !StartEnumeratingInstructionBootStreamHeaders( icpCompare_.headerOffset );
 	
-	if (bEnumerationNotStarted) {
+	if ( enumerationNotStarted) {
 		//
     	// An error report it to scheduler
     	//
-    	UINT32 ErrorCode  = GetTestType() << DiagnosticErrorTestTypeBitPos;
+    	UINT32 errorCode  = GetTestType() << DiagnosticErrorTestTypeBitPos;
     
-    	ErrorCode |= Err_UnableToStart;
+    	errorCode |= err_UnableToStart_;
     		
-		firmExcept( ErrorCode );
+		firmExcept( errorCode );
    	}
     	
 }
+
+};
 

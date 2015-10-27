@@ -4,7 +4,7 @@
 #include "BlackfinDiagDataRam.h"
 #include "BlackfinDiagRegistersTest.h"
 
-  
+namespace BlackfinDiagTests {  
 template<typename T, size_t N>
 	T * end(T (&ra)[N]) {
 		return ra + N;
@@ -12,21 +12,35 @@ template<typename T, size_t N>
 class BlackfinDiagRuntime {
 
 private:
-		
+	//
+	// Var suffix of:
+	// 
+	// 	MS == milleseconds
+	// 	US == microseconds
+	//	
 	//***********************************************************************************************************
 	//                                                                                                          *
 	// Data RAM testing parameters, structures and definitions.                                                 *
 	//                                                                                                          *
 	//***********************************************************************************************************
-	static BlackfinDiagTest::BlackfinDataRamTestSuite DataRamTestInfo;
-
-	static const UINT8  TestPatternsForRamTesting[];
-	static const UINT32 NumberOfRamTestingPatterns;
-
-	static const UINT32 TestPatternsForRegisterTesting[];
-	static const UINT32 NumberOfRegisterPatterns;
+	static const UINT32                                                   nmberDataRAMBytesToTestPerIteration_;
 	
-    static BlackfinDiagDataRam DataRamTest;
+	static const DiagnosticCommon::DiagTime_t                             dataRAMTestIterationPeriodMS_;
+	
+	static const DiagnosticCommon::DiagTime_t                             dataRAMStartOffsetFromDiagCycleStartMS_;
+	
+	static const BlackfinDiagTest::BlackfinDataRamTestSuite               dataRamTestInfo_;
+
+	static const UINT8                                                    testPatternsForRamTesting_[];
+	static const UINT32                                                   nmbrOfRamTestingPatterns_;
+	
+	static const BlackfinDiagTest::BlackfinExecTestData                   dataDataRAMTes_t;
+
+    static const BlackfinDiagTest::DiagnosticTestTypes                                      testTypeDataRam;
+    
+    static BlackfinDiagDataRam                                            dataRamTest_;
+    
+    
     
 	//***********************************************************************************************************
 	//                                                                                                          *
@@ -34,60 +48,81 @@ private:
 	//                                                                                                          *
 	//***********************************************************************************************************
 	//
+ 	static const UINT32           testPatternsForRegisterTesting_[];
+	static const UINT32           nmbrOfRegisterPatterns_;
+	
     //
     // Only one test but has flexibility to add more and we may break up current test.
     //
-    static const BlackfinDiagTest::REGISTER_TEST SanityCheck[]; 
-    static const UINT32 NumberOfSanityChecks;
+    static const BlackfinDiagTest::REGISTER_TEST              sanityCheck_[]; 
+    static const UINT32                                       nmbrOfSanityChecks_;
     		
-    static const BlackfinDiagTest::REGISTER_TEST DataRegisters[];      
-    static const UINT32 NumberOfDataRegTests;
+    static const BlackfinDiagTest::REGISTER_TEST              dataRegisters_[];      
+    static const UINT32                                       nmbrOfDataRegTests_;
     
-    static const BlackfinDiagTest::REGISTER_TEST PointerRegisters[];
-    static const UINT32 NumberOfPointerRegTests;
+    static const BlackfinDiagTest::REGISTER_TEST              pointerRegisters_[];
+    static const UINT32                                       nmbrOfPointerRegTests_;
 
 
-    static const BlackfinDiagTest::REGISTER_TEST Accumulators[];
-	static const UINT32 NumberOfAccumulatorRegTests;
+    static const BlackfinDiagTest::REGISTER_TEST              accumulators_[];
+	static const UINT32                                       nmbrOfAccumulatorRegTests_;
 	
-	static const BlackfinDiagTest::REGISTER_TEST ModifyRegisters[];
-	static const UINT32 NumberOfModifyRegTests;
+	static const BlackfinDiagTest::REGISTER_TEST              modifyRegisters_[];
+	static const UINT32                                       nmbrOfModifyRegTests_;
 
-	static const BlackfinDiagTest::REGISTER_TEST LengthRegisters[];
-	static const UINT32 NumberOfLengthRegTests;
+	static const BlackfinDiagTest::REGISTER_TEST              lengthRegisters_[];
+	static const UINT32                                       nmbrOfLengthRegTests_;
 
-	static const BlackfinDiagTest::REGISTER_TEST IndexRegisters[];
-	static const UINT32 NumberOfIndexRegTests;
+	static const BlackfinDiagTest::REGISTER_TEST              indexRegisters_[];
+	static const UINT32                                       nmbrOfIndexRegTests_;
 
-	static const BlackfinDiagTest::REGISTER_TEST BaseRegisters[];   
-	static const UINT32 NumberOfBaseRegTests;
+	static const BlackfinDiagTest::REGISTER_TEST              baseRegisters_[];   
+	static const UINT32                                       nmbrOfBaseRegTests_;
 
-    static const BlackfinDiagTest::RegisterTestDescriptor * RegisterTestSuite[];
+    static const BlackfinDiagTest::RegisterTestDescriptor     registerTestSuite_[];
     
-    static const UINT32 NumberOfRegisterTestDescriptors;
+    static const UINT32                                       nmbrOfRegisterTestDescriptors_;
  
-    static BlackfinDiagRegistersTest RegisterTest;
+	static const DiagnosticCommon::DiagTime_t                 registerTestIterationPeriodMS_;
+	
+	static const DiagnosticCommon::DiagTime_t                 registerTestStartOffsetFromDiagCycleStartMS_;
+	
+    static const BlackfinDiagTest::BlackfinExecTestData       testDataRegistersTest;
+    
+    static BlackfinDiagRegistersTest                          registerTest_;
     
 	//***********************************************************************************************************
 	//                                                                                                          *
 	// Instruction RAM testing parameters, structures and definitions.                                          *
 	//                                                                                                          *
 	//***********************************************************************************************************
-	static BlackfinDiagInstructionRam InstructionRamTest;
+	static const DiagnosticCommon::DiagTime_t                  instructionRAMTestIterationPeriodMS_;
 	
+	static const DiagnosticCommon::DiagTime_t                  instructionRAMStartOffsetFromDiagCycleStartMS_;
+	
+    static const BlackfinDiagTest::BlackfinExecTestData        testDataInstructionRAMTest;
+    
+	static BlackfinDiagInstructionRam                          instructionRamTest_;
+	
+	//***********************************************************************************************************
+	//                                                                                                          *
+	// Run the complete tests definitions.                                                                      *
+	//                                                                                                          *
+	//***********************************************************************************************************
     // Define the array of tests to run for the diagnostics
-    static BlackfinDiagTest * DiagnosticTests[];// = {&DataRamTest, &InstructionRamTest };
+    static BlackfinDiagTest *                        diagnosticTests_[];
 
     // Use a vector, it makes iterating through the tests easier when executing the tests
-    static std::vector <BlackfinDiagTest *> Diagnostics;//(DiagnosticTests, end(DiagnosticTests));
+    static std::vector <BlackfinDiagTest *>          diagnostics_;//(DiagnosticTests, end(DiagnosticTests));
     
-public:
-	
     // Constructor definition
     BlackfinDiagRuntime();
     
+public:
+	
     static void ExecuteDiagnostics();
 
 };
 
+};
 

@@ -1,55 +1,54 @@
 #include "BlackfinDiagDataRam.h"
+using namespace DiagnosticCommon;
 
-extern "C" BOOL TestAByteOfRam( BlackfinDiagDataRam::ByteTestParameters * pbtp );
+namespace BlackfinDiagTests {extern "C" BOOL TestAByteOfRam( BlackfinDiagDataRam::ByteTestParameters * pbtp );
 
-BlackfinDiagTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & ErrorCode, DiagTime_t StartTime ) {
+BlackfinDiagTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & errorCode, DiagTime_t startTime ) {
 	
 	ConfigForAnyNewDiagCycle( this );
 					
-	UINT32 ErrorInfo;
-	
-	BOOL bError = TRUE;
+	BOOL errorExists = TRUE;
 	
 	BlackfinDiagTest::TestState ts = TEST_LOOP_COMPLETE;
 	
-	UINT32 OffsetFromBankStart = 0;
+	UINT32 offsetFromBankStart = 0;
 	
-	UINT32 FailurePattern = 0;
+	UINT32 failurePattern = 0;
 	
-	if ( !DataRamTestSuite->BankA.testCompleted ) { 
+	if ( !dataRamTestSuite_->BankA.testCompleted ) { 
 		
-		 bError = !RunRamTest( &DataRamTestSuite->BankA, OffsetFromBankStart, FailurePattern );
+		 errorExists = !RunRamTest( &dataRamTestSuite_->BankA, offsetFromBankStart, failurePattern );
 		 
-		 if ( bError ) {
-		 	EncodeErrorInfo( ErrorInfo, BankA, OffsetFromBankStart, FailurePattern );
+		 if ( errorExists ) {
+		 	EncodeErrorInfo( errorCode, BankA, offsetFromBankStart, failurePattern );
 		 	
-		 	firmExcept( ErrorInfo );
+		 	firmExcept( errorCode );
 		 }
 		 
 		 ts = TEST_IN_PROGRESS; 			
 		
 	}
-	else if ( !DataRamTestSuite->BankB.testCompleted ) { 
+	else if ( !dataRamTestSuite_->BankB.testCompleted ) { 
 		
-		 bError = !RunRamTest( &DataRamTestSuite->BankB, OffsetFromBankStart, FailurePattern );
+		 errorExists = !RunRamTest( &dataRamTestSuite_->BankB, offsetFromBankStart, failurePattern );
 		 
-		 if ( bError ) {
-		 	EncodeErrorInfo( ErrorInfo, BankB, OffsetFromBankStart, FailurePattern );
+		 if ( errorExists ) {
+		 	EncodeErrorInfo( errorCode, BankB, offsetFromBankStart, failurePattern );
 		 	
-		 	firmExcept( ErrorInfo );
+		 	firmExcept( errorCode );
 		 }
 		 
 		 ts = TEST_IN_PROGRESS; 			
 		
 	}
-	else if ( !DataRamTestSuite->BankC.testCompleted ) { 
+	else if ( !dataRamTestSuite_->BankC.testCompleted ) { 
 
-		 bError = !RunRamTest( &DataRamTestSuite->BankC, OffsetFromBankStart, FailurePattern );
+		 errorExists = !RunRamTest( &dataRamTestSuite_->BankC, offsetFromBankStart, failurePattern );
 		 
-		 if ( bError ) {
-		 	EncodeErrorInfo( ErrorInfo, BankC, OffsetFromBankStart, FailurePattern );
+		 if ( errorExists ) {
+		 	EncodeErrorInfo( errorCode, BankC, offsetFromBankStart, failurePattern );
 		 	
-		 	firmExcept( ErrorInfo );
+		 	firmExcept( errorCode );
 		 }
 		 
 		 ts = TEST_IN_PROGRESS; 			
@@ -58,155 +57,126 @@ BlackfinDiagTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & ErrorCode, Di
 	return ts;
 }
 
-BOOL  BlackfinDiagDataRam::RunRamTest( DataRamTestDescriptor * RamDescriptor, 
-                                       UINT32 &                OffsetFromBankStart, 
-                                       UINT32 &                FailurePattern ) {
+BOOL  BlackfinDiagDataRam::RunRamTest( DataRamTestDescriptor * testRAMDescriptor, 
+                                       UINT32 &                offsetFromBankStart, 
+                                       UINT32 &                failurePattern ) {
 		 
-	UINT8 TestPattern = 0x77;
+	UINT8 testPattern = 0x77;
 		
-	UINT32 NumberOfBytesTestedThisIteration = 0;
+	UINT32 nmbrBytesTestedThisIteration = 0;
 	
-	UINT32 NumberOfBytesToTestThisIteration = 0;
+	UINT32 nmbrBytesToTestThisIteration = 0;
 	
-	UINT32 NumberOfBytesLeftToTest = RamDescriptor->NumberOfContiguousBytesToTest - RamDescriptor->NumberOfBytesTested;
+	UINT32 nmbrBytesLeftToTest = testRAMDescriptor->nmbrContiguousBytesToTest - testRAMDescriptor->nmbrBytesTested;
 
-	if ( NumberOfBytesLeftToTest >= NumberOfBytesToTestPerIteration ) {
-		NumberOfBytesToTestThisIteration = NumberOfBytesToTestPerIteration;
+	if ( nmbrBytesLeftToTest >= nmbrBytesToTestPerIteration_ ) {
+		nmbrBytesToTestThisIteration = nmbrBytesToTestPerIteration_;
 	}
 	else {
-		NumberOfBytesToTestThisIteration = NumberOfBytesLeftToTest;
+		nmbrBytesToTestThisIteration = nmbrBytesLeftToTest;
 	}
 		
-	UINT8 * pTestStartAddress = RamDescriptor->pDataRamAddressStart + RamDescriptor->NumberOfBytesTested;
+	UINT8 * testStartAddr = testRAMDescriptor->dataRamAddressStart + testRAMDescriptor->nmbrBytesTested;
 		
-	UINT8 * pCurrentRamAddress = pTestStartAddress;
+	UINT8 * crrntRAMAddr = testStartAddr;
 	
-	BOOL bSuccess = TRUE;
+	BOOL hadSuccess    = TRUE;
 
-	BOOL bTestNotPassed = FALSE;
+	BOOL testNotPassed = FALSE;
 
+	ByteTestParameters         btp;
+	
+	while ( nmbrBytesTestedThisIteration < nmbrBytesToTestPerIteration_) {
 
-	while ( NumberOfBytesTestedThisIteration < NumberOfBytesToTestPerIteration) {
-
-		btp.pByteToTest          = pCurrentRamAddress;
-		btp.pPatternThatFailed   = &TestPattern;
-		btp.pTestPatterns        = &RamTestPatterns[0];
-		btp.NumberOfTestPatterns = NumberOfTestPatterns;
+		btp.ptrByteToTest          = crrntRAMAddr;
+		btp.ptrPatternThatFailed   = &testPattern;
+		btp.ptrTestPatterns        = testPatternsRAM_;
+		btp.nmbrTestPatterns       = nmbrTestPatterns_;
 		
-		bTestNotPassed = !TestAByte(&btp);
+		testNotPassed = !TestAByte(&btp);
 		
-		if (bTestNotPassed) break;
+		if (testNotPassed) break;
 		
-		NumberOfBytesTestedThisIteration++;
+		++nmbrBytesTestedThisIteration;
 		
-		pCurrentRamAddress++;
+		++crrntRAMAddr;
 		
-		if (!(NumberOfBytesTestedThisIteration & 0xff))
+		if (!(nmbrBytesTestedThisIteration & 0xff))
 		{
 			int i = 0;
 			
-			i++;
+			++i;
 		}
-		else if (!(NumberOfBytesTestedThisIteration & 0xf)) {
+		else if (!(nmbrBytesTestedThisIteration & 0xf)) {
 			int i = 0;
 			
-			i++;
+			++i;
 		}
 	};
 
-	if (bTestNotPassed) {
-		OffsetFromBankStart = pCurrentRamAddress - pTestStartAddress;
+	if (testNotPassed) {
+		offsetFromBankStart = crrntRAMAddr - testStartAddr;
 		
-		FailurePattern = TestPattern;
+		failurePattern = testPattern;
 	
-		bSuccess = FALSE;
+		hadSuccess = FALSE;
 	}
 	else {
 		
-		RamDescriptor->NumberOfBytesTested += NumberOfBytesTestedThisIteration;
+		testRAMDescriptor->nmbrBytesTested += nmbrBytesTestedThisIteration;
 		
-		if ( RamDescriptor->NumberOfBytesTested >= RamDescriptor->NumberOfContiguousBytesToTest ) {
+		if ( testRAMDescriptor->nmbrBytesTested >= testRAMDescriptor->nmbrContiguousBytesToTest ) {
 			
-			RamDescriptor->testCompleted = TRUE;
+			testRAMDescriptor->testCompleted = TRUE;
 		}
 	}
 	
-	return bSuccess;
+	return hadSuccess;
 }
 		
 
 	
 BOOL BlackfinDiagDataRam::TestAByte( ByteTestParameters * pbtp ) {
-	BOOL bTestPassed = FALSE;
+	BOOL testPassed = FALSE;
 
 	DisableInterrupts();
 
 		
-	bTestPassed = TestAByteOfRam( pbtp );
+	testPassed = TestAByteOfRam( pbtp );
 	
 	//TestByteForAllTestPatterns(pbtp);
 
 	EnableInterrupts();
 
-	return bTestPassed; 
-}
-BOOL BlackfinDiagDataRam::TestByteForAllTestPatterns(ByteTestParameters * btp) {
-
-	BOOL bTestPassed = TRUE;
-
-	UINT8 * pTestByte = btp->pByteToTest;
-	
-	UINT8 * pFailurePattern = btp->pPatternThatFailed;
-	
-	const UINT8 * pPatterns = btp->pTestPatterns;
-
-	UINT8   SavedValue = *pTestByte;
-	
-	UINT32  Patterns   = btp->NumberOfTestPatterns;
-		
-	for (UINT32 ui = 0; ui < Patterns; pPatterns++, ui++) {
-		*pTestByte = *pPatterns;
-		
-		UINT8 pByteRead = *pTestByte;
-		
-		if (pByteRead != *pPatterns) {
-			*pFailurePattern = *pPatterns;
-			
-			bTestPassed = FALSE;
-			
-			break;
-		}
-	}
-	
-	*pTestByte = SavedValue;
-
-	return bTestPassed;		
+	return testPassed; 
 }
 
-void BlackfinDiagDataRam::EncodeErrorInfo( UINT32 &             ErrorInfo, 
-                                           DataRamMemoryRegions Region, 
-                                           UINT32               OffsetFromBankStart, 
-                                           UINT32 FailurePattern ) {
+void BlackfinDiagDataRam::EncodeErrorInfo( UINT32 &             errorInfo, 
+                                           DataRamMemoryBanks   memoryBank, 
+                                           UINT32               offsetFromBankStart, 
+                                           UINT32               failurePattern ) {
 	
-    ErrorInfo  = GetTestType() << DiagnosticErrorTestTypeBitPos;
+    errorInfo  = GetTestType() << DiagnosticErrorTestTypeBitPos;
     
-    ErrorInfo |= Region << ErrorRegionBitPos;
+    errorInfo |= memoryBank << memoryBankFailureBitPos_;
 	
-	ErrorInfo |= (FailurePattern << ErrorTestPatternBitPos );
+	errorInfo |= (failurePattern << testPatternErrorBitPos_ );
 	
-	ErrorInfo |= OffsetFromBankStart; 
+	errorInfo |= offsetFromBankStart; 
 }
 
 void BlackfinDiagDataRam::ConfigureForNextTestCycle() {
-	DataRamTestSuite->BankA.testCompleted     = FALSE;
+	dataRamTestSuite_->BankA.testCompleted     = FALSE;
 	
-	DataRamTestSuite->BankA.NumberOfBytesTested = 0;
+	dataRamTestSuite_->BankA.nmbrBytesTested   = 0;
 		
-	DataRamTestSuite->BankB.testCompleted = FALSE;
+	dataRamTestSuite_->BankB.testCompleted     = FALSE;
 		
-	DataRamTestSuite->BankB.NumberOfBytesTested = 0;
+	dataRamTestSuite_->BankB.nmbrBytesTested   = 0;
 		
-	DataRamTestSuite->BankC.testCompleted = FALSE;
+	dataRamTestSuite_->BankC.testCompleted     = FALSE;
 
-	DataRamTestSuite->BankC.NumberOfBytesTested = 0;		
+	dataRamTestSuite_->BankC.nmbrBytesTested   = 0;		
 }
+};
+

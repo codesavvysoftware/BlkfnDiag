@@ -26,16 +26,24 @@ namespace DiagnosticCommon {
 
 #define firmExcept( uiError ) OS_Assert( uiError );//, __FILE__, __LINE__ );           
 
-    static UINT32 GetSystemTime() {
+	static UINT32 current_system_time;
+
+	static UINT32 GetCachedSystemTime() {
+		return current_system_time;
+	}
+
+	static UINT32 GetSystemTime( ) {
     	
-    	const UINT32 DGN_CONVERSION_FACTOR_CYCLES_ms = CLOCKS_PER_SEC / 1000000000;
-		
+    	static const UINT32 DGN_CONVERSION_FACTOR_CYCLES_ms = CLOCKS_PER_SEC / 1000000000;
+
 		if (DGN_CONVERSION_FACTOR_CYCLES_ms) {
-			return (clock() / DGN_CONVERSION_FACTOR_CYCLES_ms);
+			current_system_time = (clock() / DGN_CONVERSION_FACTOR_CYCLES_ms);
 		}
 		else { 
-			return clock();
+			current_system_time = clock();
 		}
+
+		return current_system_time;
 	}
 
 };

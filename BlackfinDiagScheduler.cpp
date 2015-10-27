@@ -1,23 +1,26 @@
 #include "BlackfinDiagScheduler.h"
 #include "OS_iotk.h"
 
-BlackfinDiagScheduler::BlackfinDiagScheduler(std::vector <BlackfinDiagTest *> * Diagnostics) 
-		:	RunTimeDiagnostics              ( Diagnostics ),
-			itTestEnumeration               ( Diagnostics->end() ),
-			m_LastDiagTime                  ( 0 ),
-			bSchedulerInstantiationComplete ( FALSE ),
-			TimeCycleStarted                ( 0 ) {
+using namespace BlackfinDiagTests;
+using namespace DiagnosticCommon;
 
-	if ( !Diagnostics ) {
+BlackfinDiagScheduler::BlackfinDiagScheduler(std::vector <BlackfinDiagTest *> * diagnostics) 
+		:	runTimeDiagnostics_              ( diagnostics ),
+			itTestEnumeration_               ( diagnostics->end() ),
+			m_LastDiagTime_                  ( 0 ),
+			schedulerInstantiationComplete_  ( FALSE ),
+			timeCycleStarted_                ( 0 ) {
+
+	if ( !diagnostics ) {
 		
-		UINT32 ErrorCode = CorruptedDiagTestVector;
+		UINT32 errorCode = corruptedDiagTestVector_;
 		
-		ConfigureErrorCode( ErrorCode, BlackfinDiagTest::DiagSchedulerTestType );
+		ConfigureErrorCode( errorCode, BlackfinDiagTest::DiagSchedulerTestType );
 		
-		firmExcept( ErrorCode );
+		firmExcept( errorCode );
 	}
 
-	for (std::vector<BlackfinDiagTest *>::iterator it = RunTimeDiagnostics->begin(); it != RunTimeDiagnostics->end(); ++it) {
+	for (std::vector<BlackfinDiagTest *>::iterator it = runTimeDiagnostics_->begin(); it != runTimeDiagnostics_->end(); ++it) {
 
 		BlackfinDiagTest * pdt = (*it);
 			
@@ -43,21 +46,21 @@ void BlackfinDiagScheduler::RunScheduled(){
 	//else if ((GetSystemTime() - m_LastDiagTime) > DiagnosticSlicePeriod_Microseconds)
 	
 	
-	BOOL bNewDiagTestCycle = IsTimeForNewDiagCycle();
+	BOOL newDiagTestCycle = IsTimeForNewDiagCycle();
 	
-	if ( bNewDiagTestCycle )
+	if ( newDiagTestCycle )
 	{
-		BlackfinDiagTest::DiagnosticTestTypes TestType;
+		BlackfinDiagTest::DiagnosticTestTypes testType;
 				
-		BOOL bTestsNotCompleted = !DidAllTestsComplete( TestType );
+		BOOL testsNotCompleted = !DidAllTestsComplete( testType );
 		
-		if ( bTestsNotCompleted ) {
+		if ( testsNotCompleted ) {
 			
-			UINT32 ErrorCode = AllDiagTestsDidNotComplete;
+			UINT32 errorCode = allDiagTestsDidNotComplete_;
 			
-			ConfigureErrorCode( ErrorCode, TestType );
+			ConfigureErrorCode( errorCode, testType );
 				
-			firmExcept( ErrorCode );
+			firmExcept( errorCode );
 		}			
 
 		SaveDiagCycleStartData();
@@ -68,61 +71,61 @@ void BlackfinDiagScheduler::RunScheduled(){
 	RunTestsForCurrentTimeslice();
 }
 
-BOOL BlackfinDiagScheduler::DidAllTestsComplete( BlackfinDiagTest::DiagnosticTestTypes & TestType ) {
+BOOL BlackfinDiagScheduler::DidAllTestsComplete( BlackfinDiagTest::DiagnosticTestTypes & testType ) {
 
-	BOOL bAllTestsCompleted = TRUE;
+	BOOL allTestsCompleted = TRUE;
 	
-	for (std::vector<BlackfinDiagTest *>::iterator it = RunTimeDiagnostics->begin(); it != RunTimeDiagnostics->end(); ++it) {
+	for (std::vector<BlackfinDiagTest *>::iterator it = runTimeDiagnostics_->begin(); it != runTimeDiagnostics_->end(); ++it) {
 		
 		BlackfinDiagTest * pdt = (*it);
 			
-        BOOL bTestDidNotComplete = !pdt->IsTestingCompleteForDiagCycle();
+        BOOL testDidNotComplete = !pdt->IsTestingCompleteForDiagCycle();
         
-        if ( bTestDidNotComplete ) {
+        if ( testDidNotComplete ) {
         	
-        	TestType = pdt->GetTestType();
+        	testType = pdt->GetTestType();
         	
-        	bAllTestsCompleted = FALSE;
+        	allTestsCompleted = FALSE;
 		
 			break;
         }
 	}
 	
-	return bAllTestsCompleted;
+	return allTestsCompleted;
 }
 		
 BOOL BlackfinDiagScheduler::IsTimeForNewDiagCycle() {
 
-	BOOL bTimeForNewCycle = FALSE;
+	BOOL timeForNewCycle = FALSE;
 	
-	if ( bSchedulerInstantiationComplete ) { 
+	if ( schedulerInstantiationComplete_ ) { 
 		
-		DiagTime_t CurrentTime = GetSystemTime();
+		DiagTime_t currentTime = GetSystemTime();
 		
-		DiagTime_t ElapsedTimeForThisCycle = CurrentTime - TimeCycleStarted;
+		DiagTime_t elapsedTimeForThisCycle = currentTime - timeCycleStarted_;
 		
-		if ( ElapsedTimeForThisCycle >= PeriodForAllDiagnosticsCompleted_milleseconds ) {
+		if ( elapsedTimeForThisCycle >= PeriodForAllDiagnosticsCompleted_milleseconds ) {
 			
-			bTimeForNewCycle = TRUE;
+			timeForNewCycle = TRUE;
 		}
 	}
 	else {
 
-		bSchedulerInstantiationComplete = TRUE;
+		schedulerInstantiationComplete_ = TRUE;
 		
-		bTimeForNewCycle = TRUE;
+		timeForNewCycle = TRUE;
 	}
 	
-	return bTimeForNewCycle;
+	return timeForNewCycle;
 }
 
 void BlackfinDiagScheduler::SaveDiagCycleStartData() {
-	m_LastDiagTime = GetSystemTime();
+	m_LastDiagTime_ = GetCachedSystemTime();
 }
 
 void BlackfinDiagScheduler::SetDiagTestsReadyForNewCycle() {
 	
-	for (std::vector<BlackfinDiagTest *>::iterator it = RunTimeDiagnostics->begin(); it != RunTimeDiagnostics->end(); ++it) {
+	for (std::vector<BlackfinDiagTest *>::iterator it = runTimeDiagnostics_->begin(); it != runTimeDiagnostics_->end(); ++it) {
 		
 		BlackfinDiagTest * pdt = (*it);
 		
@@ -132,26 +135,26 @@ void BlackfinDiagScheduler::SetDiagTestsReadyForNewCycle() {
 			
 void BlackfinDiagScheduler::RunTestsForCurrentTimeslice() {
 	
-	BOOL bNewTimeSlicePeriodStarting = IsTimeForNewTimeslicePeriod();
+	BOOL newTimeSlicePeriodStarting = IsTimeForNewTimeslicePeriod();
 	
-	if ( bNewTimeSlicePeriodStarting ) {
+	if ( newTimeSlicePeriodStarting ) {
 		
 		DoMoreDiagnosticTesting();
 		
 	}
 	else {
 
-		BlackfinDiagTest::DiagnosticTestTypes  TestType;
+		BlackfinDiagTest::DiagnosticTestTypes  testType;
 
-		BOOL bAnActiveTestTakingTooLongToFinish = AreAnyActiveTestsTakingTooLong( TestType );
+		BOOL anActiveTestTakingTooLongToFinish = AreAnyActiveTestsTakingTooLong( testType );
 		
-		if ( bAnActiveTestTakingTooLongToFinish ) {
+		if ( anActiveTestTakingTooLongToFinish ) {
 			
-			UINT32 ErrorCode = DiagTestTooLongToComplete;
+			UINT32 errorCode = diagTestTooLongToComplete_;
 				
-			ConfigureErrorCode( ErrorCode, TestType );
+			ConfigureErrorCode( errorCode, testType );
 				
-			firmExcept( ErrorCode );
+			firmExcept( errorCode );
 		}
 	}
 }
@@ -159,67 +162,67 @@ void BlackfinDiagScheduler::RunTestsForCurrentTimeslice() {
 
 BOOL BlackfinDiagScheduler::IsTimeForNewTimeslicePeriod() {
 	
-	BOOL bTimeForNewTimeslicePeriod = FALSE;
+	BOOL timeForNewTimeslicePeriod = FALSE;
 	
-	DiagTime_t ElapsedTime = GetSystemTime();
+	DiagTime_t elapsedTime = GetSystemTime();
 	
-	DiagTime_t NewTime = ElapsedTime;
+	DiagTime_t newTime = elapsedTime;
 	
-	ElapsedTime  -= m_LastDiagTime;
+	elapsedTime  -= m_LastDiagTime_;
 	
-	if ( ElapsedTime > BlackfinDiagTest::GetTimeslicePeriod_milleseconds() ) {
+	if ( elapsedTime > BlackfinDiagTest::GetTimeslicePeriod_milleseconds() ) {
 	
-		m_LastDiagTime = NewTime;
+		m_LastDiagTime_ = newTime;
 		
-		bTimeForNewTimeslicePeriod = TRUE;
+		timeForNewTimeslicePeriod = TRUE;
 	}
 	
-	return bTimeForNewTimeslicePeriod;
+	return timeForNewTimeslicePeriod;
 }
 
 BOOL BlackfinDiagScheduler::AreAnyActiveTestsTakingTooLong( BlackfinDiagTest::DiagnosticTestTypes & TestType ) {
 	
-	BOOL bThereAreTestsTakingTooLong = FALSE;
+	BOOL thereAreTestsTakingTooLong = FALSE;
 	
-	for (std::vector<BlackfinDiagTest *>::iterator it = RunTimeDiagnostics->begin(); it != RunTimeDiagnostics->end(); ++it) {
+	for (std::vector<BlackfinDiagTest *>::iterator it = runTimeDiagnostics_->begin(); it != runTimeDiagnostics_->end(); ++it) {
 		
 		BlackfinDiagTest * pdt = (*it);
 			
-		BOOL bTestExecutionTimeLimitExceeded = 	pdt->HasTestTakenTooLongToRun();
+		BOOL testExecutionTimeLimitExceeded = 	pdt->HasTestTakenTooLongToRun();
 		
-		if (bTestExecutionTimeLimitExceeded)
+		if ( testExecutionTimeLimitExceeded )
 		{
-			UINT32 ErrorCode = DiagTestTooLongToComplete;
+			UINT32 errorCode = diagTestTooLongToComplete_;
 				
-			ConfigureErrorCode( ErrorCode, (*it)->GetTestType() );
+			ConfigureErrorCode( errorCode, (*it)->GetTestType() );
 				
-			firmExcept( ErrorCode );
+			firmExcept( errorCode );
 		}
 	}
 	
-	return bThereAreTestsTakingTooLong;
+	return thereAreTestsTakingTooLong;
 }
 	
 void BlackfinDiagScheduler::DoMoreDiagnosticTesting() {
 	
 	StartEnumeratingTestsForThisTimeslice();
 	
-	BOOL bTestIterationCanRun = TRUE;
+	BOOL testIterationCanRun = TRUE;
 
-    while( bTestIterationCanRun ) {
+    while( testIterationCanRun ) {
     	
     	BlackfinDiagTest * pCurrentDiagTest = NULL;
 			
-    	BOOL bTestIterationCanRun = EnumerateNextScheduledTest( pCurrentDiagTest );
+    	BOOL testIterationCanRun = EnumerateNextScheduledTest( pCurrentDiagTest );
     	
-    	if ( bTestIterationCanRun ) {
+    	if ( testIterationCanRun ) {
     		
     		// Record the entry time before calling diag
-    		UINT32 entryTime_ms = GetSystemTime();
+    		UINT32 entryTime_ms = GetCachedSystemTime();
 
-			UINT32	ReturnedErrorCode;
+			UINT32	returnedErrorCode;
 	
-			BlackfinDiagTest::TestState testResult = pCurrentDiagTest->RunTest( ReturnedErrorCode, entryTime_ms );
+			BlackfinDiagTest::TestState testResult = pCurrentDiagTest->RunTest( returnedErrorCode, entryTime_ms );
 
     		pCurrentDiagTest->SetCurrentTestState( testResult );
     
@@ -240,9 +243,9 @@ void BlackfinDiagScheduler::DoMoreDiagnosticTesting() {
 
 				default:
 				{
-					ConfigureErrorCode( ReturnedErrorCode, pCurrentDiagTest->GetTestType() );
+					ConfigureErrorCode( returnedErrorCode, pCurrentDiagTest->GetTestType() );
 		
-					firmExcept( ReturnedErrorCode );
+					firmExcept( returnedErrorCode );
 				}
 			
 					break;
@@ -257,19 +260,19 @@ void BlackfinDiagScheduler::StartEnumeratingTestsForThisTimeslice() {
 	
 	std::vector<BlackfinDiagTest *>::iterator it;
 	
-	for (it = RunTimeDiagnostics->begin(); it != RunTimeDiagnostics->end(); ++it) {
+	for (it = runTimeDiagnostics_->begin(); it != runTimeDiagnostics_->end(); ++it) {
 		
 		BlackfinDiagTest * pdt = (*it);
 				
-		BOOL bTestingNotCompleteForThisDiagCycle = !pdt->IsTestingCompleteForDiagCycle();
+		BOOL testingNotCompleteForThisDiagCycle = !pdt->IsTestingCompleteForDiagCycle();
 		
-		if ( bTestingNotCompleteForThisDiagCycle ) {
+		if ( testingNotCompleteForThisDiagCycle ) {
 			
-			BOOL bTestIsScheduledToRun = pdt->IsTestScheduledToRun();
+			BOOL testIsScheduledToRun = pdt->IsTestScheduledToRun();
 			
-			BOOL bTestIsInProgress = pdt->IsTestInProgress();
+			BOOL testIsInProgress = pdt->IsTestInProgress();
 			
-			if ( bTestIsScheduledToRun || bTestIsInProgress ) {
+			if ( testIsScheduledToRun || testIsInProgress ) {
 				
 				break;
 			}
@@ -277,47 +280,47 @@ void BlackfinDiagScheduler::StartEnumeratingTestsForThisTimeslice() {
 		}
 	}
 	
-	itTestEnumeration = it;
+	itTestEnumeration_ = it;
 }				
 
 BOOL BlackfinDiagScheduler::EnumerateNextScheduledTest( BlackfinDiagTest * & pbdtNextDiag ) {
 	
-	BOOL bSuccess = FALSE;
+	BOOL success = FALSE;
 
-    while( itTestEnumeration != RunTimeDiagnostics->end() ) {
+    while( itTestEnumeration_ != runTimeDiagnostics_->end() ) {
 
-    	BlackfinDiagTest * pdt = (*itTestEnumeration);
+    	BlackfinDiagTest * pdt = (*itTestEnumeration_);
 				
-		itTestEnumeration++;
+		++itTestEnumeration_;
 				
-		BOOL bTestingNotCompleteForThisDiagCycle = !pdt->IsTestingCompleteForDiagCycle();
+		BOOL testingNotCompleteForThisDiagCycle = !pdt->IsTestingCompleteForDiagCycle();
 		
-		if ( bTestingNotCompleteForThisDiagCycle ) {
+		if ( testingNotCompleteForThisDiagCycle ) {
 			
-			BOOL bTestIsScheduledToRun = pdt->IsTestScheduledToRun();
+			BOOL testIsScheduledToRun = pdt->IsTestScheduledToRun();
 			
-			BOOL bTestIsInProgress = pdt->IsTestInProgress();
+			BOOL testIsInProgress = pdt->IsTestInProgress();
 			
-			if ( bTestIsScheduledToRun || bTestIsInProgress ) {
+			if ( testIsScheduledToRun || testIsInProgress ) {
 				
 				pbdtNextDiag = pdt;
 				
-				bSuccess = TRUE;
+				success = TRUE;
 				
 				break;
 			}
 		}
     }						
     		
-	return bSuccess;
+	return success;
 }
 
 
-void BlackfinDiagScheduler::ConfigureErrorCode( UINT32 & ReturnedErrorCode, BlackfinDiagTest::DiagnosticTestTypes TestTypeCurrent ) {
+void BlackfinDiagScheduler::ConfigureErrorCode( UINT32 & returnedErrorCode, BlackfinDiagTest::DiagnosticTestTypes testTypeCurrent ) {
 		
-	UINT32 ui32        = TestTypeCurrent;
-	ReturnedErrorCode &= DiagnosticErrorNumberMask;
-	ReturnedErrorCode |= (ui32 << DiagnosticErrorTestTypeBitPos); 
+	UINT32 ui32        = testTypeCurrent;
+	returnedErrorCode &= DiagnosticErrorNumberMask;
+	returnedErrorCode |= (ui32 << DiagnosticErrorTestTypeBitPos); 
 }
 
 
