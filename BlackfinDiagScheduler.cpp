@@ -60,7 +60,7 @@ void BlackfinDiagScheduler::RunScheduled(){
 			
 			ConfigureErrorCode( errorCode, testType );
 				
-			firmExcept( errorCode );
+//			firmExcept( errorCode );
 		}			
 
 		SaveDiagCycleStartData();
@@ -120,7 +120,7 @@ BOOL BlackfinDiagScheduler::IsTimeForNewDiagCycle() {
 }
 
 void BlackfinDiagScheduler::SaveDiagCycleStartData() {
-	m_LastDiagTime_ = GetCachedSystemTime();
+	m_LastDiagTime_ = GetSystemTime();
 }
 
 void BlackfinDiagScheduler::SetDiagTestsReadyForNewCycle() {
@@ -213,12 +213,12 @@ void BlackfinDiagScheduler::DoMoreDiagnosticTesting() {
     	
     	BlackfinDiagTest * pCurrentDiagTest = NULL;
 			
-    	BOOL testIterationCanRun = EnumerateNextScheduledTest( pCurrentDiagTest );
+    	testIterationCanRun = EnumerateNextScheduledTest( pCurrentDiagTest );
     	
     	if ( testIterationCanRun ) {
     		
     		// Record the entry time before calling diag
-    		UINT32 entryTime_ms = GetCachedSystemTime();
+    		UINT32 entryTime_ms = GetSystemTime();
 
 			UINT32	returnedErrorCode;
 	
@@ -251,6 +251,7 @@ void BlackfinDiagScheduler::DoMoreDiagnosticTesting() {
 					break;
 			}
 		}
+
 	}
 }
     
@@ -321,6 +322,10 @@ void BlackfinDiagScheduler::ConfigureErrorCode( UINT32 & returnedErrorCode, Blac
 	UINT32 ui32        = testTypeCurrent;
 	returnedErrorCode &= DiagnosticErrorNumberMask;
 	returnedErrorCode |= (ui32 << DiagnosticErrorTestTypeBitPos); 
+}
+
+BlackfinDiagScheduler::BlackfinDiagScheduler() {
+
 }
 
 

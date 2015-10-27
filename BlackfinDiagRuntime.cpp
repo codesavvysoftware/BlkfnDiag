@@ -280,9 +280,9 @@ static BlackfinDiagTest * instructionRamTestPtr = &instructionRamTest_;
 //***********************************************************************************************************
 BlackfinDiagTest * BlackfinDiagRuntime::diagnosticTests_[] 
 	= {
-		registerTestPtr,
+//		registerTestPtr,
 		dataRamTestPtr, 
-		instructionRamTestPtr
+//		instructionRamTestPtr
 	  }; 
 
 

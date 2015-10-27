@@ -63,6 +63,8 @@ private:
     DiagnosticCommon::DiagTime_t m_LastDiagTime_;
     
     DiagnosticCommon::DiagTime_t timeCycleStarted_;
+    
+    BlackfinDiagScheduler();
 	
 	BlackfinDiagScheduler(const BlackfinDiagScheduler &);
 
