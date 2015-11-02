@@ -44,16 +44,12 @@ public:
     
     typedef struct {
     	DiagnosticCommon::DiagElapsedTime_t	      iterationPeriod;
-    	DiagnosticCommon::DiagElapsedTime_t       maxTestDuration;
-    	DiagnosticCommon::DiagElapsedTime_t		  maxTimeForTestToComplete;
-    	DiagnosticCommon::DiagElapsedTime_t       scheduledToRunTime;
-    	DiagnosticCommon::DiagTimestampTime_t     testStartTimestamp;
-		DiagnosticCommon::DiagTimestampTime_t     testIterationStartTimestamp;
-   		BOOL 		        				  completeForDiagCycle;     		// When true test configures for executing next cycle;
-   		UINT32              				  nmbrTimesToRunPerDiagCycle;  		// Number of times to run the test per diagnostic cycle
-   		UINT32		               			  nmbrTimesRanThisDiagCycle;   		// Times test has run this cycle
-		DiagnosticTestTypes 				  testType;
-		TestState  							  tsCurrentTestState;	
+		DiagnosticCommon::DiagElapsedTime_t       offsetFromDiagCycleStart;
+		DiagnosticCommon::DiagTimestampTime_t     iterationCompleteTimestamp;
+   		UINT32              				      nmbrTimesToRunPerDiagCycle;  		// Number of times to run the test per diagnostic cycle
+   		UINT32		               			      nmbrTimesRanThisDiagCycle;   		// Times test has run this cycle
+		DiagnosticTestTypes 				      testType;
+		TestState  							      tsCurrentTestState;	
     } BlackfinExecTestData;    
 
     
@@ -63,42 +59,36 @@ public:
 			
 	virtual ~BlackfinDiagTest()  {}
 
-	BOOL				  GetCompleteForDiagCycleStatus();
+	TestState                               GetCurrentTestState();
 	
-	TestState             GetCurrentTestState();
+	DiagnosticCommon::DiagTimestampTime_t   GetIterationCompletedTimestamp();
 
-	DiagTimestampTime_t   GetStartOfTestIterationTimestamp();
-
-	DiagElapsedTime_t     GetIterationPeriod();
-
-	DiagTimestampTime_t   GetStartOfTestTimestamp();
-
-	BOOL				  GetTestRanSpecifiedNumberOfTimesStatus();
+	DiagnosticCommon::DiagElapsedTime_t     GetIterationPeriod();
 	
-	DiagnosticTestTypes   GetTestType();
-
-	void                  IncrementTimesRanThisDiagCycle();
-
-	BOOL                  IsTestInProgress();	
+	UINT32                                  GetNumberOfTimesToRunPerDiagCycle();
 	
-	void                  ResetCompleteForDiagCycle();
-
-	void                  SetCompleteForDiagCycle();
-
-	void                  SetTimesRanThisDiagCycle(UINT32 nmberOfTimesRan);
-
-	void                  SetInitialSchedule();
+	UINT32                                  GetNumberOfTimesRanThisDiagCycle();
 	
-	void                  SetStartOfTestIterationTimestamp(DiagTimestampTime_t timestamp);
+	DiagnosticCommon::DiagElapsedTime_t     GetOffsetFromDiagCycleStart();
 
-	void				  SetStartOfTestTimestamp(DiagTimestampTime_t timestamp);
+	DiagnosticTestTypes                     GetTestType();
+	
+	
+	void                  SetCurrentTestState(TestState);
+	
+	void				  SetIterationCompletedTimestamp(DiagnosticCommon::DiagTimestampTime_t timestamp);
 
-	void                  UpdateMaxDurationTime();  
+	void			      SetIterationPeriod(DiagnosticCommon::DiagElapsedTime_t period);
+	
+	void                  SetNumberOfTimesToRunPerDiagCycle(UINT32);
+	
+	void                  SetNumberOfTimesRanThisDiagCycle(UINT32);
+	
+	void 				  SetOffsetFromDiagCycleStart(DiagnosticCommon::DiagElapsedTime_t offset);
 
-	static DiagnosticCommon::DiagElapsedTime_t   GetTimeslicePeriod_milleseconds(); 
-		
+	void				  SetTestType(DiagnosticTestTypes test_type);
 
-	virtual TestState   RunTest( UINT32 & ErrorCode ) = 0;
+	virtual TestState     RunTest( UINT32 & ErrorCode ) = 0;
 
 protected:
 
@@ -106,9 +96,6 @@ protected:
 
 	void                ConfigForAnyNewDiagCycle( BlackfinDiagTest * btd ); 
 	
-	BOOL                HaveTestsCompletedAtLeastOnce();
-
-
 private:
 	
 	static const DiagnosticCommon::DiagElapsedTime_t DiagTimeSlicePeriod_Milleseconds = 50;  // Resolution of microseconds
@@ -120,8 +107,6 @@ private:
 	BlackfinDiagTest(const BlackfinDiagTest & other) {}
 
 	const BlackfinDiagTest & operator = (const BlackfinDiagTest &);
-		
-	BOOL AreThereMoreCompleteTestsToRunThisDiagCycle();
 
 };
 

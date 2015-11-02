@@ -5,14 +5,11 @@ using namespace DiagnosticCommon;
 
 namespace BlackfinDiagTests {
 
-DiagElapsedTime_t defaultCurrentExecutionTimeMS     = 0;
-DiagElapsedTime_t defaultMaxTestDurationTimeMS      = 0;
-DiagElapsedTime_t defaultMaxTimeForTestCompletionMS = 4 * 60 * 60 * 1000;  // 4 hours
-DiagTimestampTime_t defaultTestStartTime            = 0;
-BOOL       defaultCompleteForDiagCycle       = FALSE;
-UINT32     defaultNmbrTimesToRunPerDiagCycle = 1;
-UINT32     defaultNmbrTimesRanThisDiagCycle  = 1;
-BlackfinDiagTest::TestState  defaultInitialTestExecutionState  = BlackfinDiagTest::TEST_IDLE;
+DiagTimestampTime_t          defaultTestStartTime                = 0;
+DiagTimestampTime_t          defaultIterationComplete            = 0;
+UINT32                       defaultNmbrTimesToRunPerDiagCycle   = 1;
+UINT32                       defaultNmbrTimesRanThisDiagCycle    = 1;
+BlackfinDiagTest::TestState  defaultInitialTestExecutionState    = BlackfinDiagTest::TEST_IDLE;
 
 //***********************************************************************************************************
 //                                                                                                          *
@@ -37,19 +34,14 @@ BlackfinDiagTest::DiagnosticTestTypes  testTypeDataRam = BlackfinDiagTest::DiagD
 
 BlackfinDiagTest::BlackfinExecTestData testDataDataRAMTest = {
 																dataRAMTestIterationPeriodMS_,
-																defaultCurrentExecutionTimeMS,
-																defaultMaxTestDurationTimeMS,
-																defaultMaxTimeForTestCompletionMS,
 																dataRAMStartOffsetFromDiagCycleStartMS_,
-																defaultTestStartTime,
-																defaultCompleteForDiagCycle,
+																defaultIterationComplete,
 																defaultNmbrTimesToRunPerDiagCycle,
 																defaultNmbrTimesRanThisDiagCycle,
 																testTypeDataRam,
 																defaultInitialTestExecutionState
 															};
 											
-	
 BlackfinDiagDataRam dataRamTest_(  &dataRamTestInfo_, 
                                    testPatternsForRamTesting_, 
                                    numberOfRamTestingPatterns_, 
@@ -223,12 +215,8 @@ DiagElapsedTime_t                registerTestStartOffsetFromDiagCycleStartMS_;  
 	
 BlackfinDiagTest::BlackfinExecTestData testDataRegistersTest = {
 																	registerTestIterationPeriodMS_,
-																	defaultCurrentExecutionTimeMS,
-																	defaultMaxTestDurationTimeMS,
-																	defaultMaxTimeForTestCompletionMS,
 																	registerTestStartOffsetFromDiagCycleStartMS_,
-																	defaultTestStartTime,
-																	defaultCompleteForDiagCycle,
+    																defaultIterationComplete,
 																	defaultNmbrTimesToRunPerDiagCycle,
 																	defaultNmbrTimesRanThisDiagCycle,
 																	BlackfinDiagTest::DiagRegisterTestType,
@@ -255,12 +243,8 @@ DiagElapsedTime_t       instructionRAMStartOffsetFromDiagCycleStartMS_  = 500;  
 
 BlackfinDiagTest::BlackfinExecTestData testDataInstructionRAMTest = {
 					      												instructionRamTestIterationPeriodMS_,
-	    																defaultCurrentExecutionTimeMS,
-		    															defaultMaxTestDurationTimeMS,
-			    														defaultMaxTimeForTestCompletionMS,
 				 	    												instructionRAMStartOffsetFromDiagCycleStartMS_,
-																		defaultTestStartTime,
-									    								defaultCompleteForDiagCycle,
+																		defaultIterationComplete,
 											    						defaultNmbrTimesToRunPerDiagCycle,
 							    										defaultNmbrTimesRanThisDiagCycle,
 								    									BlackfinDiagTest::DiagInstructionRamTestType,

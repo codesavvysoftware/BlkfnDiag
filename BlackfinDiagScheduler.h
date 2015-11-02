@@ -18,6 +18,7 @@
 /// @brief This class implements the main work flow for SIL-2 diagnostics.
 ////////////////////////////////////////////////////////////////////////////////    
 #include "BlackfinDiagTest.h"
+#include <vector>
 
 class BlackfinDiagScheduler
 {
@@ -33,7 +34,7 @@ public:
 
 	/// Runs power-up diagnostic tests.
 	void PowerUp(void) {}
-
+	
 	/// Performs run-time tests according to the schedule.
 	void RunScheduled();
 
@@ -48,6 +49,19 @@ private:
 	
 	static const UINT32  allDiagTestsDidNotComplete_ = 4;
 	
+	typedef enum {
+		INITIAL_INSTANTIATION,
+		MAX_PERIOD_EXPIRED_ALL_TESTS_COMPLETE,
+		MAX_PERIOD_EXPIRED_INCOMPLETE_TESTING,
+		NO_NEW_SCHEDULING_PERIOD,
+		NO_TESTS_TO_RUN_ALL_COMPLETED,
+		NO_TEST_ITERATIONS_SCHEDULED,
+		TEST_ITERATIONS_SCHEDULED,
+	} SchedulerStates;
+	
+	SchedulerStates        currentSchedulerState_;
+		
+	
 	std::vector <BlackfinDiagTests::BlackfinDiagTest *> * runTimeDiagnostics_;
 	
 	std::vector<BlackfinDiagTests::BlackfinDiagTest *>::iterator itTestEnumeration_; 
@@ -58,43 +72,51 @@ private:
 	// completion time diagnostic injected fault happen faster will be injected here.
 	//	static const DiagSlices_t DGN_COMPL_CHECK_INTERVAL_TIME_SLICE = 15 * DGN_INTERVALS_PER_MINUTE;
 
-    BOOL   schedulerInstantiationComplete_;
+	DiagnosticCommon::DiagTimestampTime_t timestampCurrent_;	
+	
+    DiagnosticCommon::DiagTimestampTime_t timeTestCycleStarted_;
     
-    DiagnosticCommon::DiagTimestampTime_t m_LastDiagTime_;
-    
-    DiagnosticCommon::DiagTimestampTime_t timeCycleStarted_;
-    
+    DiagnosticCommon::DiagTimestampTime_t timeLastIterationPeriodExpired_;
+
     BlackfinDiagScheduler();
 	
 	BlackfinDiagScheduler(const BlackfinDiagScheduler &);
 
 	BlackfinDiagScheduler &operator=(const BlackfinDiagScheduler &);
 
-	BOOL AreAnyActiveTestsTakingTooLong( BlackfinDiagTests::BlackfinDiagTest::DiagnosticTestTypes & TestType );
-	
-	BOOL DidAllTestsComplete( BlackfinDiagTests::BlackfinDiagTest::DiagnosticTestTypes & TestType );
+	BOOL AreTestIterationsScheduledToRun();
+
+	void DetermineCurrentSchedulerState();
+
+    void ComputeElapsedTime( DiagnosticCommon::DiagTimestampTime_t   current, 
+                             DiagnosticCommon::DiagTimestampTime_t   previous, 
+                             DiagnosticCommon::DiagElapsedTime_t   & elapsed  );
+                             
+	void ConfigureErrorCode( UINT32 & returnedErrorCode, BlackfinDiagTests::BlackfinDiagTest::DiagnosticTestTypes testTypeCurrent );
+
+	void DoMoreDiagnosticTesting();
+
+	BOOL DidAllTestsComplete();
 
 	BOOL EnumerateNextScheduledTest( BlackfinDiagTests::BlackfinDiagTest * & pbdtNextDiag );
-	
-	BOOL HasTestTakenTooLongToRun(BlackfinDiagTests::BlackfinDiagTest * & pbdt);
 
-	BOOL IsTestScheduledToRun(BlackfinDiagTests:BlackfinDiagTest * & pbdt);
-	
-	BOOL IsTimeForNewDiagCycle(BlackfinCommon::DiagElapsedTime_t elapsed_time);
-	
-	BOOL IsTimeForNewTimeslicePeriod();
-	
-    void ConfigureErrorCode( UINT32 & ReturnedErrorCode, BlackfinDiagTests::BlackfinDiagTest::DiagnosticTestTypes TestTypeCurrent );
+	DiagnosticCommon::DiagTimestampTime_t GetSystemTimestamp();
+
+	BOOL HasCompleteDiagTestPeriodExpired( DiagnosticCommon::DiagElapsedTime_t elapsed_time );
+
+	BOOL HasNewTestIterationPeriodStarted( DiagnosticCommon::DiagElapsedTime_t elapsedTimeForCurrentIteration );
+
+	BOOL IsTestScheduledToRun(BlackfinDiagTests::BlackfinDiagTest * & pbdt);
+
+    BOOL IsTestingCompleteForDiagCycle(BlackfinDiagTests::BlackfinDiagTest * & pbdt);
     
-	void DoMoreDiagnosticTesting();
-	
 	void ResetTestsCompletedForCycle(BlackfinDiagTests::BlackfinDiagTest * & pbdt);
-		
-	void RunTestsForCurrentTimeslice();
-	
+
 	void SetAnotherTestCompletedForCycle(BlackfinDiagTests::BlackfinDiagTest * & pbdt);
-	
-	void StartEnumeratingTestsForThisTimeslice();
+
+	void SetDiagTestsReadyForNewTestCycle();
+
+	BOOL StartEnumeratingTestsForThisIterationPeriod();
 	
 };
 

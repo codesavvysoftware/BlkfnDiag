@@ -25,7 +25,7 @@ private:
 	//***********************************************************************************************************
 	static const UINT32                                                   nmberDataRAMBytesToTestPerIteration_;
 	
-	static const DiagnosticCommon::DiagElapaedTime_t                             dataRAMTestIterationPeriodMS_;
+	static const DiagnosticCommon::DiagElapsedTime_t                             dataRAMTestIterationPeriodMS_;
 	
 	static const DiagnosticCommon::DiagElapsedTime_t                             dataRAMStartOffsetFromDiagCycleStartMS_;
 	
