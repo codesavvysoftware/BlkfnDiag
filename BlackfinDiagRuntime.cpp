@@ -8,7 +8,7 @@ namespace BlackfinDiagTests {
 DiagTimestampTime_t          defaultTestStartTime                = 0;
 DiagTimestampTime_t          defaultIterationComplete            = 0;
 UINT32                       defaultNmbrTimesToRunPerDiagCycle   = 1;
-UINT32                       defaultNmbrTimesRanThisDiagCycle    = 1;
+UINT32                       defaultNmbrTimesRanThisDiagCycle    = 0;
 BlackfinDiagTest::TestState  defaultInitialTestExecutionState    = BlackfinDiagTest::TEST_IDLE;
 
 //***********************************************************************************************************
@@ -264,7 +264,7 @@ static BlackfinDiagTest * instructionRamTestPtr = &instructionRamTest_;
 //***********************************************************************************************************
 BlackfinDiagTest * BlackfinDiagRuntime::diagnosticTests_[] 
 	= {
-//		registerTestPtr,
+		registerTestPtr,
 		dataRamTestPtr, 
 //		instructionRamTestPtr
 	  }; 

@@ -17,7 +17,8 @@ namespace DiagnosticCommon {
     static const DiagElapsedTime_t PeriodForAllDiagnosticsCompleted_milleseconds = 4 * 60 * 60 * 1000; // 4 hours
     
     static const DiagElapsedTime_t PeriodForOneDiagnosticTestIteration_milleseconds = 50;
-	
+    
+ 
 	static const UINT32 DiagnosticErrorNumberMask = 0x7fffffff;
 
 	static const UINT32 DiagnosticErrorTestTypeBitPos = 26;

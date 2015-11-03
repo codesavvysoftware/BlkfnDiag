@@ -26,6 +26,8 @@ BlackfinDiagScheduler::BlackfinDiagScheduler(std::vector <BlackfinDiagTest *> * 
 		ConfigureErrorCode( errorCode, BlackfinDiagTest::DiagSchedulerTestType );
 		
 		firmExcept( errorCode );
+		
+	
 	}
 
 }
@@ -39,12 +41,36 @@ void BlackfinDiagScheduler::ComputeElapsedTime( DiagTimestampTime_t current, Dia
 	
 	DiagTimestampTime_t diff       = current - previous; // difference in clock cycles;
 	
-	DiagTimestampTime_t multiplier = 1000;
+	// An approximation that is actually very close when CLOCKS_PER_SEC == 600000000
+	// avoiding a constant divide in the background
+	// in the real code probably will be simpler.
+	//
+	// Math for the approximation
+	//  CLOCKS_PER_SEC == 600000000
+	//  CLOCKS_PER_MILLESECOND = CLOCKS_PER_SEC * SECONDS_PER_MILLESECOND = 600000000 / 1000 = 600000
+	//  Elapsed time in milleseconds = difference in clock readings / CLOCKS_PER_MILLESECOND = diff / 600000;
+	//  600000 == 0x927c0
+	//  We're looking for a shift that is less which would be 0x80000 ==  524288.
+	//  600000 ~= 524288 * 1.14441
+	//  Elapsed time in millesconds ~= diff / (524288 * 1.1441) ~=  ( diff / 0x8000 ) * (1/1.1441) 
+	//                                                          ~=  ( diff >> 19 ) * (.8738 )
+	//                                                          ~=  ( diff >> 19 ) * ( 7/8 )
+	//                                                          ~=  ( diff >> 19 ) ( 1 - 1/8 )
+	//                                                          ~=  ( diff >> 19 ) - ( ( diff >> 19 ) * 1/8)
+	//                                                          ~=  ( diff >> 19 ) - ( ( diff >> 19 ) >> 3 );
+	//                                                        substitute  fast for ( diff >> 19 );
+	                                                            
+	DiagTimestampTime_t   fast = diff >> 19;
 	
-	multiplier                    /= CLOCKS_PER_SEC;     // milleseconds per clock cycle is what ends up in multiplier
+	fast -= (fast >> 3 );
+
+	elapsed = fast;  // difference in clock cycles times milleseconds per clock cycle
+	                                        // yields elapsed time in milleseconds
+//	DiagTimestampTime_t rate = CLOCKS_PER_SEC;
 	
-	elapsed                        = diff * multiplier;  // difference in clock cycles times milleseconds per clock cycle
-	                                                    // yields elapsed time in milleseconds
+//	diff *= 1000;
+	
+//	diff /= rate;     // milleseconds per clock cycle is what ends up in multiplier
 }
 	
 
@@ -64,7 +90,19 @@ void BlackfinDiagScheduler::DetermineCurrentSchedulerState() {
 	// No state determination needed will get changed by caller
 	if ( currentSchedulerState_ == INITIAL_INSTANTIATION ) {
 		
+		//
+		// Sync everything to the same timestamp upon initial instantiation.
+		//
 		timeTestCycleStarted_ = timestampCurrent_;
+		
+		timeLastIterationPeriodExpired_ = timestampCurrent_;
+		
+		for (std::vector<BlackfinDiagTest *>::iterator it = runTimeDiagnostics_->begin(); it != runTimeDiagnostics_->end(); ++it) {
+			
+			BlackfinDiagTest * pbdt = (*it);
+			
+			pbdt->SetIterationCompletedTimestamp( timestampCurrent_ );		
+        }		
 		
 		return;
 	}
@@ -91,6 +129,12 @@ void BlackfinDiagScheduler::DetermineCurrentSchedulerState() {
 		DiagElapsedTime_t elapsedTimeForCurrentIteration;
 	
 		ComputeElapsedTime( timestampCurrent_, timeLastIterationPeriodExpired_, elapsedTimeForCurrentIteration );
+		
+		if ( elapsedTimeForCurrentIteration > 50 ) {
+			int i;
+			
+			i++;
+		}
 
 	    BOOL newTestIterationPeriod = HasNewTestIterationPeriodStarted( elapsedTimeForCurrentIteration );
 	    
@@ -143,6 +187,8 @@ void BlackfinDiagScheduler::DoMoreDiagnosticTesting() {
 
     		pCurrentDiagTest->SetCurrentTestState( testResult );
     
+    		pCurrentDiagTest->SetIterationCompletedTimestamp( timestampCurrent_ );
+		
 			switch (testResult)
 			{
 				case BlackfinDiagTest::TEST_LOOP_COMPLETE: 
@@ -275,6 +321,7 @@ BOOL BlackfinDiagScheduler::IsTestScheduledToRun(BlackfinDiagTest * & pbdt) {
 	DiagElapsedTime_t iterationPeriod = pbdt->GetIterationPeriod();
 
 	if (elapsedTime >= iterationPeriod) {
+		
 		timeToRun = TRUE;
 	}
 

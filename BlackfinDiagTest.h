@@ -53,9 +53,7 @@ public:
     } BlackfinExecTestData;    
 
     
-	BlackfinDiagTest( BlackfinExecTestData & newTestExecutionData ) : testExecutionData ( newTestExecutionData )    
- 	{}
-		
+	BlackfinDiagTest( BlackfinExecTestData & newTestExecutionData );		
 			
 	virtual ~BlackfinDiagTest()  {}
 
@@ -100,7 +98,7 @@ private:
 	
 	static const DiagnosticCommon::DiagElapsedTime_t DiagTimeSlicePeriod_Milleseconds = 50;  // Resolution of microseconds
 
-	BlackfinExecTestData  testExecutionData;
+	BlackfinExecTestData  testExecutionData_;
 	
 	BlackfinDiagTest() {}
 	
