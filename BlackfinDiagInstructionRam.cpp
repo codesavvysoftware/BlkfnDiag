@@ -2,7 +2,7 @@
 
 #include <vector>
 using namespace DiagnosticCommon;
-namespace BlackfinDiagTests {
+namespace BlackfinDiagTesting {
 
 #include "Nvs_Obj.h"
 #include <bfrom.h>
@@ -458,7 +458,7 @@ void BlackfinDiagInstructionRam::ConfigureForNextTestCycle() {
     
     	errorCode |= err_UnableToStart_;
     		
-		firmExcept( errorCode );
+		OS_Assert( errorCode );
    	}
     	
 }

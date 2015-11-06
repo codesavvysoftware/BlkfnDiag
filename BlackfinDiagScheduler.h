@@ -24,7 +24,7 @@ class BlackfinDiagScheduler
 {
 public:
 
-	BlackfinDiagScheduler(std::vector <BlackfinDiagTests::BlackfinDiagTest *> * Diagnostics);
+	BlackfinDiagScheduler(std::vector <BlackfinDiagTesting::BlackfinDiagTest *> * Diagnostics);
 
 	/// Default destructor.
 	~BlackfinDiagScheduler() {}
@@ -41,14 +41,6 @@ public:
 
 private:
 
-	static const UINT32  corruptedDiagTestVector_    = 1;
-	
-	static const UINT32  corruptedDiagTestMemory_    = 2;
-	
-	static const UINT32  diagTestTooLongToComplete_  = 3;
-	
-	static const UINT32  allDiagTestsDidNotComplete_ = 4;
-	
 	typedef enum {
 		INITIAL_INSTANTIATION,
 		MAX_PERIOD_EXPIRED_ALL_TESTS_COMPLETE,
@@ -60,11 +52,20 @@ private:
 	} SchedulerStates;
 	
 	SchedulerStates        currentSchedulerState_;
+	
+	static const UINT32  corruptedDiagTestVector_    = 1;
+	
+	static const UINT32  corruptedDiagTestMemory_    = 2;
+	
+	static const UINT32  diagTestTooLongToComplete_  = 3;
+	
+	static const UINT32  allDiagTestsDidNotComplete_ = 4;
+	
+//	static DiagnosticCommon::cTiming          SchedulerTiming;
 		
+	std::vector <BlackfinDiagTesting::BlackfinDiagTest *> * runTimeDiagnostics_;
 	
-	std::vector <BlackfinDiagTests::BlackfinDiagTest *> * runTimeDiagnostics_;
-	
-	std::vector<BlackfinDiagTests::BlackfinDiagTest *>::iterator itTestEnumeration_; 
+	std::vector<BlackfinDiagTesting::BlackfinDiagTest *>::iterator itTestEnumeration_; 
 		
 	// Number of timeslices between diagnostics completion time checks
 	// Start Fault Injection Point 3
@@ -88,31 +89,25 @@ private:
 
 	void DetermineCurrentSchedulerState();
 
-    void ComputeElapsedTime( DiagnosticCommon::DiagTimestampTime_t   current, 
-                             DiagnosticCommon::DiagTimestampTime_t   previous, 
-                             DiagnosticCommon::DiagElapsedTime_t   & elapsed  );
-                             
-	void ConfigureErrorCode( UINT32 & returnedErrorCode, BlackfinDiagTests::BlackfinDiagTest::DiagnosticTestTypes testTypeCurrent );
+	void ConfigureErrorCode( UINT32 & returnedErrorCode, BlackfinDiagTesting::BlackfinDiagTest::DiagnosticTestTypes testTypeCurrent );
 
 	void DoMoreDiagnosticTesting();
 
 	BOOL DidAllTestsComplete();
 
-	BOOL EnumerateNextScheduledTest( BlackfinDiagTests::BlackfinDiagTest * & pbdtNextDiag );
-
-	DiagnosticCommon::DiagTimestampTime_t GetSystemTimestamp();
+	BOOL EnumerateNextScheduledTest( BlackfinDiagTesting::BlackfinDiagTest * & pbdtNextDiag );
 
 	BOOL HasCompleteDiagTestPeriodExpired( DiagnosticCommon::DiagElapsedTime_t elapsed_time );
 
 	BOOL HasNewTestIterationPeriodStarted( DiagnosticCommon::DiagElapsedTime_t elapsedTimeForCurrentIteration );
 
-	BOOL IsTestScheduledToRun(BlackfinDiagTests::BlackfinDiagTest * & pbdt);
+	BOOL IsTestScheduledToRun(BlackfinDiagTesting::BlackfinDiagTest * & pbdt);
 
-    BOOL IsTestingCompleteForDiagCycle(BlackfinDiagTests::BlackfinDiagTest * & pbdt);
+    BOOL IsTestingCompleteForDiagCycle(BlackfinDiagTesting::BlackfinDiagTest * & pbdt);
     
-	void ResetTestsCompletedForCycle(BlackfinDiagTests::BlackfinDiagTest * & pbdt);
+	void ResetTestsCompletedForCycle(BlackfinDiagTesting::BlackfinDiagTest * & pbdt);
 
-	void SetAnotherTestCompletedForCycle(BlackfinDiagTests::BlackfinDiagTest * & pbdt);
+	void SetAnotherTestCompletedForCycle(BlackfinDiagTesting::BlackfinDiagTest * & pbdt);
 
 	void SetDiagTestsReadyForNewTestCycle();
 

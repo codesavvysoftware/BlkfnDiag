@@ -1,7 +1,7 @@
 #pragma once
 #include "BlackfinDiag.h"
 
-namespace BlackfinDiagTests {
+namespace BlackfinDiagTesting {
 
 class BlackfinDiagTest {
 
@@ -17,7 +17,9 @@ public:
 		DiagDataRamTestType        = 1,
 		DiagInstructionRamTestType = 2,
 		DiagRegisterTestType       = 3,
-		DiagSchedulerTestType      = 4 
+		DiagSchedulerTestType      = 4,
+		DiagTimerTestType          = 5,
+		DiagInstructionTestType    = 6
 	} DiagnosticTestTypes;
 	
     typedef UINT32 (* const REGISTER_TEST)(const UINT32 *, UINT32);
@@ -44,7 +46,6 @@ public:
     
     typedef struct {
     	DiagnosticCommon::DiagElapsedTime_t	      iterationPeriod;
-		DiagnosticCommon::DiagElapsedTime_t       offsetFromDiagCycleStart;
 		DiagnosticCommon::DiagTimestampTime_t     iterationCompleteTimestamp;
    		UINT32              				      nmbrTimesToRunPerDiagCycle;  		// Number of times to run the test per diagnostic cycle
    		UINT32		               			      nmbrTimesRanThisDiagCycle;   		// Times test has run this cycle
@@ -67,8 +68,6 @@ public:
 	
 	UINT32                                  GetNumberOfTimesRanThisDiagCycle();
 	
-	DiagnosticCommon::DiagElapsedTime_t     GetOffsetFromDiagCycleStart();
-
 	DiagnosticTestTypes                     GetTestType();
 	
 	
@@ -82,8 +81,6 @@ public:
 	
 	void                  SetNumberOfTimesRanThisDiagCycle(UINT32);
 	
-	void 				  SetOffsetFromDiagCycleStart(DiagnosticCommon::DiagElapsedTime_t offset);
-
 	void				  SetTestType(DiagnosticTestTypes test_type);
 
 	virtual TestState     RunTest( UINT32 & ErrorCode ) = 0;

@@ -4,7 +4,7 @@
 #include "BlackfinDiagTest.h"
 #include <vector>
 
-namespace BlackfinDiagTests {
+namespace BlackfinDiagTesting {
 	
 class BlackfinDiagInstructionRam : public BlackfinDiagTest {
 	

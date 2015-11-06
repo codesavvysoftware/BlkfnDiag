@@ -1,7 +1,9 @@
 #include "BlackfinDiagDataRam.h"
 using namespace DiagnosticCommon;
 
-namespace BlackfinDiagTests {extern "C" BOOL TestAByteOfRam( BlackfinDiagDataRam::ByteTestParameters * pbtp );
+namespace BlackfinDiagTesting {
+	
+	extern "C" BOOL TestAByteOfRam( BlackfinDiagDataRam::ByteTestParameters * pbtp );
 
 BlackfinDiagTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & errorCode ) {
 	
@@ -22,7 +24,7 @@ BlackfinDiagTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & errorCode ) {
 		 if ( errorExists ) {
 		 	EncodeErrorInfo( errorCode, BankA, offsetFromBankStart, failurePattern );
 		 	
-		 	firmExcept( errorCode );
+		 	OS_Assert( errorCode );
 		 }
 		 
 		 ts = TEST_IN_PROGRESS; 			
@@ -35,7 +37,7 @@ BlackfinDiagTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & errorCode ) {
 		 if ( errorExists ) {
 		 	EncodeErrorInfo( errorCode, BankB, offsetFromBankStart, failurePattern );
 		 	
-		 	firmExcept( errorCode );
+		 	OS_Assert( errorCode );
 		 }
 		 
 		 ts = TEST_IN_PROGRESS; 			
@@ -48,7 +50,7 @@ BlackfinDiagTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & errorCode ) {
 		 if ( errorExists ) {
 		 	EncodeErrorInfo( errorCode, BankC, offsetFromBankStart, failurePattern );
 		 	
-		 	firmExcept( errorCode );
+		 	OS_Assert( errorCode );
 		 }
 		 
 		 ts = TEST_IN_PROGRESS; 			

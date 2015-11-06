@@ -2,11 +2,16 @@
 #include "OS_iotk.h"
 #include <time.h>
 
-using namespace BlackfinDiagTests;
+using namespace BlackfinDiagTesting;
 using namespace DiagnosticCommon;
 
+
+	
+//DiagnosticCommon::cTiming          SchedulerTiming();
+	
+
 BlackfinDiagScheduler::BlackfinDiagScheduler(std::vector <BlackfinDiagTest *> * diagnostics) 
-		:	currentSchedulerState_( INITIAL_INSTANTIATION ),
+		  : currentSchedulerState_        ( INITIAL_INSTANTIATION ),
 		 	runTimeDiagnostics_              ( diagnostics ),
 			itTestEnumeration_               ( diagnostics->end() ),
 			timestampCurrent_                ( 0 ),
@@ -25,53 +30,20 @@ BlackfinDiagScheduler::BlackfinDiagScheduler(std::vector <BlackfinDiagTest *> * 
 		
 		ConfigureErrorCode( errorCode, BlackfinDiagTest::DiagSchedulerTestType );
 		
-		firmExcept( errorCode );
-		
-	
+		OS_Assert( errorCode );	
 	}
+	
+
+	
 
 }
 
 BOOL BlackfinDiagScheduler::AreTestIterationsScheduledToRun() {
 	
 	return StartEnumeratingTestsForThisIterationPeriod();
-}	    		
+}	
+    		
 
-void BlackfinDiagScheduler::ComputeElapsedTime( DiagTimestampTime_t current, DiagTimestampTime_t previous, DiagElapsedTime_t & elapsed  ) {
-	
-	DiagTimestampTime_t diff       = current - previous; // difference in clock cycles;
-	
-	// An approximation that is actually very close when CLOCKS_PER_SEC == 600000000
-	// avoiding a constant divide in the background
-	// in the real code probably will be simpler.
-	//
-	// Math for the approximation
-	//  CLOCKS_PER_SEC == 600000000
-	//  CLOCKS_PER_MILLESECOND = CLOCKS_PER_SEC * SECONDS_PER_MILLESECOND = 600000000 / 1000 = 600000
-	//  Elapsed time in milleseconds = difference in clock readings / CLOCKS_PER_MILLESECOND = diff / 600000;
-	//  600000 == 0x927c0
-	//  We're looking for a shift that is less which would be 0x80000 ==  524288.
-	//  600000 ~= 524288 * 1.14441
-	//  Elapsed time in millesconds ~= diff / (524288 * 1.1441) ~=  ( diff / 0x8000 ) * (1/1.1441) 
-	//                                                          ~=  ( diff >> 19 ) * (.8738 )
-	//                                                          ~=  ( diff >> 19 ) * ( 7/8 )
-	//                                                          ~=  ( diff >> 19 ) ( 1 - 1/8 )
-	//                                                          ~=  ( diff >> 19 ) - ( ( diff >> 19 ) * 1/8)
-	//                                                          ~=  ( diff >> 19 ) - ( ( diff >> 19 ) >> 3 );
-	//                                                        substitute  fast for ( diff >> 19 );
-	                                                            
-	DiagTimestampTime_t   fast = diff >> 19;
-	
-	fast -= (fast >> 3 );
-
-	elapsed = fast;  // difference in clock cycles times milleseconds per clock cycle
-	                                        // yields elapsed time in milleseconds
-//	DiagTimestampTime_t rate = CLOCKS_PER_SEC;
-	
-//	diff *= 1000;
-	
-//	diff /= rate;     // milleseconds per clock cycle is what ends up in multiplier
-}
 	
 
 void BlackfinDiagScheduler::ConfigureErrorCode( UINT32 & returnedErrorCode, BlackfinDiagTest::DiagnosticTestTypes testTypeCurrent ) {
@@ -85,7 +57,7 @@ void BlackfinDiagScheduler::DetermineCurrentSchedulerState() {
 	
 	DiagElapsedTime_t elapsedTimeInTestCycle;
 	
-	timestampCurrent_ = GetSystemTimestamp();	
+	timestampCurrent_ = SystemTiming.GetSystemTimestamp();	
 	
 	// No state determination needed will get changed by caller
 	if ( currentSchedulerState_ == INITIAL_INSTANTIATION ) {
@@ -104,11 +76,11 @@ void BlackfinDiagScheduler::DetermineCurrentSchedulerState() {
 			pbdt->SetIterationCompletedTimestamp( timestampCurrent_ );		
         }		
 		
-		return;
+        return;
 	}
 
 	// Compute Elapsed Time in Current Diagnostic Test Period
-	ComputeElapsedTime( timestampCurrent_, timeTestCycleStarted_, elapsedTimeInTestCycle );
+	SystemTiming.ComputeElapsedTimeMS( timestampCurrent_, timeTestCycleStarted_, elapsedTimeInTestCycle );
 	
 	BOOL newDiagTestPeriod = HasCompleteDiagTestPeriodExpired( elapsedTimeInTestCycle );
 	
@@ -126,16 +98,11 @@ void BlackfinDiagScheduler::DetermineCurrentSchedulerState() {
 		}
 	}
 	else {
+		
 		DiagElapsedTime_t elapsedTimeForCurrentIteration;
 	
-		ComputeElapsedTime( timestampCurrent_, timeLastIterationPeriodExpired_, elapsedTimeForCurrentIteration );
+		SystemTiming.ComputeElapsedTimeMS( timestampCurrent_, timeLastIterationPeriodExpired_, elapsedTimeForCurrentIteration );
 		
-		if ( elapsedTimeForCurrentIteration > 50 ) {
-			int i;
-			
-			i++;
-		}
-
 	    BOOL newTestIterationPeriod = HasNewTestIterationPeriodStarted( elapsedTimeForCurrentIteration );
 	    
 	    if ( newTestIterationPeriod ) {
@@ -206,7 +173,7 @@ void BlackfinDiagScheduler::DoMoreDiagnosticTesting() {
 				{
 					ConfigureErrorCode( returnedErrorCode, pCurrentDiagTest->GetTestType() );
 		
-					firmExcept( returnedErrorCode );
+					OS_Assert( returnedErrorCode );
 				}
 			
 					break;
@@ -267,12 +234,6 @@ BOOL BlackfinDiagScheduler::EnumerateNextScheduledTest( BlackfinDiagTest * & pbd
 	return success;
 }
 
-DiagTimestampTime_t BlackfinDiagScheduler::GetSystemTimestamp( ) {
-	return clock();
-}
-		
-
-
 BOOL BlackfinDiagScheduler::HasCompleteDiagTestPeriodExpired( DiagElapsedTime_t elapsed_time ) {
 
 	BOOL timeForNewCycle = FALSE;
@@ -316,7 +277,7 @@ BOOL BlackfinDiagScheduler::IsTestScheduledToRun(BlackfinDiagTest * & pbdt) {
 
 	DiagElapsedTime_t elapsedTime;
 	
-	ComputeElapsedTime(timestampCurrent_, startOfIteration, elapsedTime );
+	SystemTiming.ComputeElapsedTimeMS(timestampCurrent_, startOfIteration, elapsedTime );
 
 	DiagElapsedTime_t iterationPeriod = pbdt->GetIterationPeriod();
 
@@ -368,9 +329,9 @@ void BlackfinDiagScheduler::RunScheduled(){
 			
 			UINT32 errorCode = allDiagTestsDidNotComplete_;
 			
-			ConfigureErrorCode( errorCode, BlackfinDiagTests::BlackfinDiagTest::DiagSchedulerTestType );
+			ConfigureErrorCode( errorCode, BlackfinDiagTesting::BlackfinDiagTest::DiagSchedulerTestType );
 				
-			firmExcept( errorCode );
+			OS_Assert( errorCode );
 		}
 		
 		// We won't get here now but in case it ever changes

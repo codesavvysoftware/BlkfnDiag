@@ -5,7 +5,8 @@
 #include <ccblkfn.h>                              /* Added for ssync( ), cli/sti( ) */
 
 	
-namespace BlackfinDiagTests {
+namespace BlackfinDiagTesting {
+
 class BlackfinDiagDataRam : public BlackfinDiagTest {
 
 public:

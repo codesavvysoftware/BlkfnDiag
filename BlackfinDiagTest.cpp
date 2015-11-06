@@ -1,7 +1,7 @@
 #include "BlackfinDiagTest.h"
 using namespace DiagnosticCommon;
 
-namespace BlackfinDiagTests {
+namespace BlackfinDiagTesting {
 BlackfinDiagTest::BlackfinDiagTest( BlackfinExecTestData & newTestExecutionData ) : testExecutionData_ ( newTestExecutionData )    
  	{
  		int i = 0;
@@ -43,12 +43,9 @@ UINT32 BlackfinDiagTest::GetNumberOfTimesRanThisDiagCycle() {
 	return testExecutionData_.nmbrTimesRanThisDiagCycle;  
 }
 
-DiagElapsedTime_t BlackfinDiagTest::GetOffsetFromDiagCycleStart() {
-	return testExecutionData_.offsetFromDiagCycleStart;
-}
 
 
-BlackfinDiagTests::BlackfinDiagTest::DiagnosticTestTypes BlackfinDiagTest::GetTestType() {
+BlackfinDiagTesting::BlackfinDiagTest::DiagnosticTestTypes BlackfinDiagTest::GetTestType() {
 	
 	return testExecutionData_.testType; 
 }
@@ -75,11 +72,8 @@ void BlackfinDiagTest::SetNumberOfTimesToRunPerDiagCycle(UINT32 numberTimesToRun
 	testExecutionData_.nmbrTimesToRunPerDiagCycle = numberTimesToRun;  
 }
 	
-void BlackfinDiagTest::SetOffsetFromDiagCycleStart(DiagElapsedTime_t offset) {
-	testExecutionData_.offsetFromDiagCycleStart;
-}
 
-void BlackfinDiagTest::SetTestType(BlackfinDiagTests::BlackfinDiagTest::DiagnosticTestTypes type) {
+void BlackfinDiagTest::SetTestType(BlackfinDiagTesting::BlackfinDiagTest::DiagnosticTestTypes type) {
 	
 	testExecutionData_.testType = type; 
 }

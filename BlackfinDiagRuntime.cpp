@@ -2,8 +2,10 @@
 #include "BlackfinDiagRuntime.h"
 
 using namespace DiagnosticCommon;
+using namespace BlackfinDiagTesting;
 
-namespace BlackfinDiagTests {
+
+namespace BlackfinDiagRuntimeEnvironment {
 
 DiagTimestampTime_t          defaultTestStartTime                = 0;
 DiagTimestampTime_t          defaultIterationComplete            = 0;
@@ -28,13 +30,11 @@ UINT32           numberOfRamTestingPatterns_              = sizeof( testPatterns
 UINT32           nmberDataRAMBytesToTestPerIteration_     = 0x400; // Test 1k at a time for now
 
 DiagElapsedTime_t       dataRAMTestIterationPeriodMS_            = 1000; // 1 second for now
-DiagElapsedTime_t       dataRAMStartOffsetFromDiagCycleStartMS_  = 20;   // Start 20 ms after the diagnostic cycle starts
 
 BlackfinDiagTest::DiagnosticTestTypes  testTypeDataRam = BlackfinDiagTest::DiagDataRamTestType;
 
-BlackfinDiagTest::BlackfinExecTestData testDataDataRAMTest = {
+BlackfinDiagTest::BlackfinExecTestData testDataDataRAMTest_ = {
 																dataRAMTestIterationPeriodMS_,
-																dataRAMStartOffsetFromDiagCycleStartMS_,
 																defaultIterationComplete,
 																defaultNmbrTimesToRunPerDiagCycle,
 																defaultNmbrTimesRanThisDiagCycle,
@@ -46,7 +46,7 @@ BlackfinDiagDataRam dataRamTest_(  &dataRamTestInfo_,
                                    testPatternsForRamTesting_, 
                                    numberOfRamTestingPatterns_, 
                                    nmberDataRAMBytesToTestPerIteration_,
-                                   testDataDataRAMTest );
+                                   testDataDataRAMTest_ );
     
 static BlackfinDiagTest * dataRamTestPtr = &dataRamTest_;
 
@@ -55,40 +55,9 @@ static BlackfinDiagTest * dataRamTestPtr = &dataRamTest_;
 // Register testing parameters, structures and definitions.                                                 *
 //                                                                                                          *
 //***********************************************************************************************************
-//
-// For linkage to c callable assembly language register tests
-//
-extern "C" UINT32  BlackfinDiagRegSanityChk( const UINT32 *, UINT32);
-extern "C" UINT32  BlackfinDiagRegDataReg7Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegDataReg6Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegDataReg5Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegDataReg4Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegDataReg3Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegPointerReg5Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegPointerReg4Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegPointerReg3Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegPointerReg2Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegPointerReg0Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagAccum0Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagAccum1Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegModifyReg3Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegModifyReg2Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegModifyReg1Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegModifyReg0Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegLengthReg3Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegLengthReg2Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegLengthReg1Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegLengthReg0Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegIndexReg3Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegIndexReg2Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegIndexReg1Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegIndexReg0Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegBaseReg3Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegBaseReg2Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegBaseReg1Chk( const UINT32 *, UINT32 );
-extern "C" UINT32  BlackfinDiagRegBaseReg0Chk( const UINT32 *, UINT32 );	
+
 const UINT32 testPatternsForRegisterTesting_[]   = { 0xffffffff, 0xaaaaaaaa, 0x55555555, 0 };
-UINT32 nmbrOfRegisterPatterns_             = sizeof(testPatternsForRegisterTesting_)/sizeof(UINT32);
+UINT32 nmbrOfRegisterPatterns_                   = sizeof(testPatternsForRegisterTesting_)/sizeof(UINT32);
 	
   	
     
@@ -211,11 +180,9 @@ const BlackfinDiagTest::RegisterTestDescriptor registerTestSuite_[] =
 UINT32 nmbrOfRegisterTestDescriptors_ = sizeof( registerTestSuite_ ) / sizeof(BlackfinDiagTest::RegisterTestDescriptor); 
 
 DiagElapsedTime_t                registerTestIterationPeriodMS_ = 2000;          // Every Two Seconds	
-DiagElapsedTime_t                registerTestStartOffsetFromDiagCycleStartMS_;  // Start 250 ms in
 	
-BlackfinDiagTest::BlackfinExecTestData testDataRegistersTest = {
+BlackfinDiagTest::BlackfinExecTestData testDataRegistersTest_ = {
 																	registerTestIterationPeriodMS_,
-																	registerTestStartOffsetFromDiagCycleStartMS_,
     																defaultIterationComplete,
 																	defaultNmbrTimesToRunPerDiagCycle,
 																	defaultNmbrTimesRanThisDiagCycle,
@@ -227,7 +194,7 @@ BlackfinDiagRegistersTest registerTest_( registerTestSuite_,
                                          nmbrOfRegisterTestDescriptors_, 
                                          testPatternsForRegisterTesting_, 
                                          nmbrOfRegisterPatterns_,
-                                         testDataRegistersTest ); 
+                                         testDataRegistersTest_ ); 
  
 static BlackfinDiagTest * registerTestPtr = &registerTest_;
                                          
@@ -239,11 +206,9 @@ static BlackfinDiagTest * registerTestPtr = &registerTest_;
 //                                                                                                          *
 //***********************************************************************************************************
 DiagElapsedTime_t       instructionRamTestIterationPeriodMS_            = 2000; // 2 second for now
-DiagElapsedTime_t       instructionRAMStartOffsetFromDiagCycleStartMS_  = 500;   // Start 500 ms after the diagnostic cycle starts
 
-BlackfinDiagTest::BlackfinExecTestData testDataInstructionRAMTest = {
+BlackfinDiagTest::BlackfinExecTestData testDataInstructionRAMTest_ = {
 					      												instructionRamTestIterationPeriodMS_,
-				 	    												instructionRAMStartOffsetFromDiagCycleStartMS_,
 																		defaultIterationComplete,
 											    						defaultNmbrTimesToRunPerDiagCycle,
 							    										defaultNmbrTimesRanThisDiagCycle,
@@ -253,9 +218,43 @@ BlackfinDiagTest::BlackfinExecTestData testDataInstructionRAMTest = {
 
 
 
-BlackfinDiagInstructionRam instructionRamTest_( testDataInstructionRAMTest );
+BlackfinDiagInstructionRam instructionRamTest_( testDataInstructionRAMTest_ );
 
 static BlackfinDiagTest * instructionRamTestPtr = &instructionRamTest_;
+	
+//***********************************************************************************************************
+//                                                                                                          *
+// Timer testing parameters, structures and definitions.                                          *
+//                                                                                                          *
+//***********************************************************************************************************
+DiagnosticCommon::DiagElapsedTime_t         timerTestIterationPeriodMS_ = 1000;  // Every second.
+	
+UINT32                                      errorTimerTestApexTimer_     = 1;
+UINT32                                      errorTimerTestHostTimer_     = 2;
+DiagElapsedTime_t                           maxTimerTestElapsedTimeApex_ = 950;
+DiagElapsedTime_t                           maxTimerTestElapsedTimeHost_ = 1050;
+DiagElapsedTime_t                           minTimerTestElapsedTimeApex_ = 950;
+DiagElapsedTime_t                           minTimerTestElapsedTimeHost_ = 1050; 
+BlackfinDiagTest::BlackfinExecTestData      timerTestData_ = {
+																timerTestIterationPeriodMS_,
+																defaultIterationComplete,
+											    				defaultNmbrTimesToRunPerDiagCycle,
+							    								defaultNmbrTimesRanThisDiagCycle,
+								    							BlackfinDiagTest::DiagTimerTestType,
+														    	defaultInitialTestExecutionState
+															 };
+
+BlackfinDiagTesting::BlackfinDiagTimerTest    timerTest_( errorTimerTestApexTimer_,
+     	                                                  errorTimerTestHostTimer_,
+	    												  maxTimerTestElapsedTimeApex_,
+														  maxTimerTestElapsedTimeHost_,
+					                                      minTimerTestElapsedTimeApex_,
+					                                      minTimerTestElapsedTimeHost_ ,
+					                                      timerTestData_ );
+					                                                 
+			
+static BlackfinDiagTest * timerTestPtr = &timerTest_;
+
 	
 //***********************************************************************************************************
 //                                                                                                          *
@@ -264,8 +263,9 @@ static BlackfinDiagTest * instructionRamTestPtr = &instructionRamTest_;
 //***********************************************************************************************************
 BlackfinDiagTest * BlackfinDiagRuntime::diagnosticTests_[] 
 	= {
-		registerTestPtr,
-		dataRamTestPtr, 
+//		registerTestPtr,
+//		dataRamTestPtr, 
+		timerTestPtr,
 //		instructionRamTestPtr
 	  }; 
 

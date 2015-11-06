@@ -2,7 +2,7 @@
 
 using namespace DiagnosticCommon;
 
-namespace BlackfinDiagTests {
+namespace BlackfinDiagTesting {
 	
 BlackfinDiagTest::TestState BlackfinDiagRegistersTest::RunTest( UINT32 & errorCode ) {
     
@@ -27,7 +27,7 @@ BlackfinDiagTest::TestState BlackfinDiagRegistersTest::RunTest( UINT32 & errorCo
 			
 			failureInfo = ( GetTestType() << DiagnosticErrorTestTypeBitPos );
 			
-			firmExcept( failureInfo );
+			OS_Assert( failureInfo );
 		}
 	}
 	else if (!registerTestSuite_ || !prtd)  {
@@ -35,7 +35,7 @@ BlackfinDiagTest::TestState BlackfinDiagRegistersTest::RunTest( UINT32 & errorCo
 		
 		failureInfo |= corruptedRegisterTestSuite_;
 			
-		firmExcept( failureInfo );
+		OS_Assert( failureInfo );
 	}
 	else { 
 		
@@ -100,7 +100,7 @@ void BlackfinDiagRegistersTest::ConfigureForNextTestCycle() {
 		
 		failureInfo |= corruptedRegisterTestSuite_;
 			
-		firmExcept( failureInfo );
+		OS_Assert( failureInfo );
 	}
 	
 	
@@ -115,7 +115,7 @@ void BlackfinDiagRegistersTest::ConfigureForNextTestCycle() {
 			
 			failureInfo |= corruptedRegisterTestSuite_;
 			
-			firmExcept( failureInfo );
+			OS_Assert( failureInfo );
 		}
 	    
 		prtd->testsCompleted = FALSE;
