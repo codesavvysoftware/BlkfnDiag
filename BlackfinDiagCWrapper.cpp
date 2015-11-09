@@ -1,5 +1,5 @@
 #pragma once
-#include "BlackfinDiagRuntime.h"
+#include "BlackfinDiagRuntime.hpp"
 
 extern "C" void RunDiagnostics() {
 	BlackfinDiagRuntimeEnvironment::BlackfinDiagRuntime::ExecuteDiagnostics();

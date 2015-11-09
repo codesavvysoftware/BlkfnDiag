@@ -1,81 +1,85 @@
-#include "BlackfinDiagTest.h"
+#include "BlackfinDiagTest.hpp"
+
 using namespace DiagnosticCommon;
 
-namespace BlackfinDiagTesting {
-BlackfinDiagTest::BlackfinDiagTest( BlackfinExecTestData & newTestExecutionData ) : testExecutionData_ ( newTestExecutionData )    
+namespace BlackfinDiagTesting 
+{
+    BlackfinDiagTest::BlackfinDiagTest( BlackfinExecTestData & newTestExecutionData ) : m_TestExecutionData ( newTestExecutionData )    
  	{
- 		int i = 0;
- 		
- 		i++;
  	}
 	
-void BlackfinDiagTest::ConfigForAnyNewDiagCycle( BlackfinDiagTest * btd ) {
+    void BlackfinDiagTest::ConfigForAnyNewDiagCycle( BlackfinDiagTest * btd ) 
+    {
 		
-	if ( testExecutionData_.nmbrTimesRanThisDiagCycle > 0 ) {
-			
-		testExecutionData_.nmbrTimesRanThisDiagCycle = 0;
+	    if ( m_TestExecutionData.m_NmbrTimesRanThisDiagCycle > 0 ) 
+	    {
+			m_TestExecutionData.m_NmbrTimesRanThisDiagCycle = 0;
 
-		btd->ConfigureForNextTestCycle();
-	}
-}
+		    btd->ConfigureForNextTestCycle();
+	    }
+    }
 
-
-
-BlackfinDiagTest::TestState BlackfinDiagTest::GetCurrentTestState() {
-
-	return testExecutionData_.tsCurrentTestState;
-}	
+    BlackfinDiagTest::TestState BlackfinDiagTest::GetCurrentTestState() 
+    {
+        return m_TestExecutionData.m_CurrentTestState;
+    }	
 		
-DiagTimestampTime_t BlackfinDiagTest::GetIterationCompletedTimestamp() {
-	return testExecutionData_.iterationCompleteTimestamp;
-}
+    DiagTimestampTime_t BlackfinDiagTest::GetIterationCompletedTimestamp() 
+    {
+	    return m_TestExecutionData.m_IterationCompleteTimestamp;
+    }
 
-DiagElapsedTime_t BlackfinDiagTest::GetIterationPeriod() {
-	return testExecutionData_.iterationPeriod;
-}
+    DiagElapsedTime_t BlackfinDiagTest::GetIterationPeriod() 
+    {
+	    return m_TestExecutionData.m_IterationPeriod;
+    }
 
-UINT32 BlackfinDiagTest::GetNumberOfTimesToRunPerDiagCycle() {
-	return testExecutionData_.nmbrTimesToRunPerDiagCycle;  
-}
+    UINT32 BlackfinDiagTest::GetNumberOfTimesToRunPerDiagCycle() 
+    {
+	    return m_TestExecutionData.m_NmbrTimesToRunPerDiagCycle;  
+    }
 
-UINT32 BlackfinDiagTest::GetNumberOfTimesRanThisDiagCycle() {
+    UINT32 BlackfinDiagTest::GetNumberOfTimesRanThisDiagCycle() 
+    {
+	    return m_TestExecutionData.m_NmbrTimesRanThisDiagCycle;  
+    }
+
+    BlackfinDiagTesting::BlackfinDiagTest::DiagnosticTestTypes BlackfinDiagTest::GetTestType() 
+    {	
+	   return m_TestExecutionData.m_TestType; 
+    }
 	
-	return testExecutionData_.nmbrTimesRanThisDiagCycle;  
-}
+    void BlackfinDiagTest::SetCurrentTestState( TestState tsCurrent ) 
+    {
+	    m_TestExecutionData.m_CurrentTestState = tsCurrent;
+    }
 
+    void BlackfinDiagTest::SetIterationCompletedTimestamp(DiagTimestampTime_t timestamp) 
+    {
+	    m_TestExecutionData.m_IterationCompleteTimestamp = timestamp;
+    }
 
-
-BlackfinDiagTesting::BlackfinDiagTest::DiagnosticTestTypes BlackfinDiagTest::GetTestType() {
-	
-	return testExecutionData_.testType; 
-}
-	
-
-void BlackfinDiagTest::SetCurrentTestState( TestState tsCurrent ) {
-
-	testExecutionData_.tsCurrentTestState = tsCurrent;
-}
-
-void BlackfinDiagTest::SetIterationCompletedTimestamp(DiagTimestampTime_t timestamp) {
-	testExecutionData_.iterationCompleteTimestamp = timestamp;
-}
-
-void BlackfinDiagTest::SetIterationPeriod(DiagElapsedTime_t period) {
-	testExecutionData_.iterationPeriod = period;
-}
+    void BlackfinDiagTest::SetIterationPeriod(DiagElapsedTime_t period) 
+    {
+	    m_TestExecutionData.m_IterationPeriod = period;
+    }
 			
-void BlackfinDiagTest::SetNumberOfTimesRanThisDiagCycle(UINT32 nmberOfTimesRan) {
-	testExecutionData_.nmbrTimesRanThisDiagCycle = nmberOfTimesRan;
-}
+    void BlackfinDiagTest::SetNumberOfTimesRanThisDiagCycle(UINT32 nmberOfTimesRan) 
+    {
+        m_TestExecutionData.m_NmbrTimesRanThisDiagCycle = nmberOfTimesRan;
+    }
 
-void BlackfinDiagTest::SetNumberOfTimesToRunPerDiagCycle(UINT32 numberTimesToRun) {
-	testExecutionData_.nmbrTimesToRunPerDiagCycle = numberTimesToRun;  
-}
+    void BlackfinDiagTest::SetNumberOfTimesToRunPerDiagCycle(UINT32 numberTimesToRun) 
+    {
+	    m_TestExecutionData.m_NmbrTimesToRunPerDiagCycle = numberTimesToRun;  
+    }
 	
 
-void BlackfinDiagTest::SetTestType(BlackfinDiagTesting::BlackfinDiagTest::DiagnosticTestTypes type) {
-	
-	testExecutionData_.testType = type; 
-}
+    void BlackfinDiagTest::SetTestType(BlackfinDiagTesting::BlackfinDiagTest::DiagnosticTestTypes type) 
+    {	
+	    m_TestExecutionData.m_TestType = type; 
+    }
 	
 };
+
+

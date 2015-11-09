@@ -1,5 +1,5 @@
-#include "BlackfinDiagScheduler.h"
-#include "BlackfinDiagRuntime.h"
+#include "BlackfinDiagScheduler.hpp"
+#include "BlackfinDiagRuntime.hpp"
 
 using namespace DiagnosticCommon;
 using namespace BlackfinDiagTesting;
@@ -31,7 +31,7 @@ UINT32           nmberDataRAMBytesToTestPerIteration_     = 0x400; // Test 1k at
 
 DiagElapsedTime_t       dataRAMTestIterationPeriodMS_            = 1000; // 1 second for now
 
-BlackfinDiagTest::DiagnosticTestTypes  testTypeDataRam = BlackfinDiagTest::DiagDataRamTestType;
+BlackfinDiagTest::DiagnosticTestTypes  testTypeDataRam = BlackfinDiagTest::DIAG_DATA_RAM_TEST_TYPE;
 
 BlackfinDiagTest::BlackfinExecTestData testDataDataRAMTest_ = {
 																dataRAMTestIterationPeriodMS_,
@@ -64,11 +64,11 @@ UINT32 nmbrOfRegisterPatterns_                   = sizeof(testPatternsForRegiste
     //
     // Only one test but has flexibility to add more and we may break up current test.
     //
-BlackfinDiagTest::REGISTER_TEST sanityCheck_[] 
+BlackfinDiagTest::pRegisterTest sanityCheck_[] 
     	= { BlackfinDiagRegSanityChk };
-UINT32 nmbrOfSanityChecks_ = sizeof(sanityCheck_)/sizeof( BlackfinDiagTest::REGISTER_TEST );
+UINT32 nmbrOfSanityChecks_ = sizeof(sanityCheck_)/sizeof( BlackfinDiagTest::pRegisterTest );
     		
-BlackfinDiagTest::REGISTER_TEST dataRegisters_[]      
+BlackfinDiagTest::pRegisterTest dataRegisters_[]      
 		= {
 			BlackfinDiagRegDataReg7Chk, 
             BlackfinDiagRegDataReg6Chk,
@@ -77,9 +77,9 @@ BlackfinDiagTest::REGISTER_TEST dataRegisters_[]
             BlackfinDiagRegDataReg3Chk
           };
 
-UINT32 nmbrOfDataRegTests_ = sizeof(dataRegisters_)/sizeof( BlackfinDiagTest::REGISTER_TEST );
+UINT32 nmbrOfDataRegTests_ = sizeof(dataRegisters_)/sizeof( BlackfinDiagTest::pRegisterTest );
     
-BlackfinDiagTest::REGISTER_TEST pointerRegisters_[] 
+BlackfinDiagTest::pRegisterTest pointerRegisters_[] 
     	= {
     		BlackfinDiagRegPointerReg5Chk, 
             BlackfinDiagRegPointerReg4Chk,
@@ -87,51 +87,51 @@ BlackfinDiagTest::REGISTER_TEST pointerRegisters_[]
             BlackfinDiagRegPointerReg2Chk,
             BlackfinDiagRegPointerReg0Chk
           };
-UINT32 nmbrOfPointerRegTests_ = sizeof(pointerRegisters_)/sizeof( BlackfinDiagTest::REGISTER_TEST );
+UINT32 nmbrOfPointerRegTests_ = sizeof(pointerRegisters_)/sizeof( BlackfinDiagTest::pRegisterTest );
 
 
-BlackfinDiagTest::REGISTER_TEST accumulators_[]     
+BlackfinDiagTest::pRegisterTest accumulators_[]     
     	= {
     		BlackfinDiagAccum0Chk, 
     		BlackfinDiagAccum1Chk
     	  };
-UINT32 nmbrOfAccumulatorRegTests_ = sizeof(accumulators_)/sizeof( BlackfinDiagTest::REGISTER_TEST );
+UINT32 nmbrOfAccumulatorRegTests_ = sizeof(accumulators_)/sizeof( BlackfinDiagTest::pRegisterTest );
 	
-BlackfinDiagTest::REGISTER_TEST modifyRegisters_[]  
+BlackfinDiagTest::pRegisterTest modifyRegisters_[]  
 		= {
 			BlackfinDiagRegModifyReg3Chk,
             BlackfinDiagRegModifyReg2Chk,
             BlackfinDiagRegModifyReg1Chk,
             BlackfinDiagRegModifyReg0Chk
           };
-UINT32 nmbrOfModifyRegTests_ = sizeof(modifyRegisters_)/sizeof( BlackfinDiagTest::REGISTER_TEST );
+UINT32 nmbrOfModifyRegTests_ = sizeof(modifyRegisters_)/sizeof( BlackfinDiagTest::pRegisterTest );
 
-BlackfinDiagTest::REGISTER_TEST lengthRegisters_[]  
+BlackfinDiagTest::pRegisterTest lengthRegisters_[]  
 		= {
 			BlackfinDiagRegLengthReg3Chk,
             BlackfinDiagRegLengthReg2Chk,
             BlackfinDiagRegLengthReg1Chk,
             BlackfinDiagRegLengthReg0Chk
           };
-UINT32 nmbrOfLengthRegTests_ = sizeof(lengthRegisters_)/sizeof( BlackfinDiagTest::REGISTER_TEST );
+UINT32 nmbrOfLengthRegTests_ = sizeof(lengthRegisters_)/sizeof( BlackfinDiagTest::pRegisterTest );
 
-BlackfinDiagTest::REGISTER_TEST indexRegisters_[]   
+BlackfinDiagTest::pRegisterTest indexRegisters_[]   
 		= {
 			BlackfinDiagRegIndexReg3Chk,
             BlackfinDiagRegIndexReg2Chk,
             BlackfinDiagRegIndexReg1Chk,
             BlackfinDiagRegIndexReg0Chk
           };
-UINT32 nmbrOfIndexRegTests_ = sizeof(indexRegisters_)/sizeof( BlackfinDiagTest::REGISTER_TEST );
+UINT32 nmbrOfIndexRegTests_ = sizeof(indexRegisters_)/sizeof( BlackfinDiagTest::pRegisterTest );
 
-BlackfinDiagTest::REGISTER_TEST baseRegisters_[]    
+BlackfinDiagTest::pRegisterTest baseRegisters_[]    
 		= {
 			BlackfinDiagRegBaseReg3Chk,
     	    BlackfinDiagRegBaseReg2Chk,
             BlackfinDiagRegBaseReg1Chk,
             BlackfinDiagRegBaseReg0Chk
           };
-UINT32 nmbrOfBaseRegTests_ = sizeof(baseRegisters_)/sizeof( BlackfinDiagTest::REGISTER_TEST );
+UINT32 nmbrOfBaseRegTests_ = sizeof(baseRegisters_)/sizeof( BlackfinDiagTest::pRegisterTest );
 
 const BlackfinDiagTest::RegisterTestDescriptor registerTestSuite_[] = 
 								{
@@ -186,7 +186,7 @@ BlackfinDiagTest::BlackfinExecTestData testDataRegistersTest_ = {
     																defaultIterationComplete,
 																	defaultNmbrTimesToRunPerDiagCycle,
 																	defaultNmbrTimesRanThisDiagCycle,
-																	BlackfinDiagTest::DiagRegisterTestType,
+																	BlackfinDiagTest::DIAG_REGISTER_TEST_TEST_TYPE,
 																	defaultInitialTestExecutionState
 																};
 
