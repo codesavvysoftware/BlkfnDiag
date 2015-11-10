@@ -6,20 +6,24 @@
 
 namespace BlackfinDiagTesting 
 {
-	static const UINT32   BAD_BOOTSTREAM_ERR  = 0xffd00000;
-	static const UINT32   UNABLE_TO_START_ERR = 0xfff00000;
-	static const UINT32   MISMATCH_ERR        = 0xffe00000;
-	
     class BlackfinDiagInstructionRam : public BlackfinDiagTest 
     {
 	    public:
 	        
-	        BlackfinDiagInstructionRam( BlackfinExecTestData &     rTestData ) 
-		            		         :  BlackfinDiagTest     ( rTestData ),
-                                        m_BadBootstreamErr   ( BAD_BOOTSTREAM_ERR ),
-                                        m_UnableToStartErr   ( UNABLE_TO_START_ERR ),
-                                        m_MismatchErr        ( MISMATCH_ERR ),
-							            m_EmulationActive    ( TRUE ) 
+	        BlackfinDiagInstructionRam( BlackfinExecTestData &     rTestData,
+	                                    UINT32                     badBootstreamErr,
+	                                    UINT32                     unableToStartErr,
+	                                    UINT32                     mismatchErr,
+	                                    const UINT8 *              bootstreamStartAddr,
+	                                    const void *               instructionRamStartAddr,
+	                                    UINT32                     emulationActive ) 
+		            		         :  BlackfinDiagTest           ( rTestData ),
+                                        m_BadBootstreamErr         ( badBootstreamErr ),
+                                        m_UnableToStartErr         ( unableToStartErr ),
+                                        m_MismatchErr              ( mismatchErr ),
+                                        m_pBootStreamStartAddr      ( bootstreamStartAddr ),
+                                        m_pInstructionRamStartAddr ( instructionRamStartAddr ),
+							            m_EmulationActive     ( emulationActive ) 
 	        {
 	        }
 	
@@ -78,9 +82,10 @@ namespace BlackfinDiagTesting
 	
 	        BOOL                         m_EmulationActive;
 	
-	        BOOL                         m_ScaffoldingActive;
-	
-        	//
+            const UINT8 *                m_pBootStreamStartAddr;
+            
+            const void *                 m_pInstructionRamStartAddr;
+                   	//
 	        // Inhibit copy construction and assignments of this class by putting the declarations in private portion.
 	        // If using C++ 11 and later use the delete keyword to do this.
 	        //

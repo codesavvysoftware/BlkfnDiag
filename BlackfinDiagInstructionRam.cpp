@@ -8,10 +8,6 @@ using namespace DiagnosticCommon;
 namespace BlackfinDiagTesting 
 {
 
-    const void *  INSTR_START_ADDR  = reinterpret_cast<void *>(0xffa00000);
-    
-    const UINT8 * BOOT_STREAM_START = reinterpret_cast<UINT8 *>(0x20040000L);
-    
     BlackfinDiagTest::TestState BlackfinDiagInstructionRam::RunTest( UINT32 & rErrorCode ) 
     {
 	    ConfigForAnyNewDiagCycle( this );
@@ -159,7 +155,7 @@ namespace BlackfinDiagTesting
     	    if ( (pHeader->dBlockCode & HDRSGN) != 0xAD000000 ) break;
     	
     	    // Is this the start of instruction memory 
-    	    if ( pHeader->pTargetAddress == INSTR_START_ADDR && pHeader->dByteCount ) 
+    	    if ( pHeader->pTargetAddress == m_pInstructionRamStartAddr && pHeader->dByteCount ) 
     	    {	
     		    // Yes save the header offset and exit with a true condition 
     		    rHeaderOffset     = offset;
@@ -260,7 +256,7 @@ namespace BlackfinDiagTesting
                 break;
             }
             else if (    
-                         ( pHeader->pTargetAddress >= INSTR_START_ADDR ) 
+                         ( pHeader->pTargetAddress >= m_pInstructionRamStartAddr ) 
                       && ( pHeader->dByteCount > 0 ) 
                     )
             {
@@ -347,7 +343,7 @@ namespace BlackfinDiagTesting
 
     void BlackfinDiagInstructionRam::GetBootStreamStartAddr( const UINT8 * & rBootStreamStartAddr ) 
     {
-		rBootStreamStartAddr = BOOT_STREAM_START;
+		rBootStreamStartAddr = m_pBootStreamStartAddr;
     }
    
 

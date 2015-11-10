@@ -20,7 +20,7 @@ namespace BlackfinDiagTesting
 	        {
 		        DIAG_DATA_RAM_TEST_TYPE       = 1,
 		        DIAG_INTRUCTION_RAM_TEST_TYPE = 2,
-		        DIAG_REGISTER_TEST_TYPE       = 3,
+		        DIAG_REGISTER_TEST_TEST_TYPE  = 3,
 		        DIAG_SCHEDULER_TEST_TYPE      = 4,
 		        DIAG_TIMER_TEST_TYPE          = 5,
 		        DIAG_INSTRUCTION_TEST_TYPE    = 6

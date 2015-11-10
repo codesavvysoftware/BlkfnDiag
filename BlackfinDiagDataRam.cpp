@@ -171,9 +171,9 @@ namespace BlackfinDiagTesting
     {
         errorInfo  = GetTestType() << DIAG_ERROR_TYPE_BIT_POS;
     
-        errorInfo |= memoryBank << MEMORY_BANK_FAILURE_BIT_POS;
+        errorInfo |= memoryBank << m_MemoryBankFailureBitPos;
 	
-	    errorInfo |= (failurePattern << TEST_PATTERNS_ERROR_BIT_POS );
+	    errorInfo |= (failurePattern << m_TestPatternsFailureBitPos );
 	
 	    errorInfo |= offsetFromBankStart; 
     }

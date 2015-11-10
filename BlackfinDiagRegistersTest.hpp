@@ -1,70 +1,77 @@
 #pragma once
-#include "BlackfinDiag.h"
-#include "BlackfinDiagTest.h"
+#include "BlackfinDiag.hpp"
+#include "BlackfinDiagTest.hpp"
 
 #include <ccblkfn.h>                              /* Added for ssync( ), cli/sti( ) */
 
 
-namespace BlackfinDiagTesting {
+namespace BlackfinDiagTesting 
+{
+    class BlackfinDiagRegistersTest : public BlackfinDiagTest 
+    {
+
+        public:
+            BlackfinDiagRegistersTest( const RegisterTestDescriptor  registerTestSuite[],
+                                             UINT32                  numberOfDescriptorsInTestSuite, 
+                                       const UINT32                  testPatterns[], 
+                                             UINT32                  numberOfPatterns,
+                                             UINT32                  corruptedRegTestSuiteErr,
+                                             BlackfinExecTestData &  rTestData ) 
+		    		     		:	BlackfinDiagTest             	  ( rTestData ),
+									m_CorruptedRegisterTestSuiteErr   ( corruptedRegTestSuiteErr ),
+									m_NmbrOfRegisterPatterns          ( numberOfPatterns ), 
+									m_pTestPatternsForRegisterTesting ( testPatterns ),
+									m_NmbrOfRegisterTests             ( numberOfDescriptorsInTestSuite),
+									m_pRegisterTestSuite              ( registerTestSuite ) 
+        	{
+        	}
+
+        	virtual ~BlackfinDiagRegistersTest() 
+        	{
+        	}
+
+        	virtual TestState RunTest( UINT32 & rErrorCode );
+
+        protected:
+
+        	virtual void ConfigureForNextTestCycle();
 	
-class BlackfinDiagRegistersTest : public BlackfinDiagTest {
-
-public:
-	BlackfinDiagRegistersTest( 	const RegisterTestDescriptor      registerTestSuite[],
-	                            UINT32                            numberOfDescriptorsInTestSuite, 
-								const UINT32                      testPatterns[], 
-								UINT32                            numberOfPatterns,
-		    		     		BlackfinExecTestData &     testData ) 
-		    		     		:	BlackfinDiagTest             	( testData ),
-									corruptedRegisterTestSuite_  	( 0xff ),
-									numberOfRegisterPatterns_       ( numberOfPatterns ), 
-									testPatternsForRegisterTesting_ ( testPatterns ),
-									numberOfRegisterTests_          ( numberOfDescriptorsInTestSuite),
-									registerTestSuite_              ( registerTestSuite ) 
-	{}
-
-	virtual ~BlackfinDiagRegistersTest() {}
-
-	virtual TestState RunTest( UINT32 & ErrorCode );
-
-protected:
-
-	virtual void ConfigureForNextTestCycle();
+        private:
+        	//
+        	// Inhibit copy construction and assignments of this class by putting the declarations in private portion.
+        	// If using C++ 11 and later use the delete keyword to do this.
+        	//
+        	BlackfinDiagRegistersTest(const BlackfinDiagRegistersTest &);
 	
-private:
-	//
-	// Inhibit copy construction and assignments of this class by putting the declarations in private portion.
-	// If using C++ 11 and later use the delete keyword to do this.
-	//
-	BlackfinDiagRegistersTest(const BlackfinDiagRegistersTest & other);
-	
-	const BlackfinDiagRegistersTest & operator = (const BlackfinDiagRegistersTest & );
+        	const BlackfinDiagRegistersTest & operator = (const BlackfinDiagRegistersTest & );
 	
 
-	const UINT32                      corruptedRegisterTestSuite_;
+        	const UINT32                      m_CorruptedRegisterTestSuiteErr;
 
-    const UINT32                      numberOfRegisterPatterns_;
+            const UINT32                      m_NmbrOfRegisterPatterns;
 
-	const UINT32                      numberOfRegisterTests_;
+        	const UINT32                      m_NmbrOfRegisterTests;
 	
-	const RegisterTestDescriptor *    registerTestSuite_;
+        	const RegisterTestDescriptor *    m_pRegisterTestSuite;
 	
-    const UINT32 *                    testPatternsForRegisterTesting_;
+            const UINT32 *                    m_pTestPatternsForRegisterTesting;
     
-	INT                               critical_;                    // Temp to allow disabling interrupts around critical sections 
+        	INT                               m_Critical;                    // Temp to allow disabling interrupts around critical sections 
 
-	BOOL FindTestToRun( BlackfinDiagTest::RegisterTestDescriptor * & rtdTests );
+        	BOOL FindTestToRun( BlackfinDiagTest::RegisterTestDescriptor * & rtdTests );
 	
-	void DisableInterrupts() {
-		critical_ = cli();
-	}
+        	void DisableInterrupts() 
+        	{
+        		m_Critical = cli();
+        	}
 
-	void EnableInterrupts() {
-		sti(critical_);
-	}
+        	void EnableInterrupts() 
+        	{
+        		sti(m_Critical);
+        	}
     
-    BOOL RunRegisterTests( RegisterTestDescriptor  * rtdTests, UINT32 & FailureInfo );
-};
+            BOOL RunRegisterTests( RegisterTestDescriptor  * rtdTests, UINT32 & FailureInfo );
+    };
 
 
 };

@@ -1,5 +1,5 @@
 #include <asm_sprt.h>                              /* Added for ssync( ), cli/sti( ) */
-#include "BlackfinDiagRegTestCommon.h"
+#include "BlackfinDiagRegTestCommon.hpp"
 
 	.section/DOUBLEANY program;
 	.align 4;

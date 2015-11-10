@@ -10,6 +10,12 @@ namespace DiagnosticCommon
 	//
 	// Blackfin Diagnostic constants.  Variable names are intended to describe with they are use for.
 	// 
+    //
+    // Var suffix of:
+    // 
+    // 	MS == milleseconds
+    // 	US == microseconds
+    //	
 	typedef UINT32  DiagElapsedTime;
 
 	typedef clock_t DiagTimestampTime;
@@ -32,7 +38,8 @@ namespace DiagnosticCommon
 	static const UINT32 DIVISOR_INITIAL_VALUE                                = 1;
 
 	static const UINT32 ADJ_INITIAL_SHIFT_FACTOR                             = 0;
-	class cTiming 
+		
+    class cTiming 
 	{
 		
 		public:

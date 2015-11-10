@@ -13,13 +13,17 @@ namespace BlackfinDiagTesting
 	                             const UINT8 *              pTestPatternsForRamTesting,
 	                             UINT32                     nmbrRamTestingPatterns,
 	                             UINT32                     nmbrBytesToTestPerIteration,
+	                             UINT32                     memoryBankFailureBitPos,
+	                             UINT32                     testPatternsFailureBitPos,
 		    		             BlackfinExecTestData &     rTestData )    
 						         :  BlackfinDiagTest              ( rTestData ),
                                     m_Critical                    ( 0 ),                    
 	                       	        m_pDataRamTestSuite           ( pDataRamTestSuite ),
+	                       	        m_MemoryBankFailureBitPos     ( memoryBankFailureBitPos ),
 	                       	        m_NmbrBytesToTestPerIteration ( nmbrBytesToTestPerIteration ),
 							        m_NmbrTestPatterns            ( nmbrRamTestingPatterns ),
-							        m_pTestPatternsRAM            ( pTestPatternsForRamTesting )
+							        m_pTestPatternsRAM            ( pTestPatternsForRamTesting ),
+							        m_TestPatternsFailureBitPos   ( testPatternsFailureBitPos )
 	        {
 	        }
 
@@ -64,13 +68,11 @@ namespace BlackfinDiagTesting
 	        //
 	        // Which memory bank failed
 	        //
-	        static const UINT32        MEMORY_BANK_FAILURE_BIT_POS = 30;
-	
-	        static const UINT32        TEST_PATTERNS_ERROR_BIT_POS = 16;
-
             INT                        m_Critical;                    
 
 	        BlackfinDataRamTestSuite * m_pDataRamTestSuite;
+
+            UINT32                     m_MemoryBankFailureBitPos;
 
 	        UINT32                     m_NmbrTestPatterns;
 	
@@ -78,7 +80,9 @@ namespace BlackfinDiagTesting
 
 	        const UINT8 *              m_pTestPatternsRAM;
 
-	        void DisableInterrupts(); 
+            UINT32                     m_TestPatternsFailureBitPos;
+
+            void DisableInterrupts(); 
 	
 	        void EnableInterrupts();
 	

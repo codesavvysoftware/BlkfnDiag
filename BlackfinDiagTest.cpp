@@ -24,12 +24,12 @@ namespace BlackfinDiagTesting
         return m_TestExecutionData.m_CurrentTestState;
     }	
 		
-    DiagTimestampTime_t BlackfinDiagTest::GetIterationCompletedTimestamp() 
+    DiagTimestampTime BlackfinDiagTest::GetIterationCompletedTimestamp() 
     {
 	    return m_TestExecutionData.m_IterationCompleteTimestamp;
     }
 
-    DiagElapsedTime_t BlackfinDiagTest::GetIterationPeriod() 
+    DiagElapsedTime BlackfinDiagTest::GetIterationPeriod() 
     {
 	    return m_TestExecutionData.m_IterationPeriod;
     }
@@ -54,12 +54,12 @@ namespace BlackfinDiagTesting
 	    m_TestExecutionData.m_CurrentTestState = tsCurrent;
     }
 
-    void BlackfinDiagTest::SetIterationCompletedTimestamp(DiagTimestampTime_t timestamp) 
+    void BlackfinDiagTest::SetIterationCompletedTimestamp(DiagTimestampTime timestamp) 
     {
 	    m_TestExecutionData.m_IterationCompleteTimestamp = timestamp;
     }
 
-    void BlackfinDiagTest::SetIterationPeriod(DiagElapsedTime_t period) 
+    void BlackfinDiagTest::SetIterationPeriod(DiagElapsedTime period) 
     {
 	    m_TestExecutionData.m_IterationPeriod = period;
     }

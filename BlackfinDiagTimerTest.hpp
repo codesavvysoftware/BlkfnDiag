@@ -1,68 +1,70 @@
 #pragma once
-#include "BlackfinDiag.h"
-#include "BlackfinDiagTest.h"
+#include "BlackfinDiag.hpp"
+#include "BlackfinDiagTest.hpp"
 
-namespace BlackfinDiagTesting {
+namespace BlackfinDiagTesting 
+{
+    class BlackfinDiagTimerTest : public BlackfinDiagTest 
+    {
+        public:
 
-class BlackfinDiagTimerTest : public BlackfinDiagTest {
+        	BlackfinDiagTimerTest( UINT32                              errorApexTimer,
+        					       UINT32                              errorHostTimer,
+        					       DiagnosticCommon::DiagElapsedTime   maxElapsedTimeApex,
+        	                       DiagnosticCommon::DiagElapsedTime   maxElapsedTimeHost,
+        	                       DiagnosticCommon::DiagElapsedTime   minElapsedTimeApex,
+        	                       DiagnosticCommon::DiagElapsedTime   minElapsedTimeHost, 
+        	                       BlackfinExecTestData &              rTestData ) 
+           					   	    :  BlackfinDiagTest      ( rTestData ), 
+           					   	       m_ApexTimerErr        ( errorApexTimer ),
+           					   	       m_HostTimerErr        ( errorHostTimer ),  
+        						       m_BeingInstantiated   ( TRUE ),
+        						       m_MaxElapsedTimeApex  ( maxElapsedTimeApex ),
+        						       m_MaxElapsedTimeHost  ( maxElapsedTimeHost ),
+        						       m_MinElapsedTimeApex  ( minElapsedTimeApex ),
+        						       m_MinElapsedTimeHost  ( minElapsedTimeHost ),
+                                       m_TimerValueStartApex ( 0 ),
+        						       m_TimerValueStartHost ( 0 )
+        	{
+        	}
 
+        	virtual ~BlackfinDiagTimerTest() 
+        	{
+        	}
 
-public:
-
-	BlackfinDiagTimerTest( UINT32                              errorApexTimer,
-					       UINT32                              errorHostTimer,
-					       DiagnosticCommon::DiagElapsedTime_t maxElapsedTimeApex,
-	                       DiagnosticCommon::DiagElapsedTime_t maxElapsedTimeHost,
-	                       DiagnosticCommon::DiagElapsedTime_t minElapsedTimeApex,
-	                       DiagnosticCommon::DiagElapsedTime_t minElapsedTimeHost, 
-	                       BlackfinExecTestData &              testData ) 
-   					   	    :  BlackfinDiagTest      ( testData ), 
-   					   	       errorApexTimer_       ( errorApexTimer ),
-   					   	       errorHostTimer_       ( errorHostTimer ),  
-						       beingInstantiated_    ( TRUE ),
-						       maxElapsedTimeApex_   ( maxElapsedTimeApex ),
-						       maxElapsedTimeHost_   ( maxElapsedTimeHost ),
-						       minElapsedTimeApex_   ( minElapsedTimeApex ),
-						       minElapsedTimeHost_   ( minElapsedTimeHost ),
-                               timerValueStartApex_  ( 0 ),
-						       timerValueStartHost_  ( 0 )
-	{}
-
-	virtual ~BlackfinDiagTimerTest() {}
-
-	virtual TestState RunTest( UINT32 & ErrorCode  );
+        	virtual TestState RunTest( UINT32 & rErrorCode  );
 	
-protected:
+        protected:
 
-	virtual void ConfigureForNextTestCycle();
+        	virtual void ConfigureForNextTestCycle();
 	
-private:
+        private:
 
-	//
-	// Inhibit copy construction and assignments of this class by putting the declarations in private portion.
-	// If using C++ 11 and later use the delete keyword to do this.
-	//
-	BlackfinDiagTimerTest(const BlackfinDiagTimerTest &);
+        	//
+        	// Inhibit copy construction and assignments of this class by putting the declarations in private portion.
+        	// If using C++ 11 and later use the delete keyword to do this.
+        	//
+        	BlackfinDiagTimerTest(const BlackfinDiagTimerTest &);
 	
-	const BlackfinDiagTimerTest & operator = (const BlackfinDiagTimerTest & );
+        	const BlackfinDiagTimerTest & operator = (const BlackfinDiagTimerTest & );
 		
-	BOOL                                    beingInstantiated_;
+        	BOOL                                  m_BeingInstantiated;
  
-	UINT32                                  errorApexTimer_;
+        	UINT32                                m_ApexTimerErr;
 	
-	UINT32									errorHostTimer_;
+        	UINT32                                m_HostTimerErr;
 	
-	DiagnosticCommon::DiagElapsedTime_t     maxElapsedTimeApex_;
+        	DiagnosticCommon::DiagElapsedTime     m_MaxElapsedTimeApex;
 	
-	DiagnosticCommon::DiagElapsedTime_t     maxElapsedTimeHost_;	// Read the current Apex2 System Time Register value.
+        	DiagnosticCommon::DiagElapsedTime     m_MaxElapsedTimeHost;	// Read the current Apex2 System Time Register value.
     
-	DiagnosticCommon::DiagElapsedTime_t     minElapsedTimeApex_;
+        	DiagnosticCommon::DiagElapsedTime     m_MinElapsedTimeApex;
 	
-	DiagnosticCommon::DiagElapsedTime_t     minElapsedTimeHost_;	// Read the current Apex2 System Time Register value.
+        	DiagnosticCommon::DiagElapsedTime     m_MinElapsedTimeHost;	// Read the current Apex2 System Time Register value.
     
-	DiagnosticCommon::DiagTimestampTime_t   timerValueStartApex_;
+        	DiagnosticCommon::DiagTimestampTime   m_TimerValueStartApex;
         
-    DiagnosticCommon::DiagTimestampTime_t   timerValueStartHost_;
-};
+            DiagnosticCommon::DiagTimestampTime   m_TimerValueStartHost;
+    };
 };
 
