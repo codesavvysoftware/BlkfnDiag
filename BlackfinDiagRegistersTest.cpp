@@ -5,7 +5,7 @@ using namespace DiagnosticCommon;
 namespace BlackfinDiagTesting 
 {
 	
-    BlackfinDiagTest::TestState BlackfinDiagRegistersTest::RunTest( UINT32 & rErrorCode ) 
+    TestState BlackfinDiagRegistersTest::RunTest( UINT32 & rErrorCode ) 
     {
         ConfigForAnyNewDiagCycle( this );
 					

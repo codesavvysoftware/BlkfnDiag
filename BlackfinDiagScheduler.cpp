@@ -7,8 +7,6 @@ using namespace DiagnosticCommon;
 
 namespace DiagnosticScheduling
 {	
-//    DiagTimestampTime  DEFAULT_INITIAL_TIMESTAMP = 0;	
-
     BlackfinDiagScheduler::BlackfinDiagScheduler( std::vector <BlackfinDiagTest *> * pDiagnostics,
                                                   UINT32                             corruptedVectorErr,
                                                   UINT32                             corruptedTestMemoryErr,
@@ -41,10 +39,6 @@ namespace DiagnosticScheduling
 		
     		OS_Assert( errorCode );	
     	}
-	
-
-	
-
     }
 
     BOOL BlackfinDiagScheduler::AreTestIterationsScheduledToRun() 
@@ -168,7 +162,7 @@ namespace DiagnosticScheduling
     		
     			UINT32	returnedErrorCode;
 
-    			BlackfinDiagTest::TestState testResult = pCurrentDiagTest->RunTest( returnedErrorCode );
+    			TestState testResult = pCurrentDiagTest->RunTest( returnedErrorCode );
 
         		pCurrentDiagTest->SetCurrentTestState( testResult );
     
@@ -176,23 +170,21 @@ namespace DiagnosticScheduling
 		
     			switch (testResult)
     			{
-    				case BlackfinDiagTest::TEST_LOOP_COMPLETE: 
-    				{
+    				case TEST_LOOP_COMPLETE: 
+    				
     					SetAnotherTestCompletedForCycle(pCurrentDiagTest);
-    				}
 			
     					break;
 			
-    				case BlackfinDiagTest::TEST_IN_PROGRESS:
+    				case TEST_IN_PROGRESS:
 	
     					break;
 
     				default:
-    				{
+    				
     					ConfigureErrorCode( returnedErrorCode, pCurrentDiagTest->GetTestType() );
 		
     					OS_Assert( returnedErrorCode );
-    				}
 			
     					break;
     			}

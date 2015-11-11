@@ -32,7 +32,7 @@ namespace BlackfinDiagTesting
         	{
         	}
 
-        	virtual TestState RunTest( UINT32 & rErrorCode  );
+        	virtual DiagnosticCommon::TestState RunTest( UINT32 & rErrorCode  );
 	
         protected:
 

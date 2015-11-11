@@ -4,6 +4,7 @@
 #include "BlackfinDiagDataRam.hpp"
 #include "BlackfinDiagRegistersTest.hpp"
 #include "BlackfinDiagTimerTest.hpp"
+#include "BlackfinDiagInstructionsTest.hpp"
 
 namespace BlackfinDiagRuntimeEnvironment 
 {  
@@ -128,7 +129,7 @@ namespace BlackfinDiagRuntimeEnvironment
         	// Instruction RAM testing parameters, structures and definitions.                                          *
         	//                                                                                                          *
         	//***********************************************************************************************************
-        	static const DiagnosticCommon::DiagElapsedTime                              INSTRCTN_RAM_TEST_ITERATION_PERIOD;
+        	static const DiagnosticCommon::DiagElapsedTime                              INSTRCTN_RAM_TEST_ITERATION_PERIOD_MS;
             static const UINT8 *                                                        BOOT_STREAM_START;    
             static const void *                                                         INSTR_START_ADDR;    
             static const UINT32                                                         BAD_BOOTSTREAM_ERR;
@@ -144,7 +145,7 @@ namespace BlackfinDiagRuntimeEnvironment
         	// Timer testing parameters, structures and definitions.                                          *
         	//                                                                                                          *
         	//***********************************************************************************************************
-        	static const DiagnosticCommon::DiagElapsedTime                              TIMER_TEST_ITERATION_PERIOD;
+        	static const DiagnosticCommon::DiagElapsedTime                              TIMER_TEST_ITERATION_PERIOD_MS;
 	
         	static const UINT32                                                         m_TimerTestApexTimerErr;
         	static const UINT32                                                         m_TimerTestHostTimerErr;
@@ -156,6 +157,16 @@ namespace BlackfinDiagRuntimeEnvironment
     
         	static BlackfinDiagTesting::BlackfinDiagTimerTest                           m_TimerTest;
 	
+        	//***********************************************************************************************************
+        	//                                                                                                          *
+        	// Instructions testing parameters, structures and definitions.                                          *
+        	//                                                                                                          *
+        	//***********************************************************************************************************
+        	static const DiagnosticCommon::DiagElapsedTime                              INSTRUCTIONS_TEST_ITERATION_PERIOD_MS;
+	
+            static const BlackfinDiagTesting::BlackfinDiagTest::BlackfinExecTestData    INSTRUCTIONS_TEST_TEST_DATA;
+    
+        	static BlackfinDiagTesting::BlackfinDiagInstructionsTest                    m_InstructionsTest;
         	//***********************************************************************************************************
         	//                                                                                                          *
         	// Run the complete tests definitions.                                                                      *

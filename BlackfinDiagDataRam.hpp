@@ -31,7 +31,7 @@ namespace BlackfinDiagTesting
 	        {
 	        }
 
-	        virtual TestState RunTest( UINT32 & ErrorCode  );
+	        virtual DiagnosticCommon::TestState RunTest( UINT32 & ErrorCode  );
 
  	        typedef struct 
  	        {

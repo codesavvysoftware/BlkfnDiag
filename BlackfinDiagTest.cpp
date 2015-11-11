@@ -19,7 +19,7 @@ namespace BlackfinDiagTesting
 	    }
     }
 
-    BlackfinDiagTest::TestState BlackfinDiagTest::GetCurrentTestState() 
+    TestState BlackfinDiagTest::GetCurrentTestState() 
     {
         return m_TestExecutionData.m_CurrentTestState;
     }	

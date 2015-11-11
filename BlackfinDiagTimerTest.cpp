@@ -7,7 +7,7 @@ using namespace DiagnosticCommon;
 namespace BlackfinDiagTesting 
 {
 	
-    BlackfinDiagTest::TestState BlackfinDiagTimerTest::RunTest( UINT32 & errorCode ) 
+    TestState BlackfinDiagTimerTest::RunTest( UINT32 & errorCode ) 
     {
 	
     	ConfigForAnyNewDiagCycle( this );

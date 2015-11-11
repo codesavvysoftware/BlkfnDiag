@@ -6,14 +6,14 @@ namespace BlackfinDiagTesting
 	
 	extern "C" BOOL TestAByteOfRam( BlackfinDiagDataRam::ByteTestParameters * pbtp );
 
-    BlackfinDiagTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & rErrorCode ) 
+    TestState BlackfinDiagDataRam::RunTest( UINT32 & rErrorCode ) 
     {
 	
 	    ConfigForAnyNewDiagCycle( this );
 					
 	    BOOL errorExists = TRUE;
 	
-	    BlackfinDiagTest::TestState ts = TEST_LOOP_COMPLETE;
+	    TestState ts = TEST_LOOP_COMPLETE;
 	
 	    UINT32 offsetFromBankStart = 0;
 	

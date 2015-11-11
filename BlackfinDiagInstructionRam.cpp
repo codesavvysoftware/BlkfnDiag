@@ -8,7 +8,7 @@ using namespace DiagnosticCommon;
 namespace BlackfinDiagTesting 
 {
 
-    BlackfinDiagTest::TestState BlackfinDiagInstructionRam::RunTest( UINT32 & rErrorCode ) 
+    TestState BlackfinDiagInstructionRam::RunTest( UINT32 & rErrorCode ) 
     {
 	    ConfigForAnyNewDiagCycle( this );
 	    
@@ -16,11 +16,10 @@ namespace BlackfinDiagTesting
     }
     
     
-    BlackfinDiagTest::TestState 
-    BlackfinDiagInstructionRam::RunInstructionRamTestIteration(	InstructionCompareParams & rIcpCompare,
-															    UINT32 &                   rErrorCode ) 
+    TestState BlackfinDiagInstructionRam::RunInstructionRamTestIteration(	InstructionCompareParams & rIcpCompare,
+                                                                            UINT32 &                   rErrorCode ) 
     {
-    	BlackfinDiagTest::TestState ts = TEST_IN_PROGRESS;
+    	TestState ts = TEST_IN_PROGRESS;
 
 	    BOOL hasError = TRUE;	  
 	

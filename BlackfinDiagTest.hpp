@@ -7,15 +7,6 @@ namespace BlackfinDiagTesting
     {
         public:
 
-            typedef enum _TestState 
-            {
-		        TEST_LOOP_COMPLETE,
-		        TEST_IN_PROGRESS,
-		        TEST_FAILURE,
-		        TEST_IDLE
-	        } 
-	        TestState;
-
 	        typedef enum _DiagnosticTestTypes 
 	        {
 		        DIAG_DATA_RAM_TEST_TYPE       = 1,
@@ -23,7 +14,7 @@ namespace BlackfinDiagTesting
 		        DIAG_REGISTER_TEST_TEST_TYPE  = 3,
 		        DIAG_SCHEDULER_TEST_TYPE      = 4,
 		        DIAG_TIMER_TEST_TYPE          = 5,
-		        DIAG_INSTRUCTION_TEST_TYPE    = 6
+		        DIAG_INSTRUCTIONS_TEST_TYPE   = 6
 	        } 
 	        DiagnosticTestTypes;
 	
@@ -62,7 +53,7 @@ namespace BlackfinDiagTesting
    		        UINT32              				         m_NmbrTimesToRunPerDiagCycle;  		// Number of times to run the test per diagnostic cycle
    		        UINT32		               			         m_NmbrTimesRanThisDiagCycle;   		// Times test has run this cycle
 		        DiagnosticTestTypes 				         m_TestType;
-                TestState                                    m_CurrentTestState;	
+                DiagnosticCommon::TestState                  m_CurrentTestState;	
             } 
             BlackfinExecTestData;    
 
@@ -73,7 +64,7 @@ namespace BlackfinDiagTesting
 	        {
 	        }
 
-            TestState                                        GetCurrentTestState();
+            DiagnosticCommon::TestState                      GetCurrentTestState();
 	
 	        DiagnosticCommon::DiagTimestampTime              GetIterationCompletedTimestamp();
 
@@ -85,7 +76,7 @@ namespace BlackfinDiagTesting
 	
 	        DiagnosticTestTypes                              GetTestType();
 	
-	        void                  					         SetCurrentTestState(TestState);
+	        void                  					         SetCurrentTestState(DiagnosticCommon::TestState ts);
 	
             void				                             SetIterationCompletedTimestamp(DiagnosticCommon::DiagTimestampTime timestamp);
 
@@ -97,7 +88,7 @@ namespace BlackfinDiagTesting
 	
             void				                             SetTestType(DiagnosticTestTypes test_type);
 
-            virtual TestState                                RunTest( UINT32 & errorCode ) = 0;
+            virtual DiagnosticCommon::TestState              RunTest( UINT32 & errorCode ) = 0;
 
         protected:
 
