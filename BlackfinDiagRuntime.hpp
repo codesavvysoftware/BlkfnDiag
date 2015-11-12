@@ -8,7 +8,7 @@
 
 namespace BlackfinDiagRuntimeEnvironment 
 {  
-    //
+      //
     // For linkage to c callable assembly language register tests
     //
     extern "C" UINT32  BlackfinDiagRegSanityChk( const UINT32 *, UINT32);
@@ -48,29 +48,35 @@ namespace BlackfinDiagRuntimeEnvironment
     }
     class BlackfinDiagRuntime 
     {
+        public:
+	
+            static void ExecuteDiagnostics();
+            
+            
         private:
-        	//***********************************************************************************************************
+
+      	//***********************************************************************************************************
         	//                                                                                                          *
         	// Data RAM testing parameters, structures and definitions.                                                 *
         	//                                                                                                          *
         	//***********************************************************************************************************
-        	static const UINT32                                                           NMBR_DATA_RAM_BYTES_TESTED_PER_ITERATION;
+        	static const UINT32                                                              NMBR_DATA_RAM_BYTES_TESTED_PER_ITERATION;
 	
-        	static const DiagnosticCommon::DiagElapsedTime                                DATA_RAM_TEST_ITERATION_PERIOD_MS;
+        	static const DiagnosticCommon::DiagElapsedTime                                   DATA_RAM_TEST_ITERATION_PERIOD_MS;
 	
-        	static const BlackfinDiagTesting::BlackfinDiagTest::BlackfinDataRamTestSuite  DATA_RAM_TEST_TEST_SUITE;
+        	static const BlackfinDiagTesting::BlackfinDiagDataRam::BlackfinDataRamTestSuite  DATA_RAM_TEST_TEST_SUITE;
 
-        	static const UINT8                                                            DATA_RAM_TEST_TEST_PATTERNS[];
+        	static const UINT8                                                               DATA_RAM_TEST_TEST_PATTERNS[];
 
-        	static const UINT32                                                           DATA_RAM_TEST_NMBR_TEST_PATTERNS;
+        	static const UINT32                                                              DATA_RAM_TEST_NMBR_TEST_PATTERNS;
 	
-	        static const UINT32                                                           MEMORY_BANK_FAILURE_BIT_POS;
+	        static const UINT32                                                              MEMORY_BANK_FAILURE_BIT_POS;
 	
-	        static const UINT32                                                           TEST_PATTERNS_ERROR_BIT_POS;
+	        static const UINT32                                                              TEST_PATTERNS_ERROR_BIT_POS;
 
-        	static const BlackfinDiagTesting::BlackfinDiagTest::BlackfinExecTestData      DATA_RAM_TEST_TEST_DATA;
+        	static const BlackfinDiagTesting::BlackfinDiagTest::BlackfinExecTestData         DATA_RAM_TEST_TEST_DATA;
 
-            static BlackfinDiagTesting::BlackfinDiagDataRam                               m_DataRamTest;
+            static BlackfinDiagTesting::BlackfinDiagDataRam                                  m_DataRamTest;
     
     
     
@@ -80,39 +86,39 @@ namespace BlackfinDiagRuntimeEnvironment
         	//                                                                                                          *
         	//***********************************************************************************************************
         	//
-         	static const UINT32                                                           REGISTER_TEST_TEST_PATTERNS[];
-        	static const UINT32                                                           REGISTER_TEST_NMBR_OF_TEST_PATTERNS;
+         	static const UINT32                                                                   REGISTER_TEST_TEST_PATTERNS[];
+        	static const UINT32                                                                   REGISTER_TEST_NMBR_OF_TEST_PATTERNS;
 	
             //
             // Only one test but has flexibility to add more and we may break up current test.
             //
-            static const BlackfinDiagTesting::BlackfinDiagTest::pRegisterTest             m_SanityCheck[]; 
-            static const UINT32                                                           NMBR_OF_SANITY_CHECKS;
+            static const BlackfinDiagTesting::BlackfinDiagRegistersTest::pRegisterTest             m_SanityCheck[]; 
+            static const UINT32                                                                    NMBR_OF_SANITY_CHECKS;
     		
-            static const BlackfinDiagTesting::BlackfinDiagTest::pRegisterTest             m_DataRegisters[];      
-            static const UINT32                                                           NMBR_OF_DATA_REG_TESTS;
+            static const BlackfinDiagTesting::BlackfinDiagRegistersTest::pRegisterTest             m_DataRegisters[];      
+            static const UINT32                                                                    NMBR_OF_DATA_REG_TESTS;
     
-            static const BlackfinDiagTesting::BlackfinDiagTest::pRegisterTest             m_PointerRegisters[];
-            static const UINT32                                                           NMBR_OF_POINTER_REG_TESTS;
+            static const BlackfinDiagTesting::BlackfinDiagRegistersTest::pRegisterTest             m_PointerRegisters[];
+            static const UINT32                                                                    NMBR_OF_POINTER_REG_TESTS;
 
-            static const BlackfinDiagTesting::BlackfinDiagTest::pRegisterTest             m_Accumulators[];
-        	static const UINT32                                                           NMBR_OF_ACCUM_REG_TESTS;
+            static const BlackfinDiagTesting::BlackfinDiagRegistersTest::pRegisterTest             m_Accumulators[];
+        	static const UINT32                                                                    NMBR_OF_ACCUM_REG_TESTS;
 	
-        	static const BlackfinDiagTesting::BlackfinDiagTest::pRegisterTest             m_ModifyRegisters[];
-        	static const UINT32                                                           NMBR_OF_MODIFY_REG_TESTS;
+        	static const BlackfinDiagTesting::BlackfinDiagRegistersTest::pRegisterTest             m_ModifyRegisters[];
+        	static const UINT32                                                                    NMBR_OF_MODIFY_REG_TESTS;
 
-        	static const BlackfinDiagTesting::BlackfinDiagTest::pRegisterTest             m_LengthRegisters_[];
-        	static const UINT32                                                           NMBR_OF_LENGTH_REG_TESTS;
+        	static const BlackfinDiagTesting::BlackfinDiagRegistersTest::pRegisterTest             m_LengthRegisters_[];
+        	static const UINT32                                                                    NMBR_OF_LENGTH_REG_TESTS;
 
-        	static const BlackfinDiagTesting::BlackfinDiagTest::pRegisterTest             m_IndexRegisters_[];
-        	static const UINT32                                                           NMBR_OF_INDEX_REG_TESTS;
+        	static const BlackfinDiagTesting::BlackfinDiagRegistersTest::pRegisterTest             m_IndexRegisters_[];
+        	static const UINT32                                                                    NMBR_OF_INDEX_REG_TESTS;
 
-        	static const BlackfinDiagTesting::BlackfinDiagTest::pRegisterTest             m_BaseRegisters_[];   
-        	static const UINT32                                                           NMBR_OF_BASE_REG_TESTS;
+        	static const BlackfinDiagTesting::BlackfinDiagRegistersTest::pRegisterTest             m_BaseRegisters_[];   
+        	static const UINT32                                                                    NMBR_OF_BASE_REG_TESTS;
 
-            static const BlackfinDiagTesting::BlackfinDiagTest::RegisterTestDescriptor    REGISTER_TEST_TEST_DESCRIPTORS[];
+            static const BlackfinDiagTesting::BlackfinDiagRegistersTest::RegisterTestDescriptor    REGISTER_TEST_TEST_DESCRIPTORS[];
     
-            static const UINT32                                                           REGISTER_TEST_NUMBER_TEST_DESCRIPTORS;
+            static const UINT32                                                                    REGISTER_TEST_NUMBER_TEST_DESCRIPTORS;
  
         	static const DiagnosticCommon::DiagElapsedTime                                REGISTER_TEST_ITERATION_PERIOD_MS;
         	
@@ -181,19 +187,22 @@ namespace BlackfinDiagRuntimeEnvironment
         	static const UINT32    CORRUPTED_DIAG_TEST_VECTOR_ERR = 1;
 	
         	static const UINT32    CORRUPTED_DIAG_TEST_MEMORY_ERR = 2;
-	
-        	static const UINT32    ALL_DIAG_DID_NOT_COMPLETE_ERR  = 3;
         	
-        	static const UINT32    SCHEDULER_TEST_TYPE            = BlackfinDiagTesting::BlackfinDiagTest::DIAG_SCHEDULER_TEST_TYPE;
+        	static const UINT32    TEST_TOOK_TOO_LONG_ERR         = 3;
 	
+        	static const UINT32    ALL_DIAG_DID_NOT_COMPLETE_ERR  = 4;
+        	
+			//
+			// Requirement:  All Diagnostic Tests Complete in 4 Hours.
+			//
+    		static const DiagnosticCommon::DiagElapsedTime PERIOD_FOR_ALL_DIAGNOSTICS_COMPLETED_MS     = 4 * 60 * 60 * 1000; // 4 hours, number of milleseconds in 4 hours
+    
+    		static const DiagnosticCommon::DiagElapsedTime PERIOD_FOR_ONE_DIAGNOSTIC_TEST_ITERATION_MS = 50; // Milleseconds
             // Constructor definition
             BlackfinDiagRuntime();
+    };
     
-        public:
-	
-            static void ExecuteDiagnostics();
-
-        };
+    
 
 };
 

@@ -19,6 +19,11 @@ namespace BlackfinDiagTesting
 	    }
     }
 
+    DiagElapsedTime BlackfinDiagTest::GetCurrentIterationDuration()
+    {
+        return m_TestExecutionData.m_CurrentIterationDuration;
+    }
+
     TestState BlackfinDiagTest::GetCurrentTestState() 
     {
         return m_TestExecutionData.m_CurrentTestState;
@@ -34,6 +39,11 @@ namespace BlackfinDiagTesting
 	    return m_TestExecutionData.m_IterationPeriod;
     }
 
+    DiagElapsedTime BlackfinDiagTest::GetMaxTimeBetweenTestCompletions()
+    {
+        return m_TestExecutionData.m_MaximumTimeBetweenTestCompletions;
+    }
+    
     UINT32 BlackfinDiagTest::GetNumberOfTimesToRunPerDiagCycle() 
     {
 	    return m_TestExecutionData.m_NmbrTimesToRunPerDiagCycle;  
@@ -44,11 +54,26 @@ namespace BlackfinDiagTesting
 	    return m_TestExecutionData.m_NmbrTimesRanThisDiagCycle;  
     }
 
+    DiagTimestampTime BlackfinDiagTest::GetTestCompletedTimestamp()
+    {
+        return m_TestExecutionData.m_TestCompleteTimestamp;
+    }
+    
+    DiagTimestampTime BlackfinDiagTest::GetTestStartTime()
+    {
+        return m_TestExecutionData.m_TestStartTimestamp;
+    }
+     
     BlackfinDiagTesting::BlackfinDiagTest::DiagnosticTestTypes BlackfinDiagTest::GetTestType() 
     {	
 	   return m_TestExecutionData.m_TestType; 
     }
 	
+    void BlackfinDiagTest::SetCurrentIterationDuration( DiagElapsedTime duration )
+    {
+        m_TestExecutionData.m_CurrentIterationDuration = duration;
+    }
+
     void BlackfinDiagTest::SetCurrentTestState( TestState tsCurrent ) 
     {
 	    m_TestExecutionData.m_CurrentTestState = tsCurrent;
@@ -64,6 +89,11 @@ namespace BlackfinDiagTesting
 	    m_TestExecutionData.m_IterationPeriod = period;
     }
 			
+    void BlackfinDiagTest::SetMaxTimeBetweenTestCompletions( DiagElapsedTime period )
+    {
+        m_TestExecutionData.m_MaximumTimeBetweenTestCompletions = period;
+    }
+    
     void BlackfinDiagTest::SetNumberOfTimesRanThisDiagCycle(UINT32 nmberOfTimesRan) 
     {
         m_TestExecutionData.m_NmbrTimesRanThisDiagCycle = nmberOfTimesRan;
@@ -74,7 +104,16 @@ namespace BlackfinDiagTesting
 	    m_TestExecutionData.m_NmbrTimesToRunPerDiagCycle = numberTimesToRun;  
     }
 	
-
+    void BlackfinDiagTest::SetTestCompletedTimestamp( DiagTimestampTime period )
+    {
+        m_TestExecutionData.m_TestCompleteTimestamp = period;
+    }
+    
+    void BlackfinDiagTest::SetTestStartTime( DiagTimestampTime time )
+    {
+        m_TestExecutionData.m_TestStartTimestamp = time;
+    }
+     
     void BlackfinDiagTest::SetTestType(BlackfinDiagTesting::BlackfinDiagTest::DiagnosticTestTypes type) 
     {	
 	    m_TestExecutionData.m_TestType = type; 

@@ -1,23 +1,14 @@
 #include "BlackfinDiagScheduler.hpp"
-#include "OS_iotk.h"
 #include <time.h>
-
-using namespace BlackfinDiagTesting;
-using namespace DiagnosticCommon;
 
 namespace DiagnosticScheduling
 {	
-    BlackfinDiagScheduler::BlackfinDiagScheduler( std::vector <BlackfinDiagTest *> * pDiagnostics,
-                                                  UINT32                             corruptedVectorErr,
-                                                  UINT32                             corruptedTestMemoryErr,
-                                                  UINT32                             allDiagnosticsNotCompletedErr,
-                                                  UINT32                             schedulerTestType ) 
+    template <typename T>
+    DiagnosticScheduler<T>::DiagnosticScheduler( std::vector <T *> *           pDiagnostics,
+                                                 DiagnosticRunTimeParameters * pRunTimeData )
     		  : m_CurrentSchedulerState          ( INITIAL_INSTANTIATION ),
     		 	m_pRunTimeDiagnostics            ( pDiagnostics ),
-    		 	m_CorruptedVectorErr             ( corruptedVectorErr ),
-    		 	m_CorruptedTestMemoryErr         ( corruptedTestMemoryErr ),
-    		 	m_AllDiagnosticsNotCompletedErr  ( allDiagnosticsNotCompletedErr ),
-    		 	m_SchedulerTestType              ( schedulerTestType ),
+    		 	m_pRuntimeData                   ( pRunTimeData ),
     			m_TestEnumeration                ( pDiagnostics->end() ),
     			m_TimestampCurrent               ( DEFAULT_INITIAL_TIMESTAMP ),
     			m_TimeTestCycleStarted           ( DEFAULT_INITIAL_TIMESTAMP ),
@@ -33,15 +24,16 @@ namespace DiagnosticScheduling
     	if ( !pDiagnostics ) 
     	{
 		
-    		UINT32 errorCode = m_CorruptedVectorErr;
+    		UINT32 errorCode = m_pRuntimeData->m_CorruptedVectorErr;
 		
-    		ConfigureErrorCode( errorCode, m_SchedulerTestType );
+    		ConfigureErrorCode( errorCode, m_pRuntimeData->m_SchedulerTestType );
 		
-    		OS_Assert( errorCode );	
+    		(*m_pRuntimeData->m_ExcetionError)( errorCode );	
     	}
     }
 
-    BOOL BlackfinDiagScheduler::AreTestIterationsScheduledToRun() 
+    template <typename T>
+    BOOL DiagnosticScheduler<T>::AreTestIterationsScheduledToRun() 
     {	
     	return StartEnumeratingTestsForThisIterationPeriod();
     }	
@@ -49,7 +41,8 @@ namespace DiagnosticScheduling
 
 	
 
-    void BlackfinDiagScheduler::ConfigureErrorCode( UINT32 & returnedErrorCode, UINT32 testTypeCurrent ) 
+    template <typename T>
+    void DiagnosticScheduler<T>::ConfigureErrorCode( UINT32 & returnedErrorCode, UINT32 testTypeCurrent ) 
     {
 		
     	UINT32 ui32        = testTypeCurrent;
@@ -57,11 +50,12 @@ namespace DiagnosticScheduling
     	returnedErrorCode |= (ui32 << DIAG_ERROR_TYPE_BIT_POS); 
     }
 
-    void BlackfinDiagScheduler::DetermineCurrentSchedulerState() 
+    template <typename T>
+    void DiagnosticScheduler<T>::DetermineCurrentSchedulerState() 
     {	
-    	DiagElapsedTime elapsedTimeInTestCycle;
+    	UINT32 elapsedTimeInTestCycle;
 	
-    	m_TimestampCurrent = SystemTiming.GetSystemTimestamp();	
+    	m_TimestampCurrent = (*m_pRuntimeData->m_SysTimestamp)();
 	
     	// No state determination needed will get changed by caller
     	if ( m_CurrentSchedulerState == INITIAL_INSTANTIATION ) 
@@ -73,9 +67,9 @@ namespace DiagnosticScheduling
 		
     		m_TimeLastIterationPeriodExpired = m_TimestampCurrent;
 		
-    		for (std::vector<BlackfinDiagTest *>::iterator it = m_pRunTimeDiagnostics->begin(); it != m_pRunTimeDiagnostics->end(); ++it) {
+    		for (std::vector<T *>::iterator it = m_pRunTimeDiagnostics->begin(); it != m_pRunTimeDiagnostics->end(); ++it) {
 			
-    			BlackfinDiagTest * pPbdt = (*it);
+    			T * pPbdt = (*it);
 			
     			pPbdt->SetIterationCompletedTimestamp( m_TimestampCurrent );		
             }		
@@ -84,7 +78,7 @@ namespace DiagnosticScheduling
     	}
 
     	// Compute Elapsed Time in Current Diagnostic Test Period
-    	SystemTiming.ComputeElapsedTimeMS( m_TimestampCurrent, m_TimeTestCycleStarted, elapsedTimeInTestCycle );
+    	elapsedTimeInTestCycle = (*m_pRuntimeData->m_CalcElapsedTime)( m_TimestampCurrent, m_TimeTestCycleStarted );
 	
     	BOOL newDiagTestPeriod = HasCompleteDiagTestPeriodExpired( elapsedTimeInTestCycle );
 	
@@ -105,10 +99,8 @@ namespace DiagnosticScheduling
     	}
     	else 
     	{		
-    		DiagElapsedTime elapsedTimeForCurrentIteration;
+    		UINT32 elapsedTimeForCurrentIteration = (*m_pRuntimeData->m_CalcElapsedTime)( m_TimestampCurrent, m_TimeLastIterationPeriodExpired );
 	
-    		SystemTiming.ComputeElapsedTimeMS( m_TimestampCurrent, m_TimeLastIterationPeriodExpired, elapsedTimeForCurrentIteration );
-		
     	    BOOL newTestIterationPeriod = HasNewTestIterationPeriodStarted( elapsedTimeForCurrentIteration );
 	    
     	    if ( newTestIterationPeriod ) 
@@ -146,20 +138,28 @@ namespace DiagnosticScheduling
 
 
 			
-    void BlackfinDiagScheduler::DoMoreDiagnosticTesting() 
+    template <typename T>
+    void DiagnosticScheduler<T>::DoMoreDiagnosticTesting() 
     {
 	
     	BOOL testIterationCanRun = TRUE;
 
-        while( testIterationCanRun ) {
+        while( testIterationCanRun ) 
+        {
     	
-        	BlackfinDiagTest * pCurrentDiagTest = NULL;
+        	T * pCurrentDiagTest = NULL;
 			
         	testIterationCanRun = EnumerateNextScheduledTest( pCurrentDiagTest );
     	
         	if ( testIterationCanRun ) 
         	{
-    		
+    		    TestState CurrentState = pCurrentDiagTest->GetCurrentTestState();
+    		    
+    		    if ( CurrentState == TEST_LOOP_COMPLETE )
+    		    {
+    		        pCurrentDiagTest->SetTestStartTime( m_TimestampCurrent );
+    		    }    		    
+    		    
     			UINT32	returnedErrorCode;
 
     			TestState testResult = pCurrentDiagTest->RunTest( returnedErrorCode );
@@ -172,11 +172,37 @@ namespace DiagnosticScheduling
     			{
     				case TEST_LOOP_COMPLETE: 
     				
+    				    if ( m_pRuntimeData->m_MonitorIndividualTotalTestingTime ) 
+    				    {
+    				        clock_t  clk = pCurrentDiagTest->GetTestCompletedTimestamp();
+    				        
+                            UINT32 elapsedTime = (*m_pRuntimeData->m_CalcElapsedTime)( m_TimestampCurrent, clk );
+                            
+                            UINT32 prevElapsedTime = pCurrentDiagTest->GetMaxTimeBetweenTestCompletions();
+                            
+                            if ( elapsedTime > prevElapsedTime )
+                            {
+                                pCurrentDiagTest->SetMaxTimeBetweenTestCompletions( elapsedTime );
+                            }
+                            
+                            pCurrentDiagTest->SetTestCompletedTimestamp( m_TimestampCurrent );
+                            
+    				    }      
+    				
     					SetAnotherTestCompletedForCycle(pCurrentDiagTest);
 			
     					break;
 			
     				case TEST_IN_PROGRESS:
+    				
+    				    if ( m_pRuntimeData->m_MonitorIndividualTestIterationTimes )
+    				    {
+    				        clock_t clk = pCurrentDiagTest->GetTestStartTime();
+    				        
+    				        UINT32 elapsedTime = (*m_pRuntimeData->m_CalcElapsedTime)( m_TimestampCurrent, clk );
+    				        
+    				        pCurrentDiagTest->SetCurrentIterationDuration( elapsedTime );
+    				    }
 	
     					break;
 
@@ -184,7 +210,7 @@ namespace DiagnosticScheduling
     				
     					ConfigureErrorCode( returnedErrorCode, pCurrentDiagTest->GetTestType() );
 		
-    					OS_Assert( returnedErrorCode );
+    					(*m_pRuntimeData->m_ExcetionError)( returnedErrorCode );
 			
     					break;
     			}
@@ -193,13 +219,14 @@ namespace DiagnosticScheduling
     }
     
 			
-    BOOL BlackfinDiagScheduler::DidAllTestsComplete() 
+    template <typename T>
+    BOOL DiagnosticScheduler<T>::DidAllTestsComplete() 
     {
     	BOOL allTestsCompleted = TRUE;
 	
-    	for (std::vector<BlackfinDiagTest *>::iterator it = m_pRunTimeDiagnostics->begin(); it != m_pRunTimeDiagnostics->end(); ++it) 
+    	for (std::vector<T *>::iterator it = m_pRunTimeDiagnostics->begin(); it != m_pRunTimeDiagnostics->end(); ++it) 
     	{		
-    		BlackfinDiagTest * pPdt = (*it);
+    		T * pPdt = (*it);
 			
             BOOL testDidNotComplete = !IsTestingCompleteForDiagCycle(pPdt);
         
@@ -214,13 +241,14 @@ namespace DiagnosticScheduling
     	return allTestsCompleted;
     }
 		
-    BOOL BlackfinDiagScheduler::EnumerateNextScheduledTest( BlackfinDiagTest * & rpPbdtNextDiag ) 
+    template <typename T>
+    BOOL DiagnosticScheduler<T>::EnumerateNextScheduledTest( T * & rpPbdtNextDiag ) 
     {	
     	BOOL success = FALSE;
 
         while( m_TestEnumeration != m_pRunTimeDiagnostics->end() ) 
         {
-        	BlackfinDiagTest * pPdt = (*m_TestEnumeration);
+        	T * pPdt = (*m_TestEnumeration);
 				
     		++m_TestEnumeration;
 				
@@ -244,11 +272,12 @@ namespace DiagnosticScheduling
     	return success;
     }
 
-    BOOL BlackfinDiagScheduler::HasCompleteDiagTestPeriodExpired( DiagElapsedTime elapsed_time ) 
+    template <typename T>
+    BOOL DiagnosticScheduler<T>::HasCompleteDiagTestPeriodExpired( UINT32 elapsed_time ) 
     {
     	BOOL timeForNewCycle = FALSE;
 	
-    	if ( elapsed_time >= PERIOD_FOR_ALL_DIAGNOSTICS_COMPLETED_MS ) 
+    	if ( elapsed_time >= m_pRuntimeData->m_PeriodForAllDiagnosticsToCompleteInMS ) 
     	{	
     		timeForNewCycle = TRUE;
     	}
@@ -257,11 +286,12 @@ namespace DiagnosticScheduling
 
     }
 
-    BOOL BlackfinDiagScheduler::HasNewTestIterationPeriodStarted( DiagElapsedTime elapsedTimeForCurrentIteration ) 
+    template <typename T>
+    BOOL DiagnosticScheduler<T>::HasNewTestIterationPeriodStarted( UINT32 elapsedTimeForCurrentIteration ) 
     {	
     	BOOL timeForNewTimeslicePeriod = FALSE;
 	
-    	if ( elapsedTimeForCurrentIteration > PERIOD_FOR_ONE_DIAGNOSTIC_TEST_ITERATION_MS ) 
+    	if ( elapsedTimeForCurrentIteration > m_pRuntimeData->m_PeriodForOneDiagnosticIteration ) 
     	{
     		timeForNewTimeslicePeriod = TRUE;
     	}
@@ -269,7 +299,8 @@ namespace DiagnosticScheduling
     	return timeForNewTimeslicePeriod;
     }
 
-    BOOL BlackfinDiagScheduler::IsTestingCompleteForDiagCycle(BlackfinDiagTest * & rpPbdt) 
+    template <typename T>
+    BOOL DiagnosticScheduler<T>::IsTestingCompleteForDiagCycle(T * & rpPbdt) 
     {
     	UINT32 numberToRun = rpPbdt->GetNumberOfTimesToRunPerDiagCycle();
 	
@@ -279,17 +310,16 @@ namespace DiagnosticScheduling
 	
     }
 
-    BOOL BlackfinDiagScheduler::IsTestScheduledToRun(BlackfinDiagTest * & rpPbdt) 
+    template <typename T>
+    BOOL DiagnosticScheduler<T>::IsTestScheduledToRun(T * & rpPbdt) 
     {
     	BOOL timeToRun = FALSE;
 
-    	DiagTimestampTime startOfIteration = rpPbdt->GetIterationCompletedTimestamp();
+    	clock_t startOfIteration = rpPbdt->GetIterationCompletedTimestamp();
 
-    	DiagElapsedTime elapsedTime;
+    	UINT32 elapsedTime = (*m_pRuntimeData->m_CalcElapsedTime)( m_TimestampCurrent, startOfIteration );
 	
-    	SystemTiming.ComputeElapsedTimeMS( m_TimestampCurrent, startOfIteration, elapsedTime );
-
-    	DiagElapsedTime iterationPeriod = rpPbdt->GetIterationPeriod();
+    	UINT32 iterationPeriod = rpPbdt->GetIterationPeriod();
 
     	if (elapsedTime >= iterationPeriod) 
         {	
@@ -299,12 +329,14 @@ namespace DiagnosticScheduling
     	return timeToRun;
     }
 
-    void BlackfinDiagScheduler::ResetTestsCompletedForCycle(BlackfinDiagTest * & rpPbdt) 
+    template <typename T>
+    void DiagnosticScheduler<T>::ResetTestsCompletedForCycle(T * & rpPbdt) 
     {
     	rpPbdt->SetNumberOfTimesRanThisDiagCycle(0);
     }
 
-    void BlackfinDiagScheduler::RunScheduled()
+    template <typename T>
+    void DiagnosticScheduler<T>::RunScheduled()
     {	
     	// Start Fault Injection Point 2
 	
@@ -337,11 +369,11 @@ namespace DiagnosticScheduling
     		case MAX_PERIOD_EXPIRED_INCOMPLETE_TESTING:
     		{
 			
-    			UINT32 errorCode = m_AllDiagnosticsNotCompletedErr;
+    			UINT32 errorCode = m_pRuntimeData->m_AllDiagnosticsNotCompletedErr;
 			
-    			ConfigureErrorCode( errorCode, m_SchedulerTestType );
+    			ConfigureErrorCode( errorCode, m_pRuntimeData->m_SchedulerTestType );
 				
-    			OS_Assert( errorCode );
+                (*m_pRuntimeData->m_ExcetionError)( errorCode );	
     		}
 		
     		// We won't get here now but in case it ever changes
@@ -363,7 +395,8 @@ namespace DiagnosticScheduling
     }
 
 
-    void BlackfinDiagScheduler::SetAnotherTestCompletedForCycle(BlackfinDiagTest * & rpPbdt) 
+    template <typename T>
+    void DiagnosticScheduler<T>::SetAnotherTestCompletedForCycle(T * & rpPbdt) 
     {
     	UINT32 numberOfTimesRan = rpPbdt->GetNumberOfTimesRanThisDiagCycle();
 	
@@ -372,25 +405,27 @@ namespace DiagnosticScheduling
     	rpPbdt->SetNumberOfTimesRanThisDiagCycle( numberOfTimesRan );
     }
 
-    void BlackfinDiagScheduler::SetDiagTestsReadyForNewTestCycle() 
+    template <typename T>
+    void DiagnosticScheduler<T>::SetDiagTestsReadyForNewTestCycle() 
     {	
-    	for (std::vector<BlackfinDiagTest *>::iterator it = m_pRunTimeDiagnostics->begin(); it != m_pRunTimeDiagnostics->end(); ++it) 
+    	for (std::vector<T *>::iterator it = m_pRunTimeDiagnostics->begin(); it != m_pRunTimeDiagnostics->end(); ++it) 
     	{	
-    		BlackfinDiagTest * pPdt = (*it);
+    		T * pPdt = (*it);
 		
     		ResetTestsCompletedForCycle( pPdt );
     	}
     }
 			
-    BOOL BlackfinDiagScheduler::StartEnumeratingTestsForThisIterationPeriod() 
+    template <typename T>
+    BOOL DiagnosticScheduler<T>::StartEnumeratingTestsForThisIterationPeriod() 
     {	
-    	std::vector<BlackfinDiagTest *>::iterator it;
+    	std::vector<T *>::iterator it;
 	
     	BOOL testsCanRun = FALSE;
 	
     	for (it = m_pRunTimeDiagnostics->begin(); it != m_pRunTimeDiagnostics->end(); ++it) 
     	{	
-    		BlackfinDiagTest * pPdt = (*it);
+    		T * pPdt = (*it);
 				
     		BOOL testingNotCompleteForThisDiagCycle = !IsTestingCompleteForDiagCycle(pPdt);
 		
@@ -413,11 +448,8 @@ namespace DiagnosticScheduling
     	return testsCanRun;
     }				
 		
-				
-
-
-
-    BlackfinDiagScheduler::BlackfinDiagScheduler() 
+    template <typename T>
+    DiagnosticScheduler<T>::DiagnosticScheduler() 
     {
     }
 };

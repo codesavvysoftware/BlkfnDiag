@@ -1,5 +1,6 @@
 #pragma once
 #include "BlackfinDiag.hpp"
+#include "DiagnosticDefs.h"
 
 namespace BlackfinDiagTesting 
 {
@@ -18,42 +19,18 @@ namespace BlackfinDiagTesting
 	        } 
 	        DiagnosticTestTypes;
 	
-            typedef UINT32 (* const pRegisterTest)(const UINT32 *, UINT32);
-	
-            typedef struct 
-            {
-    	        const pRegisterTest * m_pRegisterTests;
-                UINT32                m_NmbrRegisterTests;
-		        BOOL                  m_TestsCompleted;
-            }  
-            RegisterTestDescriptor;
-    
-		
-            typedef struct 
-            {
-    	        UINT8 * m_pDataRamAddressStart;
-    	        UINT32  m_NmbrContiguousBytesToTest;
-    	        UINT32  m_NmbrBytesTested;
-    	        BOOL    m_TestCompleted;
-            } 
-            DataRamTestDescriptor;
-    
-            typedef struct 
-            {
-    	        DataRamTestDescriptor  m_BankA;
-    	        DataRamTestDescriptor  m_BankB;
-    	        DataRamTestDescriptor  m_BankC;
-            } 
-            BlackfinDataRamTestSuite;
-    
             typedef struct 
             {
     	        DiagnosticCommon::DiagElapsedTime	         m_IterationPeriod;
                 DiagnosticCommon::DiagTimestampTime          m_IterationCompleteTimestamp;
+                DiagnosticCommon::DiagTimestampTime          m_TestCompleteTimestamp;
+                DiagnosticCommon::DiagElapsedTime            m_MaximumTimeBetweenTestCompletions;
+                DiagnosticCommon::DiagElapsedTime            m_CurrentIterationDuration;
+                DiagnosticCommon::DiagTimestampTime          m_TestStartTimestamp;
    		        UINT32              				         m_NmbrTimesToRunPerDiagCycle;  		// Number of times to run the test per diagnostic cycle
    		        UINT32		               			         m_NmbrTimesRanThisDiagCycle;   		// Times test has run this cycle
 		        DiagnosticTestTypes 				         m_TestType;
-                DiagnosticCommon::TestState                  m_CurrentTestState;	
+                TestState                                    m_CurrentTestState;	
             } 
             BlackfinExecTestData;    
 
@@ -64,31 +41,47 @@ namespace BlackfinDiagTesting
 	        {
 	        }
 
-            DiagnosticCommon::TestState                      GetCurrentTestState();
+            DiagnosticCommon::DiagElapsedTime                GetCurrentIterationDuration();
+            
+            TestState                                        GetCurrentTestState();
 	
 	        DiagnosticCommon::DiagTimestampTime              GetIterationCompletedTimestamp();
 
 	        DiagnosticCommon::DiagElapsedTime                GetIterationPeriod();
+	        
+	        DiagnosticCommon::DiagElapsedTime                GetMaxTimeBetweenTestCompletions();
 	
 	        UINT32                                           GetNumberOfTimesToRunPerDiagCycle();
 	
 	        UINT32                                           GetNumberOfTimesRanThisDiagCycle();
-	
+	        
+	        DiagnosticCommon::DiagTimestampTime              GetTestCompletedTimestamp();
+	        
+            DiagnosticCommon::DiagTimestampTime              GetTestStartTime();
+            	
 	        DiagnosticTestTypes                              GetTestType();
+	        
+	        void                                             SetCurrentIterationDuration( DiagnosticCommon::DiagElapsedTime duration );
 	
-	        void                  					         SetCurrentTestState(DiagnosticCommon::TestState ts);
+	        void                  					         SetCurrentTestState( TestState ts );
 	
             void				                             SetIterationCompletedTimestamp(DiagnosticCommon::DiagTimestampTime timestamp);
 
             void			                                 SetIterationPeriod(DiagnosticCommon::DiagElapsedTime period);
 	
+	        void                                             SetMaxTimeBetweenTestCompletions( DiagnosticCommon::DiagElapsedTime period );
+	
             void                                             SetNumberOfTimesToRunPerDiagCycle(UINT32);
 	
             void                                             SetNumberOfTimesRanThisDiagCycle(UINT32);
+            
+            void                                             SetTestCompletedTimestamp( DiagnosticCommon::DiagTimestampTime timestamp );
 	
+            void                                             SetTestStartTime( DiagnosticCommon::DiagTimestampTime time);
+            
             void				                             SetTestType(DiagnosticTestTypes test_type);
 
-            virtual DiagnosticCommon::TestState              RunTest( UINT32 & errorCode ) = 0;
+            virtual TestState                                RunTest( UINT32 & errorCode ) = 0;
 
         protected:
 
@@ -98,8 +91,6 @@ namespace BlackfinDiagTesting
 	
         private:
 	
-            static const DiagnosticCommon::DiagElapsedTime   DIAG_TIME_SLICE_PERIOD_MILLESECONDS = 50;  // Resolution of microseconds
-
             BlackfinExecTestData                             m_TestExecutionData;
 	
             BlackfinDiagTest();

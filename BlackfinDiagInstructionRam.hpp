@@ -32,7 +32,7 @@ namespace BlackfinDiagTesting
 	        {
 	        }
 
-            virtual DiagnosticCommon::TestState RunTest( UINT32 & ErrorCode );
+            virtual TestState RunTest( UINT32 & ErrorCode );
 
         protected:
 
@@ -103,7 +103,7 @@ namespace BlackfinDiagTesting
 
             void                         GetBootStreamStartAddr( const UINT8 * & rpBootStreamStartAddr );
 
-	        DiagnosticCommon::TestState  RunInstructionRamTestIteration( InstructionCompareParams & rIcpCompare,
+	        TestState                    RunInstructionRamTestIteration( InstructionCompareParams & rIcpCompare,
 									                                     UINT32 &                   rErrorCode	);
 																
 	        BOOL                         StartEnumeratingInstructionBootStreamHeaders(UINT32 & rHeaderOffset);

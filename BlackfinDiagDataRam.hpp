@@ -9,6 +9,23 @@ namespace BlackfinDiagTesting
     {
         public:
 
+            typedef struct 
+            {
+    	        UINT8 * m_pDataRamAddressStart;
+    	        UINT32  m_NmbrContiguousBytesToTest;
+    	        UINT32  m_NmbrBytesTested;
+    	        BOOL    m_TestCompleted;
+            } 
+            DataRamTestDescriptor;
+    
+            typedef struct 
+            {
+    	        DataRamTestDescriptor  m_BankA;
+    	        DataRamTestDescriptor  m_BankB;
+    	        DataRamTestDescriptor  m_BankC;
+            } 
+            BlackfinDataRamTestSuite;
+    
 	        BlackfinDiagDataRam( BlackfinDataRamTestSuite * pDataRamTestSuite,
 	                             const UINT8 *              pTestPatternsForRamTesting,
 	                             UINT32                     nmbrRamTestingPatterns,
@@ -31,7 +48,7 @@ namespace BlackfinDiagTesting
 	        {
 	        }
 
-	        virtual DiagnosticCommon::TestState RunTest( UINT32 & ErrorCode  );
+	        virtual TestState RunTest( UINT32 & ErrorCode  );
 
  	        typedef struct 
  	        {

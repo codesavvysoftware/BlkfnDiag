@@ -2,8 +2,6 @@
 #include "BlackfinDiag.hpp"
 #include "BlackfinDiagTest.hpp"
 
-#include <ccblkfn.h>                              /* Added for ssync( ), cli/sti( ) */
-
 
 namespace BlackfinDiagTesting 
 {
@@ -11,7 +9,18 @@ namespace BlackfinDiagTesting
     {
 
         public:
-            BlackfinDiagRegistersTest( const RegisterTestDescriptor  registerTestSuite[],
+
+            typedef UINT32 (* const pRegisterTest)(const UINT32 *, UINT32);
+	
+			typedef struct
+			{
+				const pRegisterTest * m_pRegisterTests;
+				UINT32                m_NmbrRegisterTests;
+				BOOL                  m_TestsCompleted;
+			}
+			RegisterTestDescriptor;
+
+			BlackfinDiagRegistersTest( const RegisterTestDescriptor  registerTestSuite[],
                                              UINT32                  numberOfDescriptorsInTestSuite, 
                                        const UINT32                  testPatterns[], 
                                              UINT32                  numberOfPatterns,
@@ -30,7 +39,7 @@ namespace BlackfinDiagTesting
         	{
         	}
 
-        	virtual DiagnosticCommon::TestState RunTest( UINT32 & rErrorCode );
+        	virtual TestState RunTest( UINT32 & rErrorCode );
 
         protected:
 
@@ -58,7 +67,7 @@ namespace BlackfinDiagTesting
     
         	INT                               m_Critical;                    // Temp to allow disabling interrupts around critical sections 
 
-        	BOOL FindTestToRun( BlackfinDiagTest::RegisterTestDescriptor * & rtdTests );
+        	BOOL FindTestToRun( RegisterTestDescriptor * & rtdTests );
 	
         	void DisableInterrupts() 
         	{

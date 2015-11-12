@@ -8,7 +8,8 @@ using namespace BlackfinDiagTesting;
 namespace BlackfinDiagRuntimeEnvironment 
 {
 
-    static const DiagTimestampTime            DFLT_ITERATION_COMPLETE              = 0;
+    static const DiagTimestampTime            DFLT_INITIAL_TIMESTAMP               = 0; 
+    static const DiagElapsedTime              DFLT_INITIAL_ELAPSED_TIME            = 0;           
     static const UINT32                       DFLT_NBR_TIMES_TO_RUN_PER_DIAG_CYCLE = 1; 
     static const UINT32                       DFLT_NBR_TIMES_RAN_THIS_DIAG_CYCLE   = 0;
     static const TestState  DFLT_INITIAL_TEST_EXECUTION_STATE                      = TEST_IDLE;
@@ -18,7 +19,7 @@ namespace BlackfinDiagRuntimeEnvironment
 // Data RAM testing parameters, structures and definitions.                                                 *
 //                                                                                                          *
 //***********************************************************************************************************
-BlackfinDiagTest::BlackfinDataRamTestSuite  DATA_RAM_TEST_TEST_SUITE    = 
+BlackfinDiagDataRam::BlackfinDataRamTestSuite  DATA_RAM_TEST_TEST_SUITE    = 
                                                                         { 
 																            { 
 																                reinterpret_cast<UINT8 *>(0xff800000), 
@@ -54,7 +55,11 @@ DiagElapsedTime  DATA_RAM_TEST_ITERATION_PERIOD_MS            = 1000; // 1 secon
 BlackfinDiagTest::BlackfinExecTestData DATA_RAM_TEST_TEST_DATA  = 
                                                                 {
 																   DATA_RAM_TEST_ITERATION_PERIOD_MS,
-																   DFLT_ITERATION_COMPLETE,
+																   DFLT_INITIAL_TIMESTAMP,
+																   DFLT_INITIAL_TIMESTAMP,
+																   DFLT_INITIAL_ELAPSED_TIME,
+																   DFLT_INITIAL_ELAPSED_TIME,
+                                                                   DFLT_INITIAL_TIMESTAMP,
 																   DFLT_NBR_TIMES_TO_RUN_PER_DIAG_CYCLE,
 																   DFLT_NBR_TIMES_RAN_THIS_DIAG_CYCLE,
 																   BlackfinDiagTest::DIAG_DATA_RAM_TEST_TYPE,
@@ -91,16 +96,16 @@ UINT32 REGISTER_TEST_NMBR_OF_TEST_PATTERNS  = sizeof(REGISTER_TEST_TEST_PATTERNS
     //
     // Only one test but has flexibility to add more and we may break up current test.
     //
-BlackfinDiagTest::pRegisterTest m_SanityCheck[] = 
+BlackfinDiagRegistersTest::pRegisterTest m_SanityCheck[] = 
     	                                        { 
     	                                            BlackfinDiagRegSanityChk 
     	                                        };
     	                                        
-UINT32 NMBR_OF_SANITY_CHECKS = sizeof(m_SanityCheck)/sizeof( BlackfinDiagTest::pRegisterTest );
+UINT32 NMBR_OF_SANITY_CHECKS = sizeof(m_SanityCheck)/sizeof( BlackfinDiagRegistersTest::pRegisterTest );
     		
 
 
-BlackfinDiagTest::pRegisterTest m_DataRegisters[]   =  
+BlackfinDiagRegistersTest::pRegisterTest m_DataRegisters[]   =  
                                                     {     
                                             		    BlackfinDiagRegDataReg7Chk, 
                                                         BlackfinDiagRegDataReg6Chk,
@@ -109,9 +114,9 @@ BlackfinDiagTest::pRegisterTest m_DataRegisters[]   =
                                                         BlackfinDiagRegDataReg3Chk
                                                     };
 
-UINT32 NMBR_OF_DATA_REG_TESTS = sizeof(m_DataRegisters)/sizeof( BlackfinDiagTest::pRegisterTest );
+UINT32 NMBR_OF_DATA_REG_TESTS = sizeof(m_DataRegisters)/sizeof( BlackfinDiagRegistersTest::pRegisterTest );
     
-BlackfinDiagTest::pRegisterTest m_PointerRegisters[]    = 
+BlackfinDiagRegistersTest::pRegisterTest m_PointerRegisters[]    = 
                                                         {
     		                                                BlackfinDiagRegPointerReg5Chk, 
                                                             BlackfinDiagRegPointerReg4Chk,
@@ -120,53 +125,53 @@ BlackfinDiagTest::pRegisterTest m_PointerRegisters[]    =
                                                             BlackfinDiagRegPointerReg0Chk
                                                         };
                                                         
-UINT32 NMBR_OF_POINTER_REG_TESTS = sizeof(m_PointerRegisters)/sizeof( BlackfinDiagTest::pRegisterTest );
+UINT32 NMBR_OF_POINTER_REG_TESTS = sizeof(m_PointerRegisters)/sizeof( BlackfinDiagRegistersTest::pRegisterTest );
 
 
-BlackfinDiagTest::pRegisterTest m_Accumulators[]    = 
+BlackfinDiagRegistersTest::pRegisterTest m_Accumulators[]    = 
                                                     {
                                                         BlackfinDiagAccum0Chk, 
     		                                            BlackfinDiagAccum1Chk
     	                                            };
-UINT32 NMBR_OF_ACCUM_REG_TESTS = sizeof(m_Accumulators)/sizeof( BlackfinDiagTest::pRegisterTest );
+UINT32 NMBR_OF_ACCUM_REG_TESTS = sizeof(m_Accumulators)/sizeof( BlackfinDiagRegistersTest::pRegisterTest );
 	
-BlackfinDiagTest::pRegisterTest m_ModifyRegisters[] = 
+BlackfinDiagRegistersTest::pRegisterTest m_ModifyRegisters[] = 
                                                     {
 			                                            BlackfinDiagRegModifyReg3Chk,
                                                         BlackfinDiagRegModifyReg2Chk,
                                                         BlackfinDiagRegModifyReg1Chk,
                                                         BlackfinDiagRegModifyReg0Chk
                                                     };
-UINT32 NMBR_OF_MODIFY_REG_TESTS = sizeof(m_ModifyRegisters)/sizeof( BlackfinDiagTest::pRegisterTest );
+UINT32 NMBR_OF_MODIFY_REG_TESTS = sizeof(m_ModifyRegisters)/sizeof( BlackfinDiagRegistersTest::pRegisterTest );
 
-BlackfinDiagTest::pRegisterTest m_LengthRegisters[] =
+BlackfinDiagRegistersTest::pRegisterTest m_LengthRegisters[] =
                                                     {
                                         			    BlackfinDiagRegLengthReg3Chk,
                                                         BlackfinDiagRegLengthReg2Chk,
                                                         BlackfinDiagRegLengthReg1Chk,
                                                         BlackfinDiagRegLengthReg0Chk
                                                     };
-UINT32 NMBR_OF_LENGTH_REG_TESTS = sizeof(m_LengthRegisters)/sizeof( BlackfinDiagTest::pRegisterTest );
+UINT32 NMBR_OF_LENGTH_REG_TESTS = sizeof(m_LengthRegisters)/sizeof( BlackfinDiagRegistersTest::pRegisterTest );
 
-BlackfinDiagTest::pRegisterTest m_IndexRegisters[]  = 
+BlackfinDiagRegistersTest::pRegisterTest m_IndexRegisters[]  = 
                                                     {
                                                         BlackfinDiagRegIndexReg3Chk,
                                                         BlackfinDiagRegIndexReg2Chk,
                                                         BlackfinDiagRegIndexReg1Chk,
                                                         BlackfinDiagRegIndexReg0Chk
                                                     };
-UINT32 NMBR_OF_INDEX_REG_TESTS = sizeof(m_IndexRegisters)/sizeof( BlackfinDiagTest::pRegisterTest );
+UINT32 NMBR_OF_INDEX_REG_TESTS = sizeof(m_IndexRegisters)/sizeof( BlackfinDiagRegistersTest::pRegisterTest );
 
-BlackfinDiagTest::pRegisterTest m_BaseRegisters[]   = 
+BlackfinDiagRegistersTest::pRegisterTest m_BaseRegisters[]   = 
                                                     {
                                                         BlackfinDiagRegBaseReg3Chk,
                                                         BlackfinDiagRegBaseReg2Chk,
                                                         BlackfinDiagRegBaseReg1Chk,
                                                         BlackfinDiagRegBaseReg0Chk
                                                     };
-UINT32 NMBR_OF_BASE_REG_TESTS = sizeof(m_BaseRegisters)/sizeof( BlackfinDiagTest::pRegisterTest );
+UINT32 NMBR_OF_BASE_REG_TESTS = sizeof(m_BaseRegisters)/sizeof( BlackfinDiagRegistersTest::pRegisterTest );
 
-const BlackfinDiagTest::RegisterTestDescriptor REGISTER_TEST_TEST_DESCRIPTORS[] = 
+const BlackfinDiagRegistersTest::RegisterTestDescriptor REGISTER_TEST_TEST_DESCRIPTORS[] = 
 								{
 									{ 
 										m_SanityCheck,      
@@ -210,7 +215,7 @@ const BlackfinDiagTest::RegisterTestDescriptor REGISTER_TEST_TEST_DESCRIPTORS[] 
 									}
 								};
 	 
-UINT32 REGISTER_TEST_NUMBER_TEST_DESCRIPTORS = sizeof( REGISTER_TEST_TEST_DESCRIPTORS ) / sizeof(BlackfinDiagTest::RegisterTestDescriptor); 
+UINT32 REGISTER_TEST_NUMBER_TEST_DESCRIPTORS = sizeof( REGISTER_TEST_TEST_DESCRIPTORS ) / sizeof(BlackfinDiagRegistersTest::RegisterTestDescriptor); 
 
 const UINT32 CORRUPTED_REG_TST_SUITE = 0xff;
 	
@@ -218,7 +223,11 @@ DiagElapsedTime                REGISTER_TEST_ITERATION_PERIOD_MS = 2000;        
 	
 BlackfinDiagTest::BlackfinExecTestData REGISTER_TEST_TEST_DATA = {
 																	REGISTER_TEST_ITERATION_PERIOD_MS,
-    																DFLT_ITERATION_COMPLETE,
+    																DFLT_INITIAL_TIMESTAMP,
+    																DFLT_INITIAL_TIMESTAMP,
+    																DFLT_INITIAL_ELAPSED_TIME,
+    																DFLT_INITIAL_ELAPSED_TIME,
+   																    DFLT_INITIAL_TIMESTAMP,
 																	DFLT_NBR_TIMES_TO_RUN_PER_DIAG_CYCLE,
 																	DFLT_NBR_TIMES_RAN_THIS_DIAG_CYCLE,
 																	BlackfinDiagTest::DIAG_REGISTER_TEST_TEST_TYPE,
@@ -253,7 +262,11 @@ void *                INSTR_START_ADDR                      = reinterpret_cast<v
 
 BlackfinDiagTest::BlackfinExecTestData TEST_DATA_INTSTR_RAM_TEST = {
 					      												INSTRCTN_RAM_TEST_ITERATION_PERIOD_MS,
-																		DFLT_ITERATION_COMPLETE,
+																		DFLT_INITIAL_TIMESTAMP,
+																		DFLT_INITIAL_TIMESTAMP,
+																		DFLT_INITIAL_ELAPSED_TIME,
+																		DFLT_INITIAL_ELAPSED_TIME,
+       																    DFLT_INITIAL_TIMESTAMP,
 											    						DFLT_NBR_TIMES_TO_RUN_PER_DIAG_CYCLE,
 							    										DFLT_NBR_TIMES_RAN_THIS_DIAG_CYCLE,
 								    									BlackfinDiagTest::DIAG_INTRUCTION_RAM_TEST_TYPE,
@@ -288,7 +301,11 @@ DiagElapsedTime                           m_MinTimerTestElapsedTimeHost   = 1050
 BlackfinDiagTest::BlackfinExecTestData    TIMER_TEST_TEST_DATA  = 
                                                                 {
 																    TIMER_TEST_ITERATION_PERIOD_MS,
-																    DFLT_ITERATION_COMPLETE,
+																    DFLT_INITIAL_TIMESTAMP,
+																    DFLT_INITIAL_TIMESTAMP,
+																    DFLT_INITIAL_ELAPSED_TIME,
+																    DFLT_INITIAL_ELAPSED_TIME,
+   																    DFLT_INITIAL_TIMESTAMP,
 											    				    DFLT_NBR_TIMES_TO_RUN_PER_DIAG_CYCLE,
 							    								    DFLT_NBR_TIMES_RAN_THIS_DIAG_CYCLE,
 								    							    BlackfinDiagTest::DIAG_TIMER_TEST_TYPE,
@@ -317,7 +334,11 @@ DiagElapsedTime                              INSTRUCTIONS_TEST_ITERATION_PERIOD_
 BlackfinDiagTest::BlackfinExecTestData        INSTRUCTIONS_TEST_TEST_DATA   = 
                                                                             {
 																                INSTRUCTIONS_TEST_ITERATION_PERIOD_MS,
-            																    DFLT_ITERATION_COMPLETE,
+            																    DFLT_INITIAL_TIMESTAMP,
+            																    DFLT_INITIAL_TIMESTAMP,
+            																    DFLT_INITIAL_ELAPSED_TIME,
+            																    DFLT_INITIAL_ELAPSED_TIME,
+            																    DFLT_INITIAL_TIMESTAMP,
             											    				    DFLT_NBR_TIMES_TO_RUN_PER_DIAG_CYCLE,
             							    								    DFLT_NBR_TIMES_RAN_THIS_DIAG_CYCLE,
             								    							    BlackfinDiagTest::DIAG_INSTRUCTIONS_TEST_TYPE,
@@ -344,14 +365,27 @@ BlackfinDiagTest * BlackfinDiagRuntime::m_pDiagnosticTests[]    =
 
 std::vector <BlackfinDiagTest *> BlackfinDiagRuntime::m_Diagnostics(m_pDiagnosticTests, end( m_pDiagnosticTests));
 
+
 void BlackfinDiagRuntime::ExecuteDiagnostics() 
 { 
-   
-    static DiagnosticScheduling::BlackfinDiagScheduler Schedule( &BlackfinDiagRuntime::m_Diagnostics,
-                                                                 CORRUPTED_DIAG_TEST_VECTOR_ERR,
-                                                                 CORRUPTED_DIAG_TEST_MEMORY_ERR,
-                                                                 ALL_DIAG_DID_NOT_COMPLETE_ERR,
-                                                                 SCHEDULER_TEST_TYPE );
+    static DiagnosticScheduling::DiagnosticRunTimeParameters  drtp   = 
+	                                    {
+											DiagnosticCommon::GetTimestamp,
+											DiagnosticCommon::CalcElapsedTimeMS,
+											DiagnosticCommon::BlackfinExceptions,
+											PERIOD_FOR_ALL_DIAGNOSTICS_COMPLETED_MS,
+											PERIOD_FOR_ONE_DIAGNOSTIC_TEST_ITERATION_MS,
+											FALSE,    // m_MonitorIndividualTotalTestingTime
+											FALSE,    // m_MonitorIndividualTestIterationTimes
+											BlackfinDiagTest::DIAG_SCHEDULER_TEST_TYPE,
+											DIAG_ERROR_MASK,
+                                            DIAG_ERROR_TYPE_BIT_POS,
+                                            CORRUPTED_DIAG_TEST_VECTOR_ERR,
+                                            CORRUPTED_DIAG_TEST_MEMORY_ERR,
+                                            TEST_TOOK_TOO_LONG_ERR,
+                                            ALL_DIAG_DID_NOT_COMPLETE_ERR
+	                                    }; 
+    static DiagnosticScheduling::DiagnosticScheduler<BlackfinDiagTesting::BlackfinDiagTest> Schedule( &m_Diagnostics, &drtp );
 
 	Schedule.RunScheduled(); 
 }

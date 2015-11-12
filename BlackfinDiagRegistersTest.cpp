@@ -48,8 +48,8 @@ namespace BlackfinDiagTesting
     	return result;
     }
 
-    BOOL BlackfinDiagRegistersTest::RunRegisterTests( BlackfinDiagTest::RegisterTestDescriptor * pRegisterTests, 
-                                                      UINT32 &                                   rFailureInfo )
+    BOOL BlackfinDiagRegistersTest::RunRegisterTests( RegisterTestDescriptor * pRegisterTests, 
+                                                      UINT32 &                 rFailureInfo )
     {
        	BOOL	noErrorsDetected = TRUE;
     
@@ -71,7 +71,7 @@ namespace BlackfinDiagTesting
         return noErrorsDetected;
     }
 
-    BOOL BlackfinDiagRegistersTest::FindTestToRun( BlackfinDiagTest::RegisterTestDescriptor * & rpRegisterTests ) 
+    BOOL BlackfinDiagRegistersTest::FindTestToRun( RegisterTestDescriptor * & rpRegisterTests ) 
     {
 
     	if ( !m_pRegisterTestSuite ) return FALSE;
