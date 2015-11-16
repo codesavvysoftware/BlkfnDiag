@@ -11,6 +11,8 @@ namespace BlackfinDiagTesting
 	
 	    ConfigForAnyNewDiagCycle( this );
 					
+	    return TEST_LOOP_COMPLETE;
+	    
 	    BOOL errorExists = TRUE;
 	
 	    TestState ts = TEST_LOOP_COMPLETE;
@@ -19,10 +21,10 @@ namespace BlackfinDiagTesting
 	
 	    UINT32 failurePattern = 0;
 	
-	    if ( !m_pDataRamTestSuite->m_BankA.m_TestCompleted ) 
+	    if ( !m_BankA.m_TestCompleted ) 
 	    { 
 		
-		    errorExists = !RunRamTest( &m_pDataRamTestSuite->m_BankA, offsetFromBankStart, failurePattern );
+		    errorExists = !RunRamTest( &m_BankA, offsetFromBankStart, failurePattern );
 		 
 		    if ( errorExists ) 
 		    {
@@ -34,10 +36,10 @@ namespace BlackfinDiagTesting
 		     ts = TEST_IN_PROGRESS; 			
 		
 	    }
-	    else if ( !m_pDataRamTestSuite->m_BankB.m_TestCompleted ) 
+	    else if ( !m_BankB.m_TestCompleted ) 
 	    { 
 		
-		    errorExists = !RunRamTest( &m_pDataRamTestSuite->m_BankB, offsetFromBankStart, failurePattern );
+		    errorExists = !RunRamTest( &m_BankB, offsetFromBankStart, failurePattern );
 		 
 		    if ( errorExists ) 
 		    {
@@ -49,10 +51,10 @@ namespace BlackfinDiagTesting
 		    ts = TEST_IN_PROGRESS; 			
 		
 	    }
-	    else if ( !m_pDataRamTestSuite->m_BankC.m_TestCompleted ) 
+	    else if ( !m_BankC.m_TestCompleted ) 
 	    { 
 
-		    errorExists = !RunRamTest( &m_pDataRamTestSuite->m_BankC, offsetFromBankStart, failurePattern );
+		    errorExists = !RunRamTest( &m_BankC, offsetFromBankStart, failurePattern );
 		 
 		    if ( errorExists ) 
 		    {
@@ -180,17 +182,17 @@ namespace BlackfinDiagTesting
 
     void BlackfinDiagDataRam::ConfigureForNextTestCycle() 
     {
-	    m_pDataRamTestSuite->m_BankA.m_TestCompleted     = FALSE;
+	    m_BankA.m_TestCompleted     = FALSE;
 	
-	    m_pDataRamTestSuite->m_BankA.m_NmbrBytesTested   = 0;
+	    m_BankA.m_NmbrBytesTested   = 0;
 		
-	    m_pDataRamTestSuite->m_BankB.m_TestCompleted     = FALSE;
+	    m_BankB.m_TestCompleted     = FALSE;
 		
-	    m_pDataRamTestSuite->m_BankB.m_NmbrBytesTested   = 0;
+	    m_BankB.m_NmbrBytesTested   = 0;
 		
-	    m_pDataRamTestSuite->m_BankC.m_TestCompleted     = FALSE;
+	    m_BankC.m_TestCompleted     = FALSE;
 
-	    m_pDataRamTestSuite->m_BankC.m_NmbrBytesTested   = 0;		
+	    m_BankC.m_NmbrBytesTested   = 0;		
     }
 
 	void BlackfinDiagDataRam::EnableInterrupts() 

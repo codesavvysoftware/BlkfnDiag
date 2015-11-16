@@ -16,7 +16,6 @@
 ///
 /// @brief This class implements the main work flow for SIL-2 diagnostics.
 ////////////////////////////////////////////////////////////////////////////////    
-#include <vector>
 #include <time.h>
 #include "Defs.h"
 
@@ -59,8 +58,9 @@ namespace DiagnosticScheduling
     {
         public:
 
-        	DiagnosticScheduler( std::vector <T *> *           pDiagnostics,
-                                 DiagnosticRunTimeParameters * pRunTimeData );
+            DiagnosticScheduler( T **                          ppDiagnostics,
+                                 UINT32                        numberOfDiagnosticTests,
+                                 DiagnosticRunTimeParameters  runTimeData );
 
         	/// Default destructor.
         	~DiagnosticScheduler() 
@@ -99,11 +99,13 @@ namespace DiagnosticScheduling
 	
         	SchedulerStates                 m_CurrentSchedulerState;
 	
-        	std::vector <T *> *             m_pRunTimeDiagnostics;
+        	T **                            m_ppRunTimeDiagnostics;
+        	
+        	UINT32                          m_NumberOfDiagTests;
 	
-        	std::vector <T *>::iterator     m_TestEnumeration; 
+        	T **                            m_ppTestEnumeration; 
 		
-            DiagnosticRunTimeParameters *    m_pRuntimeData;
+            DiagnosticRunTimeParameters     m_RuntimeData;
             
        	    // Number of timeslices between diagnostics completion time checks
         	// Start Fault Injection Point 3

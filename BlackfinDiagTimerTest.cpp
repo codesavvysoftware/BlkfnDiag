@@ -1,8 +1,8 @@
 #include "BlackfinDiagTimerTest.hpp"
-#include "ApxIcp.hpp"
-#include "ApxParameters.hpp"          
+//#include "ApxIcp.hpp"
+//#include "ApxParameters.hpp"          
 #include "Apex.h"
-using namespace DiagnosticCommon;
+using namespace DiagnosticTiming;
 
 namespace BlackfinDiagTesting 
 {
@@ -12,13 +12,14 @@ namespace BlackfinDiagTesting
 	
     	ConfigForAnyNewDiagCycle( this );
 					
-        // If we have not completed this diagnostic yet, get the start times
+             return ( TEST_LOOP_COMPLETE );
+       // If we have not completed this diagnostic yet, get the start times
         // and return DGN_TEST_IN_PROG.
         if ( m_BeingInstantiated ) 
         {
             m_BeingInstantiated = FALSE;
         
-            DiagTimestampTime currentDspCycles = SystemTiming.GetSystemTimestamp();
+            DiagTimestampTime currentDspCycles = (*GetTimestamp)();//SystemTiming.GetSystemTimestamp();
         
             //_GET_CYCLE_COUNT(currentDspCycles);
         
@@ -46,7 +47,7 @@ namespace BlackfinDiagTesting
 
         DiagnosticTestTypes ts  = GetTestType();
 
-        DiagTimestampTime currentDspCycles = SystemTiming.GetSystemTimestamp();
+        DiagTimestampTime currentDspCycles = (*GetTimestamp)();//SystemTiming.GetSystemTimestamp();
         
         // Read the current Apex2 System Time Register value.
         DiagTimestampTime timerValueStopApex = currentDspCycles;
@@ -95,5 +96,3 @@ namespace BlackfinDiagTesting
     {
     }
 };
-
-

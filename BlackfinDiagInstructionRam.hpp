@@ -1,8 +1,7 @@
 #pragma once
 
-#include "BlackfinDiag.hpp"
+//#include "BlackfinDiag.hpp"
 #include "BlackfinDiagTest.hpp"
-#include <vector>
 
 namespace BlackfinDiagTesting 
 {
@@ -40,17 +39,17 @@ namespace BlackfinDiagTesting
 
         private:
 
-            static const UINT32 	     DMA_BFR_SZ               = 256;	
+            #define DMA_BFR_SZ               256	
     
-            static const UINT32          EMUEXCEPT_OPCODE         = 0x25;
+            #define EMUEXCEPT_OPCODE         0x25
     
-            static const UINT32          DMA_COMPLETE_MASK        = 8;
+            #define DMA_COMPLETE_MASK        8
             
-            static const UINT32          INITIAL_HDR_OFFSET       = 0;
+            #define INITIAL_HDR_OFFSET       0
 	
-	        static const UINT32          INITIAL_BFR_OFFSET       = 0;
+	        #define INITIAL_BFR_OFFSET       0
 	
-            static const UINT32          INITIAL_NUM_BYTES_IN_BFR = 0;
+            #define INITIAL_NUM_BYTES_IN_BFR 0
                        
             static const UINT8 *         BOOT_STREAM_START;
     

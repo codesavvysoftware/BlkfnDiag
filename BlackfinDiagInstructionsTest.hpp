@@ -1,5 +1,5 @@
 #pragma once
-#include "BlackfinDiag.hpp"
+//#include "BlackfinDiag.hpp"
 #include "BlackfinDiagTest.hpp"
 
 namespace BlackfinDiagTesting 

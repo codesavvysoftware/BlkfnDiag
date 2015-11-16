@@ -9,6 +9,8 @@ namespace BlackfinDiagTesting
     {
         ConfigForAnyNewDiagCycle( this );
 					
+	    return TEST_LOOP_COMPLETE;
+	    
     	TestState result = TEST_IN_PROGRESS;
 
     	RegisterTestDescriptor * pRtd;

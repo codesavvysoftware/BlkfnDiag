@@ -4,12 +4,14 @@
 namespace DiagnosticScheduling
 {	
     template <typename T>
-    DiagnosticScheduler<T>::DiagnosticScheduler( std::vector <T *> *           pDiagnostics,
-                                                 DiagnosticRunTimeParameters * pRunTimeData )
+    DiagnosticScheduler<T>::DiagnosticScheduler( T **                          ppDiagnostics,
+                                                 UINT32                        numberOfDiagnosticTests,
+                                                 DiagnosticRunTimeParameters  runTimeData )
     		  : m_CurrentSchedulerState          ( INITIAL_INSTANTIATION ),
-    		 	m_pRunTimeDiagnostics            ( pDiagnostics ),
-    		 	m_pRuntimeData                   ( pRunTimeData ),
-    			m_TestEnumeration                ( pDiagnostics->end() ),
+    		 	m_ppRunTimeDiagnostics           ( ppDiagnostics ),
+    		 	m_NumberOfDiagTests              ( numberOfDiagnosticTests ),
+    		 	m_RuntimeData                    ( runTimeData ),
+    			m_ppTestEnumeration                ( ppDiagnostics + numberOfDiagnosticTests ),
     			m_TimestampCurrent               ( DEFAULT_INITIAL_TIMESTAMP ),
     			m_TimeTestCycleStarted           ( DEFAULT_INITIAL_TIMESTAMP ),
     			m_TimeLastIterationPeriodExpired ( DEFAULT_INITIAL_TIMESTAMP ) 
@@ -21,14 +23,14 @@ namespace DiagnosticScheduling
     	// completion time diagnostic injected fault happen faster will be injected here.
     	//	static const DiagSlices_t DGN_COMPL_CHECK_INTERVAL_TIME_SLICE = 15 * DGN_INTERVALS_PER_MINUTE;
 
-    	if ( !pDiagnostics ) 
+    	if ( FALSE )// Fix to check each pointer in the Diagnostics ) 
     	{
 		
-    		UINT32 errorCode = m_pRuntimeData->m_CorruptedVectorErr;
+    		UINT32 errorCode = m_RuntimeData.m_CorruptedVectorErr;
 		
-    		ConfigureErrorCode( errorCode, m_pRuntimeData->m_SchedulerTestType );
+    		ConfigureErrorCode( errorCode, m_RuntimeData.m_SchedulerTestType );
 		
-    		(*m_pRuntimeData->m_ExcetionError)( errorCode );	
+    		(*m_RuntimeData.m_ExcetionError)( errorCode );	
     	}
     }
 
@@ -55,7 +57,7 @@ namespace DiagnosticScheduling
     {	
     	UINT32 elapsedTimeInTestCycle;
 	
-    	m_TimestampCurrent = (*m_pRuntimeData->m_SysTimestamp)();
+    	m_TimestampCurrent = (*m_RuntimeData.m_SysTimestamp)();
 	
     	// No state determination needed will get changed by caller
     	if ( m_CurrentSchedulerState == INITIAL_INSTANTIATION ) 
@@ -63,13 +65,16 @@ namespace DiagnosticScheduling
     		//
     		// Sync everything to the same timestamp upon initial instantiation.
     		//
-    		m_TimeTestCycleStarted = m_TimestampCurrent;
+    		m_TimeTestCycleStarted           = m_TimestampCurrent;
 		
     		m_TimeLastIterationPeriodExpired = m_TimestampCurrent;
 		
-    		for (std::vector<T *>::iterator it = m_pRunTimeDiagnostics->begin(); it != m_pRunTimeDiagnostics->end(); ++it) {
+    		UINT32 ui = 0;
+    		
+    		for ( ui = 0; ui < m_NumberOfDiagTests; ui++ )
+    		{
 			
-    			T * pPbdt = (*it);
+    			T * pPbdt = m_ppRunTimeDiagnostics[ ui ];
 			
     			pPbdt->SetIterationCompletedTimestamp( m_TimestampCurrent );		
             }		
@@ -78,7 +83,7 @@ namespace DiagnosticScheduling
     	}
 
     	// Compute Elapsed Time in Current Diagnostic Test Period
-    	elapsedTimeInTestCycle = (*m_pRuntimeData->m_CalcElapsedTime)( m_TimestampCurrent, m_TimeTestCycleStarted );
+    	elapsedTimeInTestCycle = (*m_RuntimeData.m_CalcElapsedTime)( m_TimestampCurrent, m_TimeTestCycleStarted );
 	
     	BOOL newDiagTestPeriod = HasCompleteDiagTestPeriodExpired( elapsedTimeInTestCycle );
 	
@@ -99,7 +104,7 @@ namespace DiagnosticScheduling
     	}
     	else 
     	{		
-    		UINT32 elapsedTimeForCurrentIteration = (*m_pRuntimeData->m_CalcElapsedTime)( m_TimestampCurrent, m_TimeLastIterationPeriodExpired );
+    		UINT32 elapsedTimeForCurrentIteration = (*m_RuntimeData.m_CalcElapsedTime)( m_TimestampCurrent, m_TimeLastIterationPeriodExpired );
 	
     	    BOOL newTestIterationPeriod = HasNewTestIterationPeriodStarted( elapsedTimeForCurrentIteration );
 	    
@@ -111,11 +116,10 @@ namespace DiagnosticScheduling
 	    	
     	    	if ( testsCompleted ) 
     	    	{
-	    		
-    	    		m_CurrentSchedulerState = NO_TESTS_TO_RUN_ALL_COMPLETED;
+	    		    m_CurrentSchedulerState = NO_TESTS_TO_RUN_ALL_COMPLETED;
     	    	}
-    	    	else {
-	    		
+    	    	else 
+    	    	{
     	    		BOOL newTestIterationsScheduledToRun = AreTestIterationsScheduledToRun();
 	    		
     	    		if ( newTestIterationsScheduledToRun ) 
@@ -172,11 +176,11 @@ namespace DiagnosticScheduling
     			{
     				case TEST_LOOP_COMPLETE: 
     				
-    				    if ( m_pRuntimeData->m_MonitorIndividualTotalTestingTime ) 
+    				    if ( m_RuntimeData.m_MonitorIndividualTotalTestingTime ) 
     				    {
     				        clock_t  clk = pCurrentDiagTest->GetTestCompletedTimestamp();
     				        
-                            UINT32 elapsedTime = (*m_pRuntimeData->m_CalcElapsedTime)( m_TimestampCurrent, clk );
+                            UINT32 elapsedTime = (*m_RuntimeData.m_CalcElapsedTime)( m_TimestampCurrent, clk );
                             
                             UINT32 prevElapsedTime = pCurrentDiagTest->GetMaxTimeBetweenTestCompletions();
                             
@@ -195,11 +199,11 @@ namespace DiagnosticScheduling
 			
     				case TEST_IN_PROGRESS:
     				
-    				    if ( m_pRuntimeData->m_MonitorIndividualTestIterationTimes )
+    				    if ( m_RuntimeData.m_MonitorIndividualTestIterationTimes )
     				    {
     				        clock_t clk = pCurrentDiagTest->GetTestStartTime();
     				        
-    				        UINT32 elapsedTime = (*m_pRuntimeData->m_CalcElapsedTime)( m_TimestampCurrent, clk );
+    				        UINT32 elapsedTime = (*m_RuntimeData.m_CalcElapsedTime)( m_TimestampCurrent, clk );
     				        
     				        pCurrentDiagTest->SetCurrentIterationDuration( elapsedTime );
     				    }
@@ -210,7 +214,7 @@ namespace DiagnosticScheduling
     				
     					ConfigureErrorCode( returnedErrorCode, pCurrentDiagTest->GetTestType() );
 		
-    					(*m_pRuntimeData->m_ExcetionError)( returnedErrorCode );
+    					(*m_RuntimeData.m_ExcetionError)( returnedErrorCode );
 			
     					break;
     			}
@@ -224,9 +228,11 @@ namespace DiagnosticScheduling
     {
     	BOOL allTestsCompleted = TRUE;
 	
-    	for (std::vector<T *>::iterator it = m_pRunTimeDiagnostics->begin(); it != m_pRunTimeDiagnostics->end(); ++it) 
-    	{		
-    		T * pPdt = (*it);
+    	UINT32 ui = 0;
+    		
+    	for ( ui = 0; ui < m_NumberOfDiagTests; ui++ )
+    	{
+    	    T * pPdt = m_ppRunTimeDiagnostics[ ui ];
 			
             BOOL testDidNotComplete = !IsTestingCompleteForDiagCycle(pPdt);
         
@@ -246,11 +252,11 @@ namespace DiagnosticScheduling
     {	
     	BOOL success = FALSE;
 
-        while( m_TestEnumeration != m_pRunTimeDiagnostics->end() ) 
+        while( m_ppTestEnumeration != ( m_ppRunTimeDiagnostics + m_NumberOfDiagTests ) ) 
         {
-        	T * pPdt = (*m_TestEnumeration);
+        	T * pPdt = (*m_ppTestEnumeration);
 				
-    		++m_TestEnumeration;
+    		++m_ppTestEnumeration;
 				
     		BOOL testingNotCompleteForThisDiagCycle = !IsTestingCompleteForDiagCycle(pPdt);
 		
@@ -277,7 +283,7 @@ namespace DiagnosticScheduling
     {
     	BOOL timeForNewCycle = FALSE;
 	
-    	if ( elapsed_time >= m_pRuntimeData->m_PeriodForAllDiagnosticsToCompleteInMS ) 
+    	if ( elapsed_time >= m_RuntimeData.m_PeriodForAllDiagnosticsToCompleteInMS ) 
     	{	
     		timeForNewCycle = TRUE;
     	}
@@ -291,7 +297,7 @@ namespace DiagnosticScheduling
     {	
     	BOOL timeForNewTimeslicePeriod = FALSE;
 	
-    	if ( elapsedTimeForCurrentIteration > m_pRuntimeData->m_PeriodForOneDiagnosticIteration ) 
+    	if ( elapsedTimeForCurrentIteration > m_RuntimeData.m_PeriodForOneDiagnosticIteration ) 
     	{
     		timeForNewTimeslicePeriod = TRUE;
     	}
@@ -317,7 +323,7 @@ namespace DiagnosticScheduling
 
     	clock_t startOfIteration = rpPbdt->GetIterationCompletedTimestamp();
 
-    	UINT32 elapsedTime = (*m_pRuntimeData->m_CalcElapsedTime)( m_TimestampCurrent, startOfIteration );
+    	UINT32 elapsedTime = (*m_RuntimeData.m_CalcElapsedTime)( m_TimestampCurrent, startOfIteration );
 	
     	UINT32 iterationPeriod = rpPbdt->GetIterationPeriod();
 
@@ -369,11 +375,11 @@ namespace DiagnosticScheduling
     		case MAX_PERIOD_EXPIRED_INCOMPLETE_TESTING:
     		{
 			
-    			UINT32 errorCode = m_pRuntimeData->m_AllDiagnosticsNotCompletedErr;
+    			UINT32 errorCode = m_RuntimeData.m_AllDiagnosticsNotCompletedErr;
 			
-    			ConfigureErrorCode( errorCode, m_pRuntimeData->m_SchedulerTestType );
+    			ConfigureErrorCode( errorCode, m_RuntimeData.m_SchedulerTestType );
 				
-                (*m_pRuntimeData->m_ExcetionError)( errorCode );	
+                (*m_RuntimeData.m_ExcetionError)( errorCode );	
     		}
 		
     		// We won't get here now but in case it ever changes
@@ -408,10 +414,12 @@ namespace DiagnosticScheduling
     template <typename T>
     void DiagnosticScheduler<T>::SetDiagTestsReadyForNewTestCycle() 
     {	
-    	for (std::vector<T *>::iterator it = m_pRunTimeDiagnostics->begin(); it != m_pRunTimeDiagnostics->end(); ++it) 
-    	{	
-    		T * pPdt = (*it);
-		
+    	UINT32 ui = 0;
+    		
+    	for ( ui = 0; ui < m_NumberOfDiagTests; ui++ )
+    	{			
+    		T * pPdt = m_ppRunTimeDiagnostics[ ui ];
+			
     		ResetTestsCompletedForCycle( pPdt );
     	}
     }
@@ -419,14 +427,15 @@ namespace DiagnosticScheduling
     template <typename T>
     BOOL DiagnosticScheduler<T>::StartEnumeratingTestsForThisIterationPeriod() 
     {	
-    	std::vector<T *>::iterator it;
-	
     	BOOL testsCanRun = FALSE;
 	
-    	for (it = m_pRunTimeDiagnostics->begin(); it != m_pRunTimeDiagnostics->end(); ++it) 
-    	{	
-    		T * pPdt = (*it);
-				
+    	UINT32 ui = 0;
+    		
+    	for ( ui = 0; ui < m_NumberOfDiagTests; ui++ )
+    	{
+			
+    		T * pPdt = m_ppRunTimeDiagnostics[ ui ];
+							
     		BOOL testingNotCompleteForThisDiagCycle = !IsTestingCompleteForDiagCycle(pPdt);
 		
     		if ( testingNotCompleteForThisDiagCycle ) 
@@ -443,7 +452,7 @@ namespace DiagnosticScheduling
     		}
     	}
 	
-    	m_TestEnumeration = it;
+    	m_ppTestEnumeration = m_ppRunTimeDiagnostics + ui;
 	
     	return testsCanRun;
     }				

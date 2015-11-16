@@ -1,6 +1,7 @@
 #pragma once
-#include "BlackfinDiag.hpp"
+//#include "BlackfinDiag.hpp"
 #include "BlackfinDiagTest.hpp"
+#include <ccblkfn.h>                              /* Added for ssync( ), cli/sti( ) */
 
 
 namespace BlackfinDiagTesting 

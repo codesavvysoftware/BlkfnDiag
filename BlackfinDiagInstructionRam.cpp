@@ -1,7 +1,6 @@
 #include "BlackfinDiagInstructionRam.hpp"
 #include "Nvs_Obj.h"
 #include <bfrom.h>
-#include <vector>
 
 using namespace DiagnosticCommon;
 
@@ -12,7 +11,9 @@ namespace BlackfinDiagTesting
     {
 	    ConfigForAnyNewDiagCycle( this );
 	    
-        return RunInstructionRamTestIteration( m_IcpCompare, rErrorCode );
+	    return TEST_LOOP_COMPLETE;
+	    
+        //return RunInstructionRamTestIteration( m_IcpCompare, rErrorCode );
     }
     
     

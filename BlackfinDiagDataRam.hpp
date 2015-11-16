@@ -1,5 +1,4 @@
 #pragma once
-#include "BlackfinDiag.hpp"
 #include "BlackfinDiagTest.hpp"
 #include <ccblkfn.h>                              /* Added for ssync( ), cli/sti( ) */
 	
@@ -8,6 +7,8 @@ namespace BlackfinDiagTesting
     class BlackfinDiagDataRam : public BlackfinDiagTest 
     {
         public:
+        
+            
 
             typedef struct 
             {
@@ -17,16 +18,11 @@ namespace BlackfinDiagTesting
     	        BOOL    m_TestCompleted;
             } 
             DataRamTestDescriptor;
+            
     
-            typedef struct 
-            {
-    	        DataRamTestDescriptor  m_BankA;
-    	        DataRamTestDescriptor  m_BankB;
-    	        DataRamTestDescriptor  m_BankC;
-            } 
-            BlackfinDataRamTestSuite;
-    
-	        BlackfinDiagDataRam( BlackfinDataRamTestSuite * pDataRamTestSuite,
+	        BlackfinDiagDataRam( DataRamTestDescriptor      bankA,
+	                             DataRamTestDescriptor      bankB,
+	                             DataRamTestDescriptor      bankC,
 	                             const UINT8 *              pTestPatternsForRamTesting,
 	                             UINT32                     nmbrRamTestingPatterns,
 	                             UINT32                     nmbrBytesToTestPerIteration,
@@ -35,16 +31,14 @@ namespace BlackfinDiagTesting
 		    		             BlackfinExecTestData &     rTestData )    
 						         :  BlackfinDiagTest              ( rTestData ),
                                     m_Critical                    ( 0 ),                    
-	                       	        m_pDataRamTestSuite           ( pDataRamTestSuite ),
+	                       	        m_BankA                       ( bankA ),
+	                       	        m_BankB                       ( bankB ),
+	                       	        m_BankC                       ( bankC ),
 	                       	        m_MemoryBankFailureBitPos     ( memoryBankFailureBitPos ),
 	                       	        m_NmbrBytesToTestPerIteration ( nmbrBytesToTestPerIteration ),
 							        m_NmbrTestPatterns            ( nmbrRamTestingPatterns ),
 							        m_pTestPatternsRAM            ( pTestPatternsForRamTesting ),
 							        m_TestPatternsFailureBitPos   ( testPatternsFailureBitPos )
-	        {
-	        }
-
-	        virtual ~BlackfinDiagDataRam() 
 	        {
 	        }
 
@@ -85,9 +79,13 @@ namespace BlackfinDiagTesting
 	        //
 	        // Which memory bank failed
 	        //
-            INT                        m_Critical;                    
-
-	        BlackfinDataRamTestSuite * m_pDataRamTestSuite;
+            INT                        m_Critical; 
+            
+            DataRamTestDescriptor  m_BankA;
+            
+            DataRamTestDescriptor  m_BankB;
+            
+            DataRamTestDescriptor  m_BankC;                   
 
             UINT32                     m_MemoryBankFailureBitPos;
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "BlackfinDiag.hpp"
+#include "DiagnosticTiming.hpp"
 #include "BlackfinDiagTest.hpp"
 
 namespace BlackfinDiagTesting 
@@ -8,13 +8,13 @@ namespace BlackfinDiagTesting
     {
         public:
 
-        	BlackfinDiagTimerTest( UINT32                              errorApexTimer,
-        					       UINT32                              errorHostTimer,
-        					       DiagnosticCommon::DiagElapsedTime   maxElapsedTimeApex,
-        	                       DiagnosticCommon::DiagElapsedTime   maxElapsedTimeHost,
-        	                       DiagnosticCommon::DiagElapsedTime   minElapsedTimeApex,
-        	                       DiagnosticCommon::DiagElapsedTime   minElapsedTimeHost, 
-        	                       BlackfinExecTestData &              rTestData ) 
+        	BlackfinDiagTimerTest( UINT32                 errorApexTimer,
+        					       UINT32                 errorHostTimer,
+        					       DiagElapsedTime        maxElapsedTimeApex,
+        	                       DiagElapsedTime        maxElapsedTimeHost,
+        	                       DiagElapsedTime        minElapsedTimeApex,
+        	                       DiagElapsedTime        minElapsedTimeHost, 
+        	                       BlackfinExecTestData & rTestData ) 
            					   	    :  BlackfinDiagTest      ( rTestData ), 
            					   	       m_ApexTimerErr        ( errorApexTimer ),
            					   	       m_HostTimerErr        ( errorHostTimer ),  
@@ -54,17 +54,16 @@ namespace BlackfinDiagTesting
 	
         	UINT32                                m_HostTimerErr;
 	
-        	DiagnosticCommon::DiagElapsedTime     m_MaxElapsedTimeApex;
+        	DiagElapsedTime                       m_MaxElapsedTimeApex;
 	
-        	DiagnosticCommon::DiagElapsedTime     m_MaxElapsedTimeHost;	// Read the current Apex2 System Time Register value.
+        	DiagElapsedTime                       m_MaxElapsedTimeHost;	// Read the current Apex2 System Time Register value.
     
-        	DiagnosticCommon::DiagElapsedTime     m_MinElapsedTimeApex;
+        	DiagElapsedTime                       m_MinElapsedTimeApex;
 	
-        	DiagnosticCommon::DiagElapsedTime     m_MinElapsedTimeHost;	// Read the current Apex2 System Time Register value.
+        	DiagElapsedTime                       m_MinElapsedTimeHost;	// Read the current Apex2 System Time Register value.
     
-        	DiagnosticCommon::DiagTimestampTime   m_TimerValueStartApex;
+        	DiagTimestampTime                     m_TimerValueStartApex;
         
-            DiagnosticCommon::DiagTimestampTime   m_TimerValueStartHost;
+            DiagTimestampTime                     m_TimerValueStartHost;
     };
 };
-
