@@ -1,5 +1,4 @@
 #pragma once
-#include "DiagnosticTiming.hpp"
 #include "BlackfinDiagTest.hpp"
 
 namespace BlackfinDiagTesting 
@@ -10,10 +9,10 @@ namespace BlackfinDiagTesting
 
         	BlackfinDiagTimerTest( UINT32                 errorApexTimer,
         					       UINT32                 errorHostTimer,
-        					       DiagElapsedTime        maxElapsedTimeApex,
-        	                       DiagElapsedTime        maxElapsedTimeHost,
-        	                       DiagElapsedTime        minElapsedTimeApex,
-        	                       DiagElapsedTime        minElapsedTimeHost, 
+        					       UINT32                 maxElapsedTimeApex,
+        	                       UINT32                 maxElapsedTimeHost,
+        	                       UINT32                 minElapsedTimeApex,
+        	                       UINT32                 minElapsedTimeHost, 
         	                       BlackfinExecTestData & rTestData ) 
            					   	    :  BlackfinDiagTest      ( rTestData ), 
            					   	       m_ApexTimerErr        ( errorApexTimer ),
@@ -23,8 +22,8 @@ namespace BlackfinDiagTesting
         						       m_MaxElapsedTimeHost  ( maxElapsedTimeHost ),
         						       m_MinElapsedTimeApex  ( minElapsedTimeApex ),
         						       m_MinElapsedTimeHost  ( minElapsedTimeHost ),
-                                       m_TimerValueStartApex ( 0 ),
-        						       m_TimerValueStartHost ( 0 )
+                                       m_ApexTimerValueStart ( 0 ),
+        						       m_HostTimerValueStart ( 0 )
         	{
         	}
 
@@ -54,16 +53,16 @@ namespace BlackfinDiagTesting
 	
         	UINT32                                m_HostTimerErr;
 	
-        	DiagElapsedTime                       m_MaxElapsedTimeApex;
+        	UINT32                                m_MaxElapsedTimeApex;
 	
-        	DiagElapsedTime                       m_MaxElapsedTimeHost;	// Read the current Apex2 System Time Register value.
+        	UINT32                                m_MaxElapsedTimeHost;	// Read the current Apex2 System Time Register value.
     
-        	DiagElapsedTime                       m_MinElapsedTimeApex;
+        	UINT32                                m_MinElapsedTimeApex;
 	
-        	DiagElapsedTime                       m_MinElapsedTimeHost;	// Read the current Apex2 System Time Register value.
+        	UINT32                                m_MinElapsedTimeHost;	// Read the current Apex2 System Time Register value.
     
-        	DiagTimestampTime                     m_TimerValueStartApex;
+        	UINT32                                m_ApexTimerValueStart;
         
-            DiagTimestampTime                     m_TimerValueStartHost;
+            UINT32                                m_HostTimerValueStart;
     };
 };

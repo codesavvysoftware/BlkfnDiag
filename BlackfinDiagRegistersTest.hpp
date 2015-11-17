@@ -11,28 +11,18 @@ namespace BlackfinDiagTesting
 
         public:
 
-            typedef UINT32 (* const pRegisterTest)(const UINT32 *, UINT32);
+            typedef UINT32 (* const pRegisterTest)();
 	
-			typedef struct
-			{
-				const pRegisterTest * m_pRegisterTests;
-				UINT32                m_NmbrRegisterTests;
-				BOOL                  m_TestsCompleted;
-			}
-			RegisterTestDescriptor;
-
-			BlackfinDiagRegistersTest( const RegisterTestDescriptor  registerTestSuite[],
-                                             UINT32                  numberOfDescriptorsInTestSuite, 
-                                       const UINT32                  testPatterns[], 
-                                             UINT32                  numberOfPatterns,
-                                             UINT32                  corruptedRegTestSuiteErr,
-                                             BlackfinExecTestData &  rTestData ) 
-		    		     		:	BlackfinDiagTest             	  ( rTestData ),
-									m_CorruptedRegisterTestSuiteErr   ( corruptedRegTestSuiteErr ),
-									m_NmbrOfRegisterPatterns          ( numberOfPatterns ), 
-									m_pTestPatternsForRegisterTesting ( testPatterns ),
-									m_NmbrOfRegisterTests             ( numberOfDescriptorsInTestSuite),
-									m_pRegisterTestSuite              ( registerTestSuite ) 
+			BlackfinDiagRegistersTest( pRegisterTest           pRegisterSanityTest,
+			                           pRegisterTest           pRegisterTest, 
+                                       UINT32                  corruptedRegTestErr,
+                                       BlackfinExecTestData &  rTestData ) 
+		    		     		:	BlackfinDiagTest             ( rTestData ),
+									m_CorruptedRegisterTestErr   ( corruptedRegTestErr ),
+									m_pSanityTest                ( pRegisterSanityTest ),
+									m_pRegisterTest              ( pRegisterTest ),
+									m_SanityTestRan              ( FALSE ),
+									m_RegisterTestRan            ( FALSE ) 
         	{
         	}
 
@@ -56,20 +46,19 @@ namespace BlackfinDiagTesting
         	const BlackfinDiagRegistersTest & operator = (const BlackfinDiagRegistersTest & );
 	
 
-        	const UINT32                      m_CorruptedRegisterTestSuiteErr;
+        	const UINT32                      m_CorruptedRegisterTestErr;
+        	
+        	pRegisterTest                     m_pSanityTest;
+        	
+        	pRegisterTest                     m_pRegisterTest;
+        	
+        	BOOL                              m_SanityTestRan;
+        	
+        	BOOL                              m_RegisterTestRan;
 
-            const UINT32                      m_NmbrOfRegisterPatterns;
-
-        	const UINT32                      m_NmbrOfRegisterTests;
-	
-        	const RegisterTestDescriptor *    m_pRegisterTestSuite;
-	
-            const UINT32 *                    m_pTestPatternsForRegisterTesting;
     
         	INT                               m_Critical;                    // Temp to allow disabling interrupts around critical sections 
 
-        	BOOL FindTestToRun( RegisterTestDescriptor * & rtdTests );
-	
         	void DisableInterrupts() 
         	{
         		m_Critical = cli();
@@ -80,7 +69,6 @@ namespace BlackfinDiagTesting
         		sti(m_Critical);
         	}
     
-            BOOL RunRegisterTests( RegisterTestDescriptor  * rtdTests, UINT32 & FailureInfo );
     };
 
 

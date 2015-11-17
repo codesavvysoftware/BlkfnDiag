@@ -2,6 +2,7 @@
 #include "BlackfinDiagRuntime.hpp"
 #include "Os_iotk.h"
 #include "Hw.h"
+#include "DiagnosticTiming.hpp"
 
 using namespace DiagnosticCommon;
 using namespace BlackfinDiagTesting;
@@ -104,123 +105,8 @@ void BlackfinDiagRuntime::ExecuteDiagnostics()
                                                    TEST_PATTERNS_ERROR_BIT_POS,
                                                    execTestData ); 
     
-        static const UINT32 REGISTER_TEST_TEST_PATTERNS[]  = 
-                                            { 
-                                                0xffffffff, 
-                                                0xaaaaaaaa, 
-                                                0x55555555, 
-                                                0 
-                                            };
-    
-        //
-        // Only one test but has flexibility to add more and we may break up current test.
-        //
-        static BlackfinDiagRegistersTest::pRegisterTest m_SanityCheck[] = 
-    	                                        { 
-    	                                            BlackfinDiagRegSanityChk 
-    	                                        };
-    	                                        
 
-        static BlackfinDiagRegistersTest::pRegisterTest m_DataRegisters[]   =  
-                                                    {     
-                                            		    BlackfinDiagRegDataReg7Chk, 
-                                                        BlackfinDiagRegDataReg6Chk,
-                                                        BlackfinDiagRegDataReg5Chk,
-                                                        BlackfinDiagRegDataReg4Chk,
-                                                        BlackfinDiagRegDataReg3Chk
-                                                    };
-
-        static BlackfinDiagRegistersTest::pRegisterTest m_PointerRegisters[]    = 
-                                                        {
-    		                                                BlackfinDiagRegPointerReg5Chk, 
-                                                            BlackfinDiagRegPointerReg4Chk,
-                                                            BlackfinDiagRegPointerReg3Chk,
-                                                            BlackfinDiagRegPointerReg2Chk,
-                                                            BlackfinDiagRegPointerReg0Chk
-                                                        };
-                                                        
-        static BlackfinDiagRegistersTest::pRegisterTest m_Accumulators[]    = 
-                                                    {
-                                                        BlackfinDiagAccum0Chk, 
-    		                                            BlackfinDiagAccum1Chk
-    	                                            };
-
-        static BlackfinDiagRegistersTest::pRegisterTest m_ModifyRegisters[] = 
-                                                    {
-			                                            BlackfinDiagRegModifyReg3Chk,
-                                                        BlackfinDiagRegModifyReg2Chk,
-                                                        BlackfinDiagRegModifyReg1Chk,
-                                                        BlackfinDiagRegModifyReg0Chk
-                                                    };
-        static BlackfinDiagRegistersTest::pRegisterTest m_LengthRegisters[] =
-                                                    {
-                                        			    BlackfinDiagRegLengthReg3Chk,
-                                                        BlackfinDiagRegLengthReg2Chk,
-                                                        BlackfinDiagRegLengthReg1Chk,
-                                                        BlackfinDiagRegLengthReg0Chk
-                                                    };
-
-        static BlackfinDiagRegistersTest::pRegisterTest m_IndexRegisters[]  = 
-                                                    {
-                                                        BlackfinDiagRegIndexReg3Chk,
-                                                        BlackfinDiagRegIndexReg2Chk,
-                                                        BlackfinDiagRegIndexReg1Chk,
-                                                        BlackfinDiagRegIndexReg0Chk
-                                                    };
-        static BlackfinDiagRegistersTest::pRegisterTest m_BaseRegisters[]   = 
-                                                    {
-                                                        BlackfinDiagRegBaseReg3Chk,
-                                                        BlackfinDiagRegBaseReg2Chk,
-                                                        BlackfinDiagRegBaseReg1Chk,
-                                                        BlackfinDiagRegBaseReg0Chk
-                                                    };
-
-        static const BlackfinDiagRegistersTest::RegisterTestDescriptor REGISTER_TEST_TEST_DESCRIPTORS[] = 
-								{
-									{ 
-										m_SanityCheck,      
-										sizeof(m_SanityCheck)/sizeof( BlackfinDiagRegistersTest::pRegisterTest ),        
-										FALSE 
-									},
-									{ 
-										m_DataRegisters,
-										sizeof(m_DataRegisters)/sizeof( BlackfinDiagRegistersTest::pRegisterTest ),        
-										FALSE  
-									},
-									{ 
-										m_PointerRegisters, 
-										sizeof(m_PointerRegisters)/sizeof( BlackfinDiagRegistersTest::pRegisterTest ),     
-										FALSE 
-									},
-									{ 
-										m_Accumulators,     
-										sizeof(m_Accumulators)/sizeof( BlackfinDiagRegistersTest::pRegisterTest ), 
-										FALSE  
-									},
-									{ 
-										m_BaseRegisters,    
-										sizeof(m_BaseRegisters)/sizeof( BlackfinDiagRegistersTest::pRegisterTest ),       
-										FALSE 
-									},
-									{ 
-										m_IndexRegisters,   
-										sizeof(m_IndexRegisters)/sizeof( BlackfinDiagRegistersTest::pRegisterTest ),
-										FALSE  
-									},
-									{ 
-										m_LengthRegisters,  
-										sizeof(m_LengthRegisters)/sizeof( BlackfinDiagRegistersTest::pRegisterTest ),      
-										FALSE 
-									},
-									{ 
-										m_ModifyRegisters,  
-										sizeof(m_ModifyRegisters)/sizeof( BlackfinDiagRegistersTest::pRegisterTest ),      
-										FALSE  
-									}
-								};
-	 
-
-        #define CORRUPTED_REG_TST_SUITE 0xff
+        #define CORRUPTED_REG_TST 0xff
 	
         #define  REGISTER_TEST_ITERATION_PERIOD_MS 2000          // Every Two Seconds	
 	
@@ -228,11 +114,9 @@ void BlackfinDiagRuntime::ExecuteDiagnostics()
    		execTestData.m_TestType                          = BlackfinDiagTest::DIAG_REGISTER_TEST_TEST_TYPE;
 
 
-        static BlackfinDiagRegistersTest m_RegisterTest( REGISTER_TEST_TEST_DESCRIPTORS, 
-                                                         sizeof( REGISTER_TEST_TEST_DESCRIPTORS ) / sizeof(BlackfinDiagRegistersTest::RegisterTestDescriptor), 
-                                                         REGISTER_TEST_TEST_PATTERNS, 
-                                                         sizeof(REGISTER_TEST_TEST_PATTERNS)/sizeof(UINT32),
-                                                         CORRUPTED_REG_TST_SUITE,
+        static BlackfinDiagRegistersTest m_RegisterTest( BlackfinDiagRegSanityChk, 
+                                                         BlackfinDiagRegChk, 
+                                                         CORRUPTED_REG_TST,
                                                          execTestData ); 
  
 
@@ -269,10 +153,11 @@ void BlackfinDiagRuntime::ExecuteDiagnostics()
 	
         #define TIMER_TEST_APEX_TIMER_ERR        1
         #define TIMER_TEST_HOST_TIMER_ERR        2
-        #define MAX_TIMER_TEST_ELAPSED_TIME_APEX 950
-        #define MAX_TIMER_TEST_ELAPSED_TIME_HOST 1050
-        #define MIN_TIMER_TEST_ELAPSED_TIME_APEX 950
-        #define MIN_TIMER_TEST_ELAPSED_TIME_HOST 1050 
+        #define TIMER_MARGIN_OF_ERROR 30 * 60 * 1000000 / 20  //5% of 30 minutes in microseconds 
+        #define MAX_TIMER_TEST_ELAPSED_TIME_APEX (30 * 60 * 1000000) + TIMER_MARGIN_OF_ERROR
+        #define MAX_TIMER_TEST_ELAPSED_TIME_HOST (30 * 60 * 1000000) + TIMER_MARGIN_OF_ERROR
+        #define MIN_TIMER_TEST_ELAPSED_TIME_APEX (30 * 60 * 1000000) - TIMER_MARGIN_OF_ERROR
+        #define MIN_TIMER_TEST_ELAPSED_TIME_HOST (30 * 60 * 1000000) - TIMER_MARGIN_OF_ERROR
 
         execTestData.m_IterationPeriod                   = TIMER_TEST_ITERATION_PERIOD_MS;
    		execTestData.m_TestType                          = BlackfinDiagTest::DIAG_TIMER_TEST_TYPE;
