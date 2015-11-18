@@ -15,7 +15,7 @@ namespace DiagnosticTiming
 		    cTiming() : m_DivisorApproxClocksToMS    (DIVISOR_INITIAL_VALUE),
 		                m_AdjustmentApproxClocksToMS (ADJ_INITIAL_SHIFT_FACTOR)
 			{			
-			    //CalcShiftFactorsForCountingMilleseconds( m_DivisorApproxClocksToMS, m_AdjustmentApproxClocksToMS );
+			    CalcShiftFactorsForCountingMilleseconds( m_DivisorApproxClocksToMS, m_AdjustmentApproxClocksToMS );
 		    }
 				
 		    DiagTimestampTime GetSystemTimestamp() 
@@ -47,7 +47,7 @@ namespace DiagnosticTiming
 			    //
 			    // Find MSB of ClocksPerMillesecond
 			    //
-/*			    DiagTimestampTime dtt = clockTimeRate;
+			    DiagTimestampTime dtt = clockTimeRate;
 	
 			    UINT32 bitpos = 0;
 	
@@ -58,17 +58,18 @@ namespace DiagnosticTiming
 				    dtt >>= 1;
 			    }
 	
+    		    // Scale to the seoond
     		    dtt = CLOCKS_PER_SEC;
     
     		    dtt >>= bitpos-1;
     
-    		    UINT32 i = 0;
+    		    UINT32 i = 1;
     
     		    DiagTimestampTime error = 0;
     
     		    DiagTimestampTime prev_error = 0;
     
-    		    for ( i = 1; i < bitpos - 1; ++i ) 
+    		    for ( ; i < bitpos - 1; ++i ) 
 				{    	
     			    error = ( dtt - (dtt >> i ) );	
     	
@@ -78,7 +79,7 @@ namespace DiagnosticTiming
     		    }
     
     		    //
-    		    // Pick the adjustment that yiels the closest value to 1000
+    		    // Pick the adjustment that yiels the closest value to 1000 milleseconds/ 1 second
     		    //
     
     		    DiagTimestampTime lower = 1000 - prev_error;
@@ -94,7 +95,7 @@ namespace DiagnosticTiming
     			    rShiftAdjustment = i-1;
     		    }
     
-    		    rShiftFactor = bitpos -1; */  
+    		    rShiftFactor = bitpos -1;   
 		    }    
 
             UINT32 ComputeElapsedTime( clock_t   current, 
@@ -133,9 +134,10 @@ namespace DiagnosticTiming
 	
 	   static cTiming SystemTiming; 
 	   
+
 	   static UINT32 ComputeElapsedTimeMS( clock_t current, clock_t previous ) 
 	   {
-	       return SystemTiming.ComputeElapsedTimeMS( current, previous );
+	        return SystemTiming.ComputeElapsedTimeMS( current, previous );
 	   }
 	   
 	   static clock_t (*GetTimestamp)() = &clock;  

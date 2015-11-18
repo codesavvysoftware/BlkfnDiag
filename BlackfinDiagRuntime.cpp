@@ -201,9 +201,9 @@ void BlackfinDiagRuntime::ExecuteDiagnostics()
 
         static BlackfinDiagTest * pDiagnosticTests[]    = 
                                                  {
-                                                     &m_RegisterTest,
+//                                                     &m_RegisterTest,
                                                      &m_DataRamTest, 
-                                                     &m_TimerTest,
+//                                                     &m_TimerTest,
                                                      &m_InstructionRamTest,
                                                      &m_InstructionsTest,
                                                  };

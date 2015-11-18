@@ -11,9 +11,7 @@ namespace BlackfinDiagTesting
     {
 	    ConfigForAnyNewDiagCycle( this );
 	    
-	    return TEST_LOOP_COMPLETE;
-	    
-        //return RunInstructionRamTestIteration( m_IcpCompare, rErrorCode );
+        return RunInstructionRamTestIteration( m_IcpCompare, rErrorCode );
     }
     
     

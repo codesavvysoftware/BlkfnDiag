@@ -11,8 +11,6 @@ namespace BlackfinDiagTesting
 	
 	    ConfigForAnyNewDiagCycle( this );
 					
-	    return TEST_LOOP_COMPLETE;
-	    
 	    BOOL errorExists = TRUE;
 	
 	    TestState ts = TEST_LOOP_COMPLETE;

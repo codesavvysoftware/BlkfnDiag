@@ -393,38 +393,26 @@ R7Continue:
     
  	cc = r0 == r6;
  	
- 	if cc jump R6Continue;
+ 	if !cc jump TestError;
     
-    jump.s TestError;
-    
-R6Continue:    
    	r2 = R5Failure;
     
  	cc = r0 == r5;
  	
- 	if cc jump R5Continue;
+ 	if !cc jump TestError;
     
-    jump.s TestError;
-
-R5Continue:    
    	r2 = R4Failure;
     
  	cc = r0 == r4;
  	
- 	if cc jump R4Continue;
+ 	if !cc jump TestError;
     
-    jump.s TestError;
-
-R4Continue:    
    	r2 = R3Failure;
     
  	cc = r0 == r3;
  	
- 	if cc jump R3Continue;
+ 	if !cc jump TestError;
     
-    jump.s TestError;
-
-R3Continue:    
     r3 = p0;
     
     r4 = p2;
@@ -439,55 +427,32 @@ R3Continue:
     
     cc = r0 == r3;
     
-    if cc jump p0Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-p0Continue:
-
     r2 = P2Failure;
     
     cc = r0 == r4;
     
-    if cc jump p2Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-p2Continue:
-
     r2 = P3Failure;
     
     cc = r0 == r5;
     
-    if cc jump p3Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-
-p3Continue:
-
     r2 = P4Failure;
     
     cc = r0 == r6;
     
-    if cc jump p4Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-
-p4Continue:
-
     r2 = P5Failure;
     
     cc = r0 == r7;
     
-    if cc jump p2Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-
-p5Continue:
-
     r3 = m0;
     
     r4 = m1;
@@ -500,43 +465,25 @@ p5Continue:
     
     cc = r0 == r3;
     
-    if cc jump m0Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-m0Continue:
-
     r2 = Modify1Failure;
     
     cc = r0 == r4;
     
-    if cc jump m1Continue;
-    
-    jump.s TestError;
-    
-m1Continue:
+    if !cc jump TestError;
 
     r2 = Modify2Failure;
     
     cc = r0 == r5;
     
-    if cc jump m2Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-
-m2Continue:
-
     r2 = Modify3Failure;
     
     cc = r0 == r6;
     
-    if cc jump m3Continue;
-    
-    jump.s TestError;
-    
-
-m3Continue:
+    if !cc jump TestError;
     
     r3 = l0;
     
@@ -550,44 +497,26 @@ m3Continue:
     
     cc = r0 == r3;
     
-    if cc jump l0Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-l0Continue:
-
     r2 = Length1Failure;
     
     cc = r0 == r4;
     
-    if cc jump l1Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-l1Continue:
-
     r2 = Length2Failure;
     
     cc = r0 == r5;
     
-    if cc jump l2Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-
-l2Continue:
-
     r2 = Length3Failure;
     
     cc = r0 == r6;
     
-    if cc jump l3Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-
-l3Continue:
-
     r3 = i0;
     
     r4 = i1;
@@ -600,44 +529,26 @@ l3Continue:
     
     cc = r0 == r3;
     
-    if cc jump i0Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-i0Continue:
-
     r2 = Idx1Failure;
     
     cc = r0 == r4;
     
-    if cc jump i1Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-i1Continue:
-
     r2 = Idx2Failure;
     
     cc = r0 == r5;
     
-    if cc jump i2Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-
-i2Continue:
-
     r2 = Idx3Failure;
     
     cc = r0 == r6;
     
-    if cc jump i3Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-
-i3Continue:
-
     r3 = b0;
     
     r4 = b1;
@@ -650,44 +561,26 @@ i3Continue:
     
     cc = r0 == r3;
     
-    if cc jump b0Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-b0Continue:
-
     r2 = Base1Failure;
     
     cc = r0 == r4;
     
-    if cc jump b1Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-b1Continue:
-
     r2 = Base2Failure;
     
     cc = r0 == r5;
     
-    if cc jump b2Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-
-b2Continue:
-
     r2 = Base3Failure;
     
     cc = r0 == r6;
     
-    if cc jump b3Continue;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-
-b3Continue:
-
 	r2 = A0Failure32;
 	
 	a0.x = r0.l;
@@ -698,12 +591,8 @@ b3Continue:
 				
 	cc = r0 == r3;             // Patterns Match?
 	
-	if cc jump A0Cont;
-	
-	jump.s TestError;
-	
-A0Cont:
-
+    if !cc jump TestError;
+    
     r2 = A0Failure8;
 	     
     r3.l = a0.x;
@@ -718,12 +607,8 @@ A0Cont:
     
     cc = r3 == r1;
     
-    if cc jump A0Ok;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-A0Ok:
-
 	r2 = A1Failure32;
 	
 	a1.x = r0.l;
@@ -732,14 +617,8 @@ A0Ok:
 	
 	r3 = a1.w;
 				
-	cc = r0 == r3;             // Patterns Match?
-	
-	if cc jump A1Cont;
-	
-	jump.s TestError;
-	
-A1Cont:
-
+    if !cc jump TestError;
+    
     r2 = A1Failure8;
 	     
     r3.l = a1.x;
@@ -752,12 +631,8 @@ A1Cont:
     
     cc = r1 == r3;
     
-    if cc jump A1Ok;
+    if !cc jump TestError;
     
-    jump.s TestError;
-    
-A1Ok:
-
     r0 = 0;
     
     jump.s  TestExit;

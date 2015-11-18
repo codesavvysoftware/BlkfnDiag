@@ -104,7 +104,13 @@ namespace DiagnosticScheduling
     	}
     	else 
     	{		
-    		UINT32 elapsedTimeForCurrentIteration = (*m_RuntimeData.m_CalcElapsedTime)( m_TimestampCurrent, m_TimeLastIterationPeriodExpired );
+    	    if ( NO_TESTS_TO_RUN_ALL_COMPLETED == m_CurrentSchedulerState ) 
+    	    {
+	    	    return;
+    	    	
+    	    }
+   	    	
+    	    UINT32 elapsedTimeForCurrentIteration = (*m_RuntimeData.m_CalcElapsedTime)( m_TimestampCurrent, m_TimeLastIterationPeriodExpired );
 	
     	    BOOL newTestIterationPeriod = HasNewTestIterationPeriodStarted( elapsedTimeForCurrentIteration );
 	    

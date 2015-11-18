@@ -2,6 +2,8 @@
 //#include "BlackfinDiag.hpp"
 #include "BlackfinDiagTest.hpp"
 
+extern "C" UINT32  BlackfinDiagInstrTest();
+
 namespace BlackfinDiagTesting 
 {
     class BlackfinDiagInstructionsTest : public BlackfinDiagTest 

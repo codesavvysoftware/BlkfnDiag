@@ -24,7 +24,7 @@ namespace BlackfinDiagTesting
   		
     			rErrorCode &= DIAG_ERROR_MASK;
 			
-    			rErrorCode = ( GetTestType() << DIAG_ERROR_TYPE_BIT_POS );
+    			rErrorCode |= ( GetTestType() << DIAG_ERROR_TYPE_BIT_POS );
 			
     			OS_Assert( rErrorCode );
         	}
@@ -41,7 +41,7 @@ namespace BlackfinDiagTesting
   		
     			rErrorCode &= DIAG_ERROR_MASK;
 			
-    			rErrorCode = ( GetTestType() << DIAG_ERROR_TYPE_BIT_POS );
+    			rErrorCode |= ( GetTestType() << DIAG_ERROR_TYPE_BIT_POS );
 			
     			OS_Assert( rErrorCode );
         	}
@@ -60,7 +60,7 @@ namespace BlackfinDiagTesting
            
             error &= DIAG_ERROR_MASK;
 			
-    		error = ( GetTestType() << DIAG_ERROR_TYPE_BIT_POS );
+    		error |= ( GetTestType() << DIAG_ERROR_TYPE_BIT_POS );
 			
     		OS_Assert( error );
         }
