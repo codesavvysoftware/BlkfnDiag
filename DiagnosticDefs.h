@@ -1,6 +1,7 @@
 #pragma once
 
 #include <time.h>
+#include "defs.h"
 
 	typedef UINT32  DiagElapsedTime;
 

@@ -23,11 +23,11 @@ namespace DiagnosticScheduling
 {
     typedef struct 
     {
-        clock_t                                                 (*m_SysTimestamp)();
+        UINT64                                                 (*m_SysTimestamp)();
             	
-        UINT32                                                  (*m_CalcElapsedTime)(clock_t current, clock_t previous);
+        UINT32                                                  (*m_CalcElapsedTime)(UINT64 current, UINT64 previous);
             	
-        void                                                    (*m_ExcetionError)(UINT32 errorCode);
+        void                                                    (*m_ExcetionError)(INT errorCode);
             	
         UINT32                                                  m_PeriodForAllDiagnosticsToCompleteInMS;
             	
@@ -62,11 +62,6 @@ namespace DiagnosticScheduling
                                  UINT32                        numberOfDiagnosticTests,
                                  DiagnosticRunTimeParameters  runTimeData );
 
-        	/// Default destructor.
-        	~DiagnosticScheduler() 
-        	{
-        	}
-
         	/// Initializes diagnostics.
         	void Initialize(void) 
         	{
@@ -83,7 +78,7 @@ namespace DiagnosticScheduling
 
         private:
 
-            static const clock_t  DEFAULT_INITIAL_TIMESTAMP = 0;	
+            static const UINT64  DEFAULT_INITIAL_TIMESTAMP = 0;	
 
             typedef enum 
         	{
@@ -113,11 +108,11 @@ namespace DiagnosticScheduling
         	// completion time diagnostic injected fault happen faster will be injected here.
         	//	static const DiagSlices_t DGN_COMPL_CHECK_INTERVAL_TIME_SLICE = 15 * DGN_INTERVALS_PER_MINUTE;
 
-        	clock_t m_TimestampCurrent;	
+        	UINT64 m_TimestampCurrent;	
 	
-            clock_t m_TimeTestCycleStarted;
+            UINT64 m_TimeTestCycleStarted;
     
-            clock_t m_TimeLastIterationPeriodExpired;
+            UINT64 m_TimeLastIterationPeriodExpired;
 
             DiagnosticScheduler();
 	
@@ -125,33 +120,24 @@ namespace DiagnosticScheduling
 
         	DiagnosticScheduler &operator=(const DiagnosticScheduler &);
 
-        	BOOL AreTestIterationsScheduledToRun();
-
         	void DetermineCurrentSchedulerState();
 
         	void ConfigureErrorCode( UINT32 & returnedErrorCode, UINT32 testTypeCurrent );
 
         	void DoMoreDiagnosticTesting();
 
-        	BOOL DidAllTestsComplete();
-
-        	BOOL EnumerateNextScheduledTest( T * & pbdtNextDiag );
-
-        	BOOL HasCompleteDiagTestPeriodExpired( UINT32 elapsed_time );
-
-        	BOOL HasNewTestIterationPeriodStarted( UINT32 elapsedTimeForCurrentIteration );
-
         	BOOL IsTestScheduledToRun( T * & rpPbdt );
 
             BOOL IsTestingCompleteForDiagCycle( T * & rpPbdt );
-    
-        	void ResetTestsCompletedForCycle( T * & rpPbdt );
+            
+//            DiagnosticScheduler(const DiagnosticScheduler &);
+	
+//	        const DiagnosticScheduler & operator = (const DiagnosticScheduler & );
+		
+//            DiagnosticScheduler();
+            
+//            ~DiagnosticScheduler();
 
-        	void SetAnotherTestCompletedForCycle( T * & rpPbdt );
-
-        	void SetDiagTestsReadyForNewTestCycle();
-
-        	BOOL StartEnumeratingTestsForThisIterationPeriod();
 	
     };
 };

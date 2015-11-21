@@ -8,12 +8,6 @@
 
 namespace BlackfinDiagRuntimeEnvironment 
 {  
-      //
-    // For linkage to c callable assembly language register tests
-    //
-    extern "C" UINT32  BlackfinDiagRegSanityChk();
-    extern "C" UINT32  BlackfinDiagRegChk();
-
     template<typename T, size_t N>
     T * end(T (&ra)[N]) 
     {
@@ -30,6 +24,12 @@ namespace BlackfinDiagRuntimeEnvironment
     
             // Constructor definition
             BlackfinDiagRuntime();
+            
+            BlackfinDiagRuntime(const BlackfinDiagRuntime &);
+
+            const BlackfinDiagRuntime & operator = (const BlackfinDiagRuntime &);
+
+            
     };
     
     

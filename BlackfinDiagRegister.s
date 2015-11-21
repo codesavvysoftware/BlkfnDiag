@@ -14,12 +14,33 @@ _BlackfinDiagRegSanityChk:
     // We're going to test the sanity of r0, r1, r2, and p1.  We'll write and read back
     // all ones, all zeros, alternating 1's and 0's with the msb set and reset.
     //
-    r0.h = AllOnesPattern;
-    r0.l = AllOnesPattern;  // All ones
-    r1.h = AllOnesPattern;
-    r1.l = AllOnesPattern;
+ 	r0 = 0xffffffff;
+
+ 	call _BlackfinSanityChkPattern;
+ 	
+    r1 = 0;
+    
     cc = r0 == r1;
-    if cc jump R0R1AllOnesPassed;
+    
+    if cc jump NextSanityPattern;
+    
+ExitSanityTest:
+
+    unlink;
+    
+    rts;
+NextSanityPattern:
+
+    call _BlackfinSanityChkPattern;
+    jump.s ExitSanityTest;
+        
+_BlackfinDiagRegSanityChk.end:
+
+_BlackfinSanityChkPattern:
+    link 0;
+    r1 = r0;
+    cc = r0 == r1;
+    if cc jump R0R1Passed;
     //
     // First Sanity Check Failure Indicate as such upon return.
     //
@@ -27,12 +48,10 @@ _BlackfinDiagRegSanityChk:
     // r0.h Already has the FailurePattern
     jump.s Exit;
 
-R0R1AllOnesPassed:
-	r2.h = AllOnesPattern;
-	r2.l = AllOnesPattern;
-	
+R0R1Passed:
+	r2 = r0;
     cc = r0 == r2;
-    if cc jump R0R2AllOnesPassed;
+    if cc jump R0R2Passed;
     //
     // Second Sanity Check Failure Indicate as such upon return.
     //
@@ -40,9 +59,9 @@ R0R1AllOnesPassed:
     // r0.h Already has the FailurePattern
     jump.s Exit;
 
-R0R2AllOnesPassed:
+R0R2Passed:
     cc = r1 == r2;
-    if cc jump R1R2AllOnesPassed;
+    if cc jump R1R2Passed;
     //
     // Third Sanity Check Failure Indicate as such upon return.
     //
@@ -50,178 +69,35 @@ R0R2AllOnesPassed:
     // r0.h Already has the FailurePattern
     jump.s Exit;
 
-R1R2AllOnesPassed:
-    r0.h = AllZerosPattern;
-    r0.l = AllZerosPattern;  // All zeros
-    r1.h = AllZerosPattern;
-    r1.l = AllZerosPattern;
+R1R2Passed:
+    p0 = r0;
+
+    nop;
+    
+    nop;
+    
+    nop;
+    
+    nop;
+    
+    r1 = p0;
+    
     cc = r0 == r1;
-    if cc jump R0R1AllZerosPassed;
-    //
-    // Fourth Sanity Check Failure Indicate as such upon return.
-    //
-    r0.l = ( SanityCheckFailure << TestFailurePos ) | R0R1SanityCheckFail;
-    // r0.h Already has the FailurePattern
-    jump.s Exit;
-
-R0R1AllZerosPassed:
-	r2.h = AllZerosPattern;
-	r2.l = AllZerosPattern;
-    cc = r0 == r2;
-    if cc jump R0R2AllZerosPassed;
-    //
-    // Fifth Sanity Check Failure Indicate as such upon return.
-    //
-    r0.l = ( SanityCheckFailure << TestFailurePos ) | R0R2SanityCheckFail;
-    // r0.h Already has the FailurePattern
-    jump.s Exit;
-
-R0R2AllZerosPassed:
-    cc = r1 == r2;
-    if cc jump R1R2AllZerosPassed;
-    //
-    // Sixth Sanity Check Failure Indicate as such upon return.
-    //
-    r0.l = ( SanityCheckFailure << TestFailurePos ) | R1R2SanityCheckFail;
-    // r0.h Already has the FailurePattern
-Exit:
-    unlink;
-    rts;
-R1R2AllZerosPassed:
-    r0.h = AlternatingOnesZeros;
-    r0.l = AlternatingOnesZeros;  // Alternating ones, zeros
-    r1.h = AlternatingOnesZeros;
-    r1.l = AlternatingOnesZeros;
-    cc = r0 == r1;
-    if cc jump R0R1AltOnesZerosPassed;
-    //
-    // Seventh Sanity Check Failure Indicate as such upon return.
-    //
-    r0.l = ( SanityCheckFailure << TestFailurePos ) | R0R1SanityCheckFail;
-    // r0.h Already has the FailurePattern
-    jump.s Exit;
-
-R0R1AltOnesZerosPassed:
-	r2.h = AlternatingOnesZeros;
-	r2.l = AlternatingOnesZeros;
-    cc = r0 == r2;
-    if cc jump R0R2AltOnesZerosPassed;
-    //
-    // Eighth Sanity Check Failure Indicate as such upon return.
-    //
-    r0.l = ( SanityCheckFailure << TestFailurePos ) | R0R2SanityCheckFail;
-    // r0.h Already has the FailurePattern
-    jump.s Exit;
-
-R0R2AltOnesZerosPassed:
-    cc = r1 == r2;
-    if cc jump R1R2AltOnesZerosPassed;
-    //
-    // Nineth Sanity Check Failure Indicate as such upon return.
-    //
-    r0.l = ( SanityCheckFailure << TestFailurePos ) | R1R2SanityCheckFail;
-    // r0.h Already has the FailurePattern
-    jump.s Exit;
-R1R2AltOnesZerosPassed:
-    r0.h = AlternatingZerosOnes;
-    r0.l = AlternatingZerosOnes;  // Alternating ones, zeros
-    r1.h = AlternatingZerosOnes;
-    r1.l = AlternatingZerosOnes;
-    cc = r0 == r1;
-    if cc jump R0R1AltZerosOnesPassed;
-    //
-    // Tenth Sanity Check Failure Indicate as such upon return.
-    //
-    r0.l = ( SanityCheckFailure << TestFailurePos ) | R0R1SanityCheckFail;
-    // r0.h Already has the FailurePattern
-    jump.s Exit;
-
-R0R1AltZerosOnesPassed:
-	r2.h = AlternatingZerosOnes;
-	r2.l = AlternatingZerosOnes;
-    cc = r0 == r2;
-    if cc jump R0R2AltZerosOnesPassed;
-    //
-    // Eleventh Sanity Check Failure Indicate as such upon return.
-    //
-    r0.l = ( SanityCheckFailure << TestFailurePos ) | R0R2SanityCheckFail;
-    // r0.h Already has the FailurePattern
-    jump.s Exit;
-
-R0R2AltZerosOnesPassed:
-    cc = r1 == r2;
-    if cc jump R1R2AltZerosOnesPassed;
-    //
-    // Twelth Sanity Check Failure Indicate as such upon return.
-    //
-    r0.l = ( SanityCheckFailure << TestFailurePos ) | R1R2SanityCheckFail;
-    // r0.h Already has the FailurePattern
-    jump.s Exit;
-R1R2AltZerosOnesPassed:
-//
-// At this point we know that r0-r2 are at least comparing inverting pattens correctly.
-// So we'll assume they are working based on the results.  We need P1 to loop through
-// Input patters so lets do sanity checks on it.
-//
-    r0.h = AllOnesPattern;
-    r0.l = AllOnesPattern;
-    p1.h = AllOnesPattern;
-    p1.l = AllOnesPattern;
-    r1 = p1;
-    cc = r0 == r1;
-    if cc jump P0AllOnesPassed;
+    if cc jump P0Passed;
     //
     // Thirteenth Sanity Check Failure Indicate as such upon return.
     //
     r0.l = ( SanityCheckFailure << TestFailurePos ) | P0SanityCheckFail;
     // r0.h Already has the FailurePattern
     jump.s Exit;
-P0AllOnesPassed:
-    r0.h = AllZerosPattern;
-    r0.l = AllZerosPattern;
-    p1.h = AllZerosPattern;
-    p1.l = AllZerosPattern;
-    r1 = p1;
-    cc = r0 == r1;
-    if cc jump P0AllZerosPassed;
-    //
-    // Fourteenth Sanity Check Failure Indicate as such upon return.
-    //
-    r0.l = ( SanityCheckFailure << TestFailurePos ) | P0SanityCheckFail;
-    // r0.h Already has the FailurePattern
-    jump.s Exit;
-P0AllZerosPassed:
-    r0.h = AlternatingOnesZeros;
-    r0.l = AlternatingOnesZeros;
-    p1.h = AlternatingOnesZeros;
-    p1.l = AlternatingOnesZeros;
-    r1 = p1;
-    cc = r0 == r1;
-    if cc jump P0AltOnesZerosPassed;
-    //
-    // Fifteenth Sanity Check Failure Indicate as such upon return.
-    //
-    r0.l = ( SanityCheckFailure << TestFailurePos ) | P0SanityCheckFail;
-    // r0.h Already has the FailurePattern
-    jump.s Exit;
-P0AltOnesZerosPassed:
-    r0.h = AlternatingZerosOnes;
-    r0.l = AlternatingZerosOnes;
-    p1.h = AlternatingZerosOnes;
-    p1.l = AlternatingZerosOnes;
-    r1 = p1;
-    cc = r0 == r1;
-    if cc jump P0AltZerosOnesPassed;
-    //
-    // Sixteenth Sanity Check Failure Indicate as such upon return.
-    //
-    r0.l = ( SanityCheckFailure << TestFailurePos ) | P0SanityCheckFail;
-    // r0.h Already has the FailurePattern
-    jump.s Exit;
-P0AltZerosOnesPassed:
-    r0 = 0;              // Test passed
-    jump.s Exit;
-_BlackfinDiagRegSanityChk.end:
+P0Passed:
+    r0 = 0;
+Exit:
+    unlink;
+    
+    rts;
+            
+_BlackfinSanityChkPattern.end:
 
 	
 _BlackfinDiagRegChk:
@@ -319,7 +195,7 @@ _BlackfinDiagRegTestPattern:
     
     r4 = r0;
     
-    r4 = r0;
+    r5 = r0;
     
     r6 = r0;
     
@@ -333,7 +209,7 @@ _BlackfinDiagRegTestPattern:
     
     p2 = r0;
     
-    p0 = r0;
+    p1 = r0;
     
     m3 = r0;
     
@@ -413,7 +289,7 @@ R7Continue:
  	
  	if !cc jump TestError;
     
-    r3 = p0;
+    r3 = p1;
     
     r4 = p2;
     
@@ -423,7 +299,7 @@ R7Continue:
     
     r7 = p5;
     
-    r2 = P0Failure;
+    r2 = P1Failure;
     
     cc = r0 == r3;
     
@@ -617,15 +493,15 @@ R7Continue:
 	
 	r3 = a1.w;
 				
+	cc = r0 == r3;             // Patterns Match?
+	
     if !cc jump TestError;
     
     r2 = A1Failure8;
 	     
     r3.l = a1.x;
     
-    r4.h = 0;
-    
-    r4.l = 0xff;
+    r3 = r3 & r4;
     
     r1 = r0 & r4;
     

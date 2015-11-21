@@ -12,21 +12,9 @@ _BlackfinDiagInstrTest:
 	//
 	r0 = 1;
 	
-	r2 = 8;
+	p1 = 8;
 	
-	p5 = r2;
-	
-	// loop 8 times, 2**8
-	
-    nop;
-    
-    nop;
-    
-    nop;
-    
-    nop;
-    
-    loop lc0_test lc0 = p5;
+    loop lc0_test lc0 = p1;
 	
 	loop_begin lc0_test;
 	
@@ -42,29 +30,17 @@ _BlackfinDiagInstrTest:
 	
 	r0 = 1;
 	
-	r2 = 8;
-	
-	p5 = r2;
-	
-	nop;
-	
-	nop;
-	
-	nop;
-	
-	nop;
+	p1 = 8;
 	
 	// loop 8 times, 2**8
 	
-	loop lc1_test lc1 = p5;
+	loop lc1_test lc1 = p1;
 	
 	loop_begin lc1_test;
 	
 	r0 <<= 1;
 	
 	loop_end lc1_test;
-	
-	r1 = 256;
 	
 	cc = r0 == r1;
 	

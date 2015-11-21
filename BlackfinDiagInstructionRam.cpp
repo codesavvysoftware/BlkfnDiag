@@ -1,8 +1,8 @@
 #include "BlackfinDiagInstructionRam.hpp"
 #include "Nvs_Obj.h"
 #include <bfrom.h>
-
-using namespace DiagnosticCommon;
+#include "Os_iotk.h"
+#include "Hw.h"
 
 namespace BlackfinDiagTesting 
 {
@@ -28,22 +28,13 @@ namespace BlackfinDiagTesting
 	
 	    hasError = !CompareInstructMemToBootStream( rIcpCompare ); 
 
-        if (rIcpCompare.m_ScaffoldingActive) 
-        {
-    	    //
-            // If scaffolding is active record all mismatches. Resetting error will result in reading
-            // all of the instruction RAM.
-            //
-            //if (bError) bError = FALSE;
-        }
-
         // Miscomparison results in an error return.
 	    if (hasError) 
 	    {
 		
    		    rErrorCode  = GetTestType() << DIAG_ERROR_TYPE_BIT_POS;
     
-   		    rErrorCode |= m_MismatchErr;
+   		    rErrorCode |= MISMATCH_ERR;
    		
    		    void * pCurrentAddr= rIcpCompare.m_pReadFromAddr + rIcpCompare.m_CurrentBfrOffset;
    		
@@ -69,7 +60,7 @@ namespace BlackfinDiagTesting
 	        {
 	    	    rErrorCode  = GetTestType() << DIAG_ERROR_TYPE_BIT_POS;
 	    	
-	    	    rErrorCode |= m_BadBootstreamErr;   		
+	    	    rErrorCode |= BAD_BOOTSTREAM_ERR;   		
 	
 	    	    ts = TEST_FAILURE;
 	        }
@@ -367,7 +358,7 @@ namespace BlackfinDiagTesting
     	    //
     	    UINT32 errorCode  = GetTestType() << DIAG_ERROR_TYPE_BIT_POS;
     
-    	    errorCode |= m_UnableToStartErr;
+    	    errorCode |= UNABLE_TO_START_ERR;
     		
 		    OS_Assert( errorCode );
    	    }    	

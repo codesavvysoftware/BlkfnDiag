@@ -1,7 +1,6 @@
 #include "BlackfinDiagInstructionsTest.hpp"
-
-using namespace DiagnosticCommon;
-
+#include "Os_iotk.h"
+#include "Hw.h"
 namespace BlackfinDiagTesting 
 {
 	

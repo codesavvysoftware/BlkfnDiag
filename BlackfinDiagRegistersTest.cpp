@@ -1,6 +1,6 @@
 #include "BlackfinDiagRegistersTest.hpp"
-
-using namespace DiagnosticCommon;
+#include "Os_iotk.h"
+#include "Hw.h"
 
 namespace BlackfinDiagTesting 
 {
@@ -9,13 +9,11 @@ namespace BlackfinDiagTesting
     {
         ConfigForAnyNewDiagCycle( this );
 					
-	    return TEST_LOOP_COMPLETE;
-	    
-    	TestState result = TEST_IN_PROGRESS;
+       	TestState result = TEST_IN_PROGRESS;
     	
     	if ( !m_SanityTestRan ) 
     	{
-        	rErrorCode = (m_pSanityTest )();
+        	rErrorCode = BlackfinDiagRegSanityChk();
         	
         	m_SanityTestRan = TRUE;
     	
@@ -32,7 +30,7 @@ namespace BlackfinDiagTesting
        	}
        	else
        	{
-       	    rErrorCode = (m_pRegisterTest)();
+       	    rErrorCode = BlackfinDiagRegChk();
        	    
        	    m_RegisterTestRan = TRUE;
        	    
@@ -54,17 +52,6 @@ namespace BlackfinDiagTesting
            	    
     void BlackfinDiagRegistersTest::ConfigureForNextTestCycle() 
     {
-        if ( !m_pSanityTest || !m_pRegisterTest )
-        {
-           UINT32 error = m_CorruptedRegisterTestErr;
-           
-            error &= DIAG_ERROR_MASK;
-			
-    		error |= ( GetTestType() << DIAG_ERROR_TYPE_BIT_POS );
-			
-    		OS_Assert( error );
-        }
-        
         m_SanityTestRan   = FALSE;
         
         m_RegisterTestRan = FALSE;

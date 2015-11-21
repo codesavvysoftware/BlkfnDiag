@@ -4,6 +4,7 @@
 #include "Apex.h"
 #include "DiagnosticDefs.h"
 #include "Hw.h"
+#include "Os_iotk.h"
 
 namespace BlackfinDiagTesting 
 {
@@ -27,13 +28,13 @@ namespace BlackfinDiagTesting
              
             m_HostTimerValueStart = CCLK_TO_US( ullCurrentDspCycles );
         
-            m_ApexTimerValueStart = pHI_ApexReg->SystemTime;
+            m_ApexTimerValueStart = 0;//pHI_ApexReg->SystemTime;
         
             return ( TEST_LOOP_COMPLETE );
         }
 
         // Read the current Apex2 System Time Register value.
-        UINT32 apexTimerValueStop = pHI_ApexReg->SystemTime;
+        UINT32 apexTimerValueStop = 0;//pHI_ApexReg->SystemTime;
 
         UINT64 ullCurrentDspCycles;
             
@@ -56,7 +57,7 @@ namespace BlackfinDiagTesting
            ) 
         {
        	
-           	UINT32 errorCode = (ts << DIAG_ERROR_TYPE_BIT_POS) | m_ApexTimerErr;
+           	UINT32 errorCode = (ts << DIAG_ERROR_TYPE_BIT_POS) | TIMER_TEST_APEX_TIMER_ERR;
 
         	OS_Assert( errorCode );
         }
@@ -66,7 +67,7 @@ namespace BlackfinDiagTesting
              || ( apexTimeElapsed > m_MaxElapsedTimeApex ) 
           )
         {
-           	UINT32 errorCode = (ts << DIAG_ERROR_TYPE_BIT_POS) | m_HostTimerErr;
+           	UINT32 errorCode = (ts << DIAG_ERROR_TYPE_BIT_POS) | TIMER_TEST_HOST_TIMER_ERR;
 
         	OS_Assert( errorCode );
         }

@@ -3,31 +3,28 @@
 
 namespace BlackfinDiagTesting 
 {
+	
+    #define TIMER_TEST_APEX_TIMER_ERR        1
+    #define TIMER_TEST_HOST_TIMER_ERR        2
+    #define TIMER_MARGIN_OF_ERROR 30 * 60 * 1000000 / 20  //5% of 30 minutes in microseconds 
+    #define MAX_TIMER_TEST_ELAPSED_TIME_APEX (30 * 60 * 1000000) + TIMER_MARGIN_OF_ERROR
+    #define MAX_TIMER_TEST_ELAPSED_TIME_HOST (30 * 60 * 1000000) + TIMER_MARGIN_OF_ERROR
+    #define MIN_TIMER_TEST_ELAPSED_TIME_APEX (30 * 60 * 1000000) - TIMER_MARGIN_OF_ERROR
+    #define MIN_TIMER_TEST_ELAPSED_TIME_HOST (30 * 60 * 1000000) - TIMER_MARGIN_OF_ERROR
+
     class BlackfinDiagTimerTest : public BlackfinDiagTest 
     {
         public:
 
-        	BlackfinDiagTimerTest( UINT32                 errorApexTimer,
-        					       UINT32                 errorHostTimer,
-        					       UINT32                 maxElapsedTimeApex,
-        	                       UINT32                 maxElapsedTimeHost,
-        	                       UINT32                 minElapsedTimeApex,
-        	                       UINT32                 minElapsedTimeHost, 
-        	                       BlackfinExecTestData & rTestData ) 
+        	BlackfinDiagTimerTest( BlackfinExecTestData & rTestData ) 
            					   	    :  BlackfinDiagTest      ( rTestData ), 
-           					   	       m_ApexTimerErr        ( errorApexTimer ),
-           					   	       m_HostTimerErr        ( errorHostTimer ),  
         						       m_BeingInstantiated   ( TRUE ),
-        						       m_MaxElapsedTimeApex  ( maxElapsedTimeApex ),
-        						       m_MaxElapsedTimeHost  ( maxElapsedTimeHost ),
-        						       m_MinElapsedTimeApex  ( minElapsedTimeApex ),
-        						       m_MinElapsedTimeHost  ( minElapsedTimeHost ),
+        						       m_MaxElapsedTimeApex  ( MAX_TIMER_TEST_ELAPSED_TIME_APEX ),
+        						       m_MaxElapsedTimeHost  ( MAX_TIMER_TEST_ELAPSED_TIME_HOST ),
+        						       m_MinElapsedTimeApex  ( MIN_TIMER_TEST_ELAPSED_TIME_APEX ),
+        						       m_MinElapsedTimeHost  ( MIN_TIMER_TEST_ELAPSED_TIME_HOST ),
                                        m_ApexTimerValueStart ( 0 ),
         						       m_HostTimerValueStart ( 0 )
-        	{
-        	}
-
-        	virtual ~BlackfinDiagTimerTest() 
         	{
         	}
 
@@ -47,12 +44,10 @@ namespace BlackfinDiagTesting
 	
         	const BlackfinDiagTimerTest & operator = (const BlackfinDiagTimerTest & );
 		
+            BlackfinDiagTimerTest();
+                        
         	BOOL                                  m_BeingInstantiated;
  
-        	UINT32                                m_ApexTimerErr;
-	
-        	UINT32                                m_HostTimerErr;
-	
         	UINT32                                m_MaxElapsedTimeApex;
 	
         	UINT32                                m_MaxElapsedTimeHost;	// Read the current Apex2 System Time Register value.

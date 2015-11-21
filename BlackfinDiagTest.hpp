@@ -1,5 +1,4 @@
 #pragma once
-#include "BlackfinDiag.hpp"
 #include "DiagnosticDefs.h"
 
 namespace BlackfinDiagTesting 
@@ -36,13 +35,9 @@ namespace BlackfinDiagTesting
             BlackfinExecTestData;    
 
     
-	        BlackfinDiagTest( BlackfinExecTestData & newTestExec );		
+	        BlackfinDiagTest( BlackfinExecTestData  newTestExec );		
 			
-	        virtual ~BlackfinDiagTest()  
-	        {
-	        }
 
-            DiagElapsedTime                                  GetCurrentIterationDuration();
             
             TestState                                        GetCurrentTestState();
 	
@@ -72,16 +67,12 @@ namespace BlackfinDiagTesting
 	
 	        void                                             SetMaxTimeBetweenTestCompletions( DiagElapsedTime period );
 	
-            void                                             SetNumberOfTimesToRunPerDiagCycle(UINT32);
-	
             void                                             SetNumberOfTimesRanThisDiagCycle(UINT32);
             
             void                                             SetTestCompletedTimestamp( DiagTimestampTime timestamp );
 	
             void                                             SetTestStartTime( DiagTimestampTime time);
             
-            void				                             SetTestType(DiagnosticTestTypes test_type);
-
             virtual TestState                                RunTest( UINT32 & errorCode ) = 0;
 
         protected:
@@ -99,7 +90,7 @@ namespace BlackfinDiagTesting
             BlackfinDiagTest(const BlackfinDiagTest &);
 
             const BlackfinDiagTest & operator = (const BlackfinDiagTest &);
-
+            
     };
 };
 

@@ -6,6 +6,14 @@
 
 namespace BlackfinDiagTesting 
 {
+    #define CORRUPTED_REG_TST 0xff
+	
+      //
+    // For linkage to c callable assembly language register tests
+    //
+    extern "C" UINT32  BlackfinDiagRegSanityChk();
+    extern "C" UINT32  BlackfinDiagRegChk();
+
     class BlackfinDiagRegistersTest : public BlackfinDiagTest 
     {
 
@@ -13,20 +21,10 @@ namespace BlackfinDiagTesting
 
             typedef UINT32 (* const pRegisterTest)();
 	
-			BlackfinDiagRegistersTest( pRegisterTest           pRegisterSanityTest,
-			                           pRegisterTest           pRegisterTest, 
-                                       UINT32                  corruptedRegTestErr,
-                                       BlackfinExecTestData &  rTestData ) 
+			BlackfinDiagRegistersTest( BlackfinExecTestData &  rTestData ) 
 		    		     		:	BlackfinDiagTest             ( rTestData ),
-									m_CorruptedRegisterTestErr   ( corruptedRegTestErr ),
-									m_pSanityTest                ( pRegisterSanityTest ),
-									m_pRegisterTest              ( pRegisterTest ),
 									m_SanityTestRan              ( FALSE ),
 									m_RegisterTestRan            ( FALSE ) 
-        	{
-        	}
-
-        	virtual ~BlackfinDiagRegistersTest() 
         	{
         	}
 
@@ -45,26 +43,20 @@ namespace BlackfinDiagTesting
 	
         	const BlackfinDiagRegistersTest & operator = (const BlackfinDiagRegistersTest & );
 	
-
-        	const UINT32                      m_CorruptedRegisterTestErr;
-        	
-        	pRegisterTest                     m_pSanityTest;
-        	
-        	pRegisterTest                     m_pRegisterTest;
-        	
+            BlackfinDiagRegistersTest();
+           
         	BOOL                              m_SanityTestRan;
         	
         	BOOL                              m_RegisterTestRan;
-
     
         	INT                               m_Critical;                    // Temp to allow disabling interrupts around critical sections 
 
-        	void DisableInterrupts() 
+        	inline void DisableInterrupts() 
         	{
         		m_Critical = cli();
         	}
 
-        	void EnableInterrupts() 
+        	inline void EnableInterrupts() 
         	{
         		sti(m_Critical);
         	}

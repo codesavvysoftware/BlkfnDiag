@@ -16,10 +16,6 @@ namespace BlackfinDiagTesting
         	{
         	}
 
-        	virtual ~BlackfinDiagInstructionsTest() 
-        	{
-        	}
-
         	virtual TestState RunTest( UINT32 & rErrorCode );
 
         protected:
@@ -27,5 +23,11 @@ namespace BlackfinDiagTesting
         	virtual void ConfigureForNextTestCycle();
 	
         private:
+	        BlackfinDiagInstructionsTest(const BlackfinDiagInstructionsTest &);
+	
+	        const BlackfinDiagInstructionsTest & operator = (const BlackfinDiagInstructionsTest & );
+		
+            BlackfinDiagInstructionsTest();
+            
     };
 };

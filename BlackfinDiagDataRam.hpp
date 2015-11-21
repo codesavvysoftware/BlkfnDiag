@@ -4,6 +4,9 @@
 	
 namespace BlackfinDiagTesting 
 {
+    #define MEMORY_BANK_FAILURE_BIT_POS               30
+    #define TEST_PATTERNS_ERROR_BIT_POS               16
+
     class BlackfinDiagDataRam : public BlackfinDiagTest 
     {
         public:
@@ -26,19 +29,14 @@ namespace BlackfinDiagTesting
 	                             const UINT8 *              pTestPatternsForRamTesting,
 	                             UINT32                     nmbrRamTestingPatterns,
 	                             UINT32                     nmbrBytesToTestPerIteration,
-	                             UINT32                     memoryBankFailureBitPos,
-	                             UINT32                     testPatternsFailureBitPos,
 		    		             BlackfinExecTestData &     rTestData )    
 						         :  BlackfinDiagTest              ( rTestData ),
-                                    m_Critical                    ( 0 ),                    
 	                       	        m_BankA                       ( bankA ),
 	                       	        m_BankB                       ( bankB ),
 	                       	        m_BankC                       ( bankC ),
-	                       	        m_MemoryBankFailureBitPos     ( memoryBankFailureBitPos ),
-	                       	        m_NmbrBytesToTestPerIteration ( nmbrBytesToTestPerIteration ),
+	                       	        //m_NmbrBytesToTestPerIteration ( nmbrBytesToTestPerIteration ),
 							        m_NmbrTestPatterns            ( nmbrRamTestingPatterns ),
-							        m_pTestPatternsRAM            ( pTestPatternsForRamTesting ),
-							        m_TestPatternsFailureBitPos   ( testPatternsFailureBitPos )
+							        m_pTestPatternsRAM            ( pTestPatternsForRamTesting )//,
 	        {
 	        }
 
@@ -67,8 +65,9 @@ namespace BlackfinDiagTesting
 	
 	        const BlackfinDiagDataRam & operator = (const BlackfinDiagDataRam & );
 	
-
-	        typedef enum 
+            BlackfinDiagDataRam();
+            
+            typedef enum 
 	        { 
 	        	BANK_A = 1, 
 	        	BANK_B = 2, 
@@ -87,19 +86,15 @@ namespace BlackfinDiagTesting
             
             DataRamTestDescriptor  m_BankC;                   
 
-            UINT32                     m_MemoryBankFailureBitPos;
-
 	        UINT32                     m_NmbrTestPatterns;
 	
 	        UINT32                     m_NmbrBytesToTestPerIteration;
 
 	        const UINT8 *              m_pTestPatternsRAM;
 
-            UINT32                     m_TestPatternsFailureBitPos;
-
-            void DisableInterrupts(); 
+            inline void DisableInterrupts(); 
 	
-	        void EnableInterrupts();
+	        inline void EnableInterrupts();
 	
             void EncodeErrorInfo( UINT32 &             rErrorInfo, 
                                   DataRamMemoryBanks   memoryBank, 

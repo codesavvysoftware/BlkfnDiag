@@ -30,6 +30,7 @@
 #define P4Failure                  5    
 #define P3Failure                  4    
 #define P2Failure                  3    
+#define P1Failure                  2
 #define P0Failure                  1    
 
 #define Modify3Failure             4

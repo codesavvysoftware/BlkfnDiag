@@ -1,27 +1,24 @@
 #include "BlackfinDiagTest.hpp"
-
-using namespace DiagnosticCommon;
+#include "Os_iotk.h"
+#include "Hw.h"
 
 namespace BlackfinDiagTesting 
 {
-    BlackfinDiagTest::BlackfinDiagTest( BlackfinExecTestData & newTestExecutionData ) : m_TestExecutionData ( newTestExecutionData )    
+    BlackfinDiagTest::BlackfinDiagTest( BlackfinExecTestData  newTestExecutionData ) : m_TestExecutionData ( newTestExecutionData )    
  	{
  	}
 	
     void BlackfinDiagTest::ConfigForAnyNewDiagCycle( BlackfinDiagTest * btd ) 
     {
-		
-	    if ( m_TestExecutionData.m_NmbrTimesRanThisDiagCycle > 0 ) 
+		if ( 
+		        (m_TestExecutionData.m_NmbrTimesRanThisDiagCycle > 0)
+		     || (TEST_IDLE == m_TestExecutionData.m_CurrentTestState)
+		   ) 
 	    {
 			m_TestExecutionData.m_NmbrTimesRanThisDiagCycle = 0;
 
 		    btd->ConfigureForNextTestCycle();
 	    }
-    }
-
-    DiagElapsedTime BlackfinDiagTest::GetCurrentIterationDuration()
-    {
-        return m_TestExecutionData.m_CurrentIterationDuration;
     }
 
     TestState BlackfinDiagTest::GetCurrentTestState() 
@@ -99,11 +96,6 @@ namespace BlackfinDiagTesting
         m_TestExecutionData.m_NmbrTimesRanThisDiagCycle = nmberOfTimesRan;
     }
 
-    void BlackfinDiagTest::SetNumberOfTimesToRunPerDiagCycle(UINT32 numberTimesToRun) 
-    {
-	    m_TestExecutionData.m_NmbrTimesToRunPerDiagCycle = numberTimesToRun;  
-    }
-	
     void BlackfinDiagTest::SetTestCompletedTimestamp( DiagTimestampTime period )
     {
         m_TestExecutionData.m_TestCompleteTimestamp = period;
@@ -114,10 +106,6 @@ namespace BlackfinDiagTesting
         m_TestExecutionData.m_TestStartTimestamp = time;
     }
      
-    void BlackfinDiagTest::SetTestType(BlackfinDiagTesting::BlackfinDiagTest::DiagnosticTestTypes type) 
-    {	
-	    m_TestExecutionData.m_TestType = type; 
-    }
 	
 };
 

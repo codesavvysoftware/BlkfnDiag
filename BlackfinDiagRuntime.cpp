@@ -4,7 +4,6 @@
 #include "Hw.h"
 #include "DiagnosticTiming.hpp"
 
-using namespace DiagnosticCommon;
 using namespace BlackfinDiagTesting;
 
 
@@ -14,7 +13,7 @@ namespace BlackfinDiagRuntimeEnvironment
     #define DFLT_INITIAL_TIMESTAMP                0 
     #define DFLT_INITIAL_ELAPSED_TIME             0           
     #define DFLT_NBR_TIMES_TO_RUN_PER_DIAG_CYCLE  1 
-    #define DFLT_NBR_TIMES_RAN_THIS_DIAG_CYCLE    0
+    #define DFLT_NBR_TIMES_RAN_THIS_DIAG_CYCLE    1
     #define DFLT_INITIAL_TEST_EXECUTION_STATE     TEST_IDLE
 
 
@@ -24,6 +23,11 @@ namespace BlackfinDiagRuntimeEnvironment
 //                                                                                                          *
 //***********************************************************************************************************
 
+    static void BlackfinCrash( INT errorCode )
+    {
+        OS_Assert( errorCode );
+    }
+        
 
 
 void BlackfinDiagRuntime::ExecuteDiagnostics() 
@@ -42,8 +46,6 @@ void BlackfinDiagRuntime::ExecuteDiagnostics()
         //***********************************************************************************************************
 
         #define NMBR_DATA_RAM_BYTES_TESTED_PER_ITERATION  0x400 // Test 1k at a time for now
-        #define MEMORY_BANK_FAILURE_BIT_POS               30
-        #define TEST_PATTERNS_ERROR_BIT_POS               16
         #define DATA_RAM_TEST_ITERATION_PERIOD_MS         1000 // 1 second for now
 
         static UINT8 DATA_RAM_TEST_TEST_PATTERNS[]  = 
@@ -101,23 +103,16 @@ void BlackfinDiagRuntime::ExecuteDiagnostics()
                                                    DATA_RAM_TEST_TEST_PATTERNS, 
                                                    ( sizeof( DATA_RAM_TEST_TEST_PATTERNS ) / sizeof( UINT8 ) ), 
                                                    NMBR_DATA_RAM_BYTES_TESTED_PER_ITERATION,
-                                                   MEMORY_BANK_FAILURE_BIT_POS,
-                                                   TEST_PATTERNS_ERROR_BIT_POS,
                                                    execTestData ); 
     
 
-        #define CORRUPTED_REG_TST 0xff
-	
         #define  REGISTER_TEST_ITERATION_PERIOD_MS 2000          // Every Two Seconds	
 	
         execTestData.m_IterationPeriod                   = REGISTER_TEST_ITERATION_PERIOD_MS;
    		execTestData.m_TestType                          = BlackfinDiagTest::DIAG_REGISTER_TEST_TEST_TYPE;
 
 
-        static BlackfinDiagRegistersTest m_RegisterTest( BlackfinDiagRegSanityChk, 
-                                                         BlackfinDiagRegChk, 
-                                                         CORRUPTED_REG_TST,
-                                                         execTestData ); 
+        static BlackfinDiagRegistersTest m_RegisterTest( execTestData ); 
  
 
         //***********************************************************************************************************
@@ -126,23 +121,11 @@ void BlackfinDiagRuntime::ExecuteDiagnostics()
         //                                                                                                          *
         //***********************************************************************************************************
         #define INSTRCTN_RAM_TEST_ITERATION_PERIOD_MS 2000          // 2 second for now
-        #define BAD_BOOTSTREAM_ERR                    0xffd00000
-        #define EMULATION_ACTIVE                      TRUE
-        #define UNABLE_TO_START_ERR                   0xfff00000
-        #define MISMATCH_ERR                          0xffe00000
-        #define BOOT_STREAM_START                     reinterpret_cast<UINT8 *>(0x20040000L)
-        #define INSTR_START_ADDR                      reinterpret_cast<void *>(0xffa00000)
     
         execTestData.m_IterationPeriod                   = INSTRCTN_RAM_TEST_ITERATION_PERIOD_MS;
         execTestData.m_TestType                          = BlackfinDiagTest::DIAG_INTRUCTION_RAM_TEST_TYPE;
 
-        static BlackfinDiagInstructionRam m_InstructionRamTest( execTestData,
-                                                                 BAD_BOOTSTREAM_ERR,
-                                                                 UNABLE_TO_START_ERR,
-                                                                 MISMATCH_ERR,
-                                                                 BOOT_STREAM_START,
-                                                                 INSTR_START_ADDR,
-                                                                 EMULATION_ACTIVE );
+        static BlackfinDiagInstructionRam m_InstructionRamTest( execTestData );
 
         //***********************************************************************************************************
         //                                                                                                          *
@@ -150,25 +133,10 @@ void BlackfinDiagRuntime::ExecuteDiagnostics()
         //                                                                                                          *
         //***********************************************************************************************************
         #define TIMER_TEST_ITERATION_PERIOD_MS   1000  // Every second.
-	
-        #define TIMER_TEST_APEX_TIMER_ERR        1
-        #define TIMER_TEST_HOST_TIMER_ERR        2
-        #define TIMER_MARGIN_OF_ERROR 30 * 60 * 1000000 / 20  //5% of 30 minutes in microseconds 
-        #define MAX_TIMER_TEST_ELAPSED_TIME_APEX (30 * 60 * 1000000) + TIMER_MARGIN_OF_ERROR
-        #define MAX_TIMER_TEST_ELAPSED_TIME_HOST (30 * 60 * 1000000) + TIMER_MARGIN_OF_ERROR
-        #define MIN_TIMER_TEST_ELAPSED_TIME_APEX (30 * 60 * 1000000) - TIMER_MARGIN_OF_ERROR
-        #define MIN_TIMER_TEST_ELAPSED_TIME_HOST (30 * 60 * 1000000) - TIMER_MARGIN_OF_ERROR
-
         execTestData.m_IterationPeriod                   = TIMER_TEST_ITERATION_PERIOD_MS;
    		execTestData.m_TestType                          = BlackfinDiagTest::DIAG_TIMER_TEST_TYPE;
 
-        static BlackfinDiagTesting::BlackfinDiagTimerTest    m_TimerTest( TIMER_TEST_APEX_TIMER_ERR,
-     	                                                                  TIMER_TEST_HOST_TIMER_ERR,
-	    												                  MAX_TIMER_TEST_ELAPSED_TIME_APEX,
-														                  MAX_TIMER_TEST_ELAPSED_TIME_HOST,
-					                                                      MIN_TIMER_TEST_ELAPSED_TIME_APEX,
-					                                                      MIN_TIMER_TEST_ELAPSED_TIME_HOST,
-					                                                      execTestData );
+        static BlackfinDiagTesting::BlackfinDiagTimerTest    m_TimerTest( execTestData );
 					                                                 
 			
         //***********************************************************************************************************
@@ -195,24 +163,24 @@ void BlackfinDiagRuntime::ExecuteDiagnostics()
         //
         // Requirement:  All Diagnostic Tests Complete in 4 Hours.
         //
-        #define PERIOD_FOR_ALL_DIAGNOSTICS_COMPLETED_MS     4 * 60 * 60 * 1000 // 4 hours, number of milleseconds in 4 hours
+        #define PERIOD_FOR_ALL_DIAGNOSTICS_COMPLETED_MS     3 * 60 * 1000 // 3 minutes for now 4 * 60 * 60 * 1000 // 4 hours, number of milleseconds in 4 hours
     
         #define PERIOD_FOR_ONE_DIAGNOSTIC_TEST_ITERATION_MS 50 // Milleseconds
 
         static BlackfinDiagTest * pDiagnosticTests[]    = 
                                                  {
-//                                                     &m_RegisterTest,
-                                                     &m_DataRamTest, 
+                                                     //&m_RegisterTest,
+                                                     //&m_DataRamTest, 
 //                                                     &m_TimerTest,
                                                      &m_InstructionRamTest,
-                                                     &m_InstructionsTest,
+                                                     //&m_InstructionsTest,
                                                  };
      
         DiagnosticScheduling::DiagnosticRunTimeParameters drtp   = 
 	                                    {
 											DiagnosticTiming::GetTimestamp,
 											DiagnosticTiming::CalcElapsedTimeMS,
-											DiagnosticCommon::BlackfinExceptions,
+											&BlackfinCrash,
 											PERIOD_FOR_ALL_DIAGNOSTICS_COMPLETED_MS,
 											PERIOD_FOR_ONE_DIAGNOSTIC_TEST_ITERATION_MS,
 											FALSE,    // m_MonitorIndividualTotalTestingTime
@@ -236,11 +204,6 @@ void BlackfinDiagRuntime::ExecuteDiagnostics()
     }
     
 	pSchedule->RunScheduled(); 
-}
-
-BlackfinDiagRuntime::BlackfinDiagRuntime() 
-{
-
 }
 
 
