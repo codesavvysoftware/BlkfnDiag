@@ -163,16 +163,16 @@ void BlackfinDiagRuntime::ExecuteDiagnostics()
         //
         // Requirement:  All Diagnostic Tests Complete in 4 Hours.
         //
-        #define PERIOD_FOR_ALL_DIAGNOSTICS_COMPLETED_MS     3 * 60 * 1000 // 3 minutes for now 4 * 60 * 60 * 1000 // 4 hours, number of milleseconds in 4 hours
+        #define PERIOD_FOR_ALL_DIAGNOSTICS_COMPLETED_MS     4 * 60 * 60 * 1000 // 10 minutes for now 4 * 60 * 60 * 1000 // 4 hours, number of milleseconds in 4 hours
     
         #define PERIOD_FOR_ONE_DIAGNOSTIC_TEST_ITERATION_MS 50 // Milleseconds
 
         static BlackfinDiagTest * pDiagnosticTests[]    = 
                                                  {
                                                      //&m_RegisterTest,
-                                                     //&m_DataRamTest, 
-//                                                     &m_TimerTest,
-                                                     &m_InstructionRamTest,
+                                                     //m_DataRamTest, 
+                                                     &m_TimerTest,
+                                                     //&m_InstructionRamTest,
                                                      //&m_InstructionsTest,
                                                  };
      

@@ -34,7 +34,7 @@ namespace BlackfinDiagTesting
 	                       	        m_BankA                       ( bankA ),
 	                       	        m_BankB                       ( bankB ),
 	                       	        m_BankC                       ( bankC ),
-	                       	        //m_NmbrBytesToTestPerIteration ( nmbrBytesToTestPerIteration ),
+	                       	        m_NmbrBytesToTestPerIteration ( nmbrBytesToTestPerIteration ),
 							        m_NmbrTestPatterns            ( nmbrRamTestingPatterns ),
 							        m_pTestPatternsRAM            ( pTestPatternsForRamTesting )//,
 	        {

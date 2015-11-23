@@ -13,8 +13,6 @@ namespace DiagnosticScheduling
     		 	m_RuntimeData                    ( runTimeData ),
     			m_ppTestEnumeration                ( ppDiagnostics + numberOfDiagnosticTests ),
     			m_TimestampCurrent               ( DEFAULT_INITIAL_TIMESTAMP )//,
-    			//m_TimeTestCycleStarted           ( DEFAULT_INITIAL_TIMESTAMP ),
-    			//m_TimeLastIterationPeriodExpired ( DEFAULT_INITIAL_TIMESTAMP ) 
     {
 
     	// Number of timeslices between diagnostics completion time checks
@@ -23,15 +21,6 @@ namespace DiagnosticScheduling
     	// completion time diagnostic injected fault happen faster will be injected here.
     	//	static const DiagSlices_t DGN_COMPL_CHECK_INTERVAL_TIME_SLICE = 15 * DGN_INTERVALS_PER_MINUTE;
 
-/*    	if ( FALSE )// Fix to check each pointer in the Diagnostics ) 
-    	{
-		
-    		UINT32 errorCode = m_RuntimeData.m_CorruptedVectorErr;
-		
-    		ConfigureErrorCode( errorCode, m_RuntimeData.m_SchedulerTestType );
-		
-    		(*m_RuntimeData.m_ExcetionError)( errorCode );	
-    	} */
     }
 
 
@@ -230,7 +219,7 @@ namespace DiagnosticScheduling
     				
     				ConfigureErrorCode( returnedErrorCode, pCurrentDiagTest->GetTestType() );
 		
-    				(*m_RuntimeData.m_ExcetionError)( returnedErrorCode );
+    				(*m_RuntimeData.m_ExceptionError)( returnedErrorCode );
 			
     				break;
     		}
@@ -308,7 +297,7 @@ namespace DiagnosticScheduling
 			
     			ConfigureErrorCode( errorCode, m_RuntimeData.m_SchedulerTestType );
 				
-                (*m_RuntimeData.m_ExcetionError)( errorCode );	
+                (*m_RuntimeData.m_ExceptionError)( errorCode );	
     		}
 		
     		// We won't get here now but in case it ever changes

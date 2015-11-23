@@ -20,7 +20,3 @@
 
 #define DIAG_ERROR_TYPE_BIT_POS  26
 
-
-
-
- 

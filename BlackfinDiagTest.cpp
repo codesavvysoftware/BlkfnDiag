@@ -11,7 +11,7 @@ namespace BlackfinDiagTesting
     void BlackfinDiagTest::ConfigForAnyNewDiagCycle( BlackfinDiagTest * btd ) 
     {
 		if ( 
-		        (m_TestExecutionData.m_NmbrTimesRanThisDiagCycle > 0)
+		        (TEST_LOOP_COMPLETE == m_TestExecutionData.m_CurrentTestState)
 		     || (TEST_IDLE == m_TestExecutionData.m_CurrentTestState)
 		   ) 
 	    {

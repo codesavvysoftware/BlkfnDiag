@@ -14,8 +14,7 @@ namespace BlackfinDiagTesting
 	
     	ConfigForAnyNewDiagCycle( this );
 					
-             return ( TEST_LOOP_COMPLETE );
-       // If we have not completed this diagnostic yet, get the start times
+        // If we have not completed this diagnostic yet, get the start times
         // and return DGN_TEST_IN_PROG.
         if ( m_BeingInstantiated ) 
         {
@@ -28,9 +27,11 @@ namespace BlackfinDiagTesting
              
             m_HostTimerValueStart = CCLK_TO_US( ullCurrentDspCycles );
         
-            m_ApexTimerValueStart = 0;//pHI_ApexReg->SystemTime;
+            m_ApexTimerValueStart = 0; //pHI_ApexReg->SystemTime;
+            
+            SetIterationPeriod( TIMER_TIMING_PERIOD_MS );  //
         
-            return ( TEST_LOOP_COMPLETE );
+            return ( TEST_IN_PROGRESS );
         }
 
         // Read the current Apex2 System Time Register value.
@@ -67,20 +68,23 @@ namespace BlackfinDiagTesting
              || ( apexTimeElapsed > m_MaxElapsedTimeApex ) 
           )
         {
-           	UINT32 errorCode = (ts << DIAG_ERROR_TYPE_BIT_POS) | TIMER_TEST_HOST_TIMER_ERR;
+           	//UINT32 errorCode = (ts << DIAG_ERROR_TYPE_BIT_POS) | TIMER_TEST_HOST_TIMER_ERR;
 
-        	OS_Assert( errorCode );
+        	//OS_Assert( errorCode );
         }
 
         // Set the start values equal to the stop values to prepare for the next time this diagnostic is run.
         m_ApexTimerValueStart = apexTimerValueStop;
         m_HostTimerValueStart = hostTimerValueStop;
 
+        SetIterationPeriod( m_PeriodAfterStartToBeginTiming );  
+        
         // If we get this far, the diagnostic has completed so return DGN_TEST_LOOP_COMPLETE.
         return ( TEST_LOOP_COMPLETE );
     }
 
     void BlackfinDiagTimerTest::ConfigureForNextTestCycle() 
     {
+        m_BeingInstantiated = TRUE;
     }
 };
