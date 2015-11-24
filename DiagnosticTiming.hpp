@@ -1,5 +1,4 @@
 #include "Defs.h"
-#include "DiagnosticDefs.h"
 
 namespace DiagnosticTiming 
 {
@@ -87,7 +86,7 @@ namespace DiagnosticTiming
         
     static UINT32 ComputeElapsedTimeMS( UINT64 current, UINT64 previous ) 
 	{
-        DiagTimestampTime diff       = current - previous; // difference in clock cycles;
+        UINT64 diff       = current - previous; // difference in clock cycles;
 	
         // An approximation that is actually very close when CLOCKS_PER_SEC == 600000000
         // avoiding a constant divide in the background

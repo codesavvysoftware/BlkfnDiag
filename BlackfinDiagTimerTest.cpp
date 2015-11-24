@@ -2,7 +2,6 @@
 //#include "ApxIcp.hpp"
 //#include "ApxParameters.hpp"          
 #include "Apex.h"
-#include "DiagnosticDefs.h"
 #include "Hw.h"
 #include "Os_iotk.h"
 

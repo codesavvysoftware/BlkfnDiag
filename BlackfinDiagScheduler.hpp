@@ -1,13 +1,13 @@
 // #pragma once
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @file DiagnosticScheduler.hpp
 ///
 /// Namespace for scheduling and monitoring diagnostic tests.
 ///
 /// @par Full Description
 /// 
-/// Contains the namespace for Diagnostic scheduling.  The namespace includes the definition of the parameters
-/// that comprise the runtime environment for diagnostics and the templace class for the diagnostic scheduler;
+/// Contains the namespace for Diagnostic scheduling.  The namespace includes the definition of the parameters         
+/// that comprise the runtime environment for diagnostics and the templace class definition for the diagnostic scheduler;
 ///
 /// @if REVISION_HISTORY_INCLUDED
 /// @par Edit History
@@ -27,6 +27,7 @@
 
 // C PROJECT INCLUDES
 #include "Defs.h"
+#include "DiagnosticDefs.h"
  
 // C++ PROJECT INCLUDES
 // (none)
@@ -88,67 +89,62 @@ namespace DiagnosticScheduling
         // Error number for reporting when all tests are taking too long to complete.
         UINT32                                                  m_AllDiagnosticsNotCompletedErr;
 
-    } DiagnosticRunTimeParameters;
+    } 
+    DiagnosticRunTimeParameters;
     
-    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// CLASS NAME: DiagnosticScheduler
     ///
-    /// Templace class for instantiating a DiagnosticScheduler class.
+    /// Template class for instantiating a DiagnosticScheduler class.
     ///
     /// @par Full Description
     ///
-    /// Instantiate this template with a type the fulfills the interface 
-    /// defined for the generic typename.  The intent is to provide a 
-    /// common set of diagnostic requirements across multiple platforms.  
-    /// The idea here is to define a base class for the test type 
-    /// (Blackfin or Apex currently), derive individual tests like data 
-    /// ram, timing, instructions, etc. from the base class.  Create a 
-    /// runtime environoment for the platform being tested and pass 
-    /// the runtime environment to the instantiated scheduler class in 
-    /// order to schedule and monitor diagnostic testing.  
+    /// Instantiate this template with a type the fulfills the interface defined for the generic typename.  The intent 
+    /// is to provide a reusable component that implements a common set of diagnostic requirements across multiple 
+    /// platforms.  The idea here is to define a base class for the test type (Blackfin or Apex currently), derive 
+    /// individual tests like data ram, timing, instructions, etc. from the base class.  Create a runtime environoment 
+    /// for the platform being tested and pass the runtime environment to the instantiated scheduler class in order 
+    /// to schedule and monitor diagnostic testing.  
     ///
-    /// Diagnostics must complete in a time period, for Blackfin it is
-    /// currently 4 hours.  For Apex it is 8 hours.  In the code the term
-    /// diagnostic test cycle and/or diagnostic test period are used to 
-    /// refer to this overall time period.  Within this diagnostic cycle
-    /// individual diagnostic tests are run until they all complete.  
-    /// Determining whether or not tests chould be run and is done on 
-    /// a periodic basis.  The time resolution of this period is in
-    /// microseconds so there are literally millions of these periods 
-    /// within a diagnostic test cycle.  These periods are referred to
-    /// as iteration periods in the code since many tests run in iterations
-    /// that are scheduled.
+    /// Diagnostics must complete in a time period, for Blackfin it is currently 4 hours.  For Apex it is 8 hours.  
+    /// In the code the term diagnostic test cycle and/or diagnostic test period are used to refer to this overall time 
+    /// period.  Within this diagnostic cycle individual diagnostic tests are run until they all complete.  Determining 
+    /// whether or not tests chould be run and is done on a periodic basis.  The time resolution of this period is in
+    /// microseconds so there are literally millions of these periods within a diagnostic test cycle.  These periods are 
+    /// referred to as iteration periods in the code since many tests run in iterations that are scheduled.
     ///
-    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template <typename T >
     class DiagnosticScheduler
     {
         public:
 
-            ///////////////////////////////////////////////////////////////////
+            //***************************************************************************
+            // PUBLIC METHODS
+            //***************************************************************************
+            
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///	METHOD NAME: DiagnositcScheduler: DiagnosticScheduler
             ///
             /// @par Full Description
-            ///      For instantiating a scheduler class for a system.  This 
-            ///      the one and only method for instantiating the scheduler.
+            ///      For instantiating a scheduler class for a system.  This the one and only method for instantiating 
+            ///      the scheduler.
             ///      
             ///
-            /// @param ppDiagnostics                Diagnostic pointer array to
-            ///                                     to tests to run.
-            ///        numberOfDiagnosticTests      Number of diagnostic tests
-            ///                                     in total.
-            ///        DiagnosticRunTimeParameters  Linkage to system runtime 
-            ///                                     parameters scheduler needs
-            ///                                     to run tests in.
+            /// @param ppDiagnostics                Diagnostic pointer array to tests to run.
+            ///
+            ///        numberOfDiagnosticTests:     Number of diagnostic tests in total.
+            ///                                     
+            ///        DiagnosticRunTimeParameters: Linkage to system runtime parameters scheduler needs to run tests in.
             ///                               
             /// @return                             Scheduler is configured.
             ///
-            ///////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
             DiagnosticScheduler( T **                          ppDiagnostics,
                                  UINT32                        numberOfDiagnosticTests,
                                  DiagnosticRunTimeParameters  runTimeData );
 
-            ///////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
             //	METHOD NAME: DiagnositcScheduler: PowerUp
             //
             /// @par Full Description
@@ -159,12 +155,12 @@ namespace DiagnosticScheduling
             ///                               
             /// @return                             Power up testing executed.
             ///
-            ///////////////////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////
         	void PowerUp(void) 
         	{
         	}
 	
-            ///////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///	METHOD NAME: DiagnositcScheduler: RunScheduled
             ///
             /// @par Full Description
@@ -173,15 +169,11 @@ namespace DiagnosticScheduling
             ///
             /// @param                              None.              
             ///                               
-            /// @return                             Performs run-time tests 
-            ///                                     according to the schedule
-            ///                                     defined by the runtime 
-            ///                                     input to the scheduler.
-            ///                                     Scheduler runs diagnostics 
-            ///                                     when they are supposed to 
-            ///                                     be run.
+            /// @return                             Performs run-time tests according to the schedule defined by the 
+            ///                                     runtime input to the scheduler.  Scheduler runs diagnostics when 
+            ///                                     they are supposed to be run.
             ///
-            /////////////////////////////////////////////////////////////////// 
+            //////////////////////////////////////////////////////////////////////////////////////////////////////// 
         	void RunScheduled();
 
 
@@ -231,6 +223,10 @@ namespace DiagnosticScheduling
             // For determining if a new period within the total time to run all the tests has started.
             UINT64 m_TimeLastIterationPeriodExpired;
 
+            //***************************************************************************
+            // PRIVATE METHODS
+            //***************************************************************************
+            
             // Hide certain members of a class that are automatically created by the compiler if not defined;
             // Don't want the default constructer, the copy constructor, or the assignment operator to be 
             // accessable.
@@ -240,7 +236,27 @@ namespace DiagnosticScheduling
 
         	DiagnosticScheduler &operator=(const DiagnosticScheduler &);
 
-            /////////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///	METHOD NAME: DiagnositcScheduler: ConfigureErrorCode
+            ///
+            /// @par Full Description
+            ///      Configure error code to report.
+            ///      
+            ///
+            /// @param                        returnedErrorCode: Error code generated as a result of testing
+            ///
+            ///                               testType:          Test type that detected the error code.  Almost all 
+            ///                                                  errors detected by the scheduler will have the sched-
+            ///                                                  uler test type IE most errors detected by individual 
+            ///                                                  tests are reported by the tests themselves and never
+            ///                                                  get passed back to the scheduler.              
+            ///                               
+            /// @return                       Error reported and recorded.
+            ///
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+        	void ConfigureErrorCode( UINT32 & returnedErrorCode, UINT32 testTypeCurrent );
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///	METHOD NAME: DiagnositcScheduler: DetermineCurrentSchedulerState
             ///
             /// @par Full Description
@@ -250,103 +266,59 @@ namespace DiagnosticScheduling
             /// @param                        None.              
             ///                                     
             ///                               
-            /// @return                       m_CurrentScheduleState configured
-            ///                               with current scheduler stated.
-            ///////////////////////////////////////////////////////////////////
+            /// @return                       m_CurrentScheduleState configured with current scheduler stated.
+            ///
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
         	void DetermineCurrentSchedulerState();
 
-            /////////////////////////////////////////////////////////////////////
-            ///	METHOD NAME: DiagnositcScheduler: ConfigureErrorCode
-            ///
-            /// @par Full Description
-            ///      Configure error code to report.
-            ///      
-            ///
-            /// @param                        Output: returnedErrorCode 
-            ///                                   Error code generated as a 
-            ///                                   result of testing
-            ///
-            ///                               Input: testType 
-            ///                                   Test type that detected the 
-            ///                                   error code.  Almost all 
-            ///                                   errors detected by the 
-            ///                                   scheduler will have the 
-            ///                                   scheduler test type IE most 
-            ///                                   errors detected by individual 
-            ///                                   tests are reported by the 
-            ///                                   tests themselves and never
-            ///                                   get passed back to the 
-            ///                                   scheduler.              
-            ///                                     
-            ///                               
-            /// @return                       Error reported and recorded.
-            ///
-            ////////////////////////////////////////////////////////////////////////
-        	void ConfigureErrorCode( UINT32 & returnedErrorCode, UINT32 testTypeCurrent );
-
-            /////////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///	METHOD NAME: DiagnositcScheduler: DoMoreDiagnosticTesting
             ///
             /// @par Full Description
-            ///      Schedulre more diagnostic testing when there is more testing
-            ///      to do.
+            ///      Schedulre more diagnostic testing when there is more testing to do.
             ///      
             ///
-            /// @param                        None.
-            ///
-            ///                               Do more testing when it is determined
-            ///                               that a test can run and it is not 
-            ///                               completed for the the diagnostic cycle.              
-            ///                                     
-            ///                               
+            /// @param                        None.            
+            ///                                                                    
             /// @return                       Test iteration performed
             ///.
-            ////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
         	void DoMoreDiagnosticTesting();
 
-            /////////////////////////////////////////////////////////////////////
-            ///	METHOD NAME: DiagnositcScheduler: IsTestScheduledToRun
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///	METHOD NAME: DiagnositcScheduler: IsTestingCompleteForDiagCycle
             ///
             /// @par Full Description
-            ///      Returns true when a test is scheduled to run and returns a 
-            ///      pointer to the test to be run.
+            ///      Returns true when a testing for test indicated is complete for current diagnostic cycle.
             ///      
             ///
-            /// @param                        Output: 
-            ///                                   Reference to a pointer when a
-            ///                                   test is scheduled to be run 
-            ///                                   for the current iteration.
-            ///                               
-            /// @return                       TRUE when a test iteration is ready 
-            ///                               to be run by the scheduler.
-            ///                             
-            ////////////////////////////////////////////////////////////////////////
-        	BOOL IsTestScheduledToRun( T * & rpPbdt );
-
-            // Returns true when a test has completed all its testing for a current diagnostic cycle.
-            /////////////////////////////////////////////////////////////////////
-            ///	METHOD NAME: DiagnositcScheduler: IsTestScheduledToRun
-            ///
-            /// @par Full Description
-            ///      Returns true when a test is scheduled to run and returns a 
-            ///      pointer to the test to be run.
-            ///      
-            ///
-            /// @param                        Input: 
-            ///                                   Reference to a pointer to 
-            ///                                   determine if testing is
-            ///                                   completed for the current 
-            ///                                   diagnostic cycle. A reference
-            ///                                   is used because references 
-            ///                                   can't be and thus no concerns 
-            ///                                   about de-referencing a NULL 
-            ///                                   pointer.
+            /// @param                        rpPbdt: Reference to a pointer to determine if testing is completed for the 
+            ///                                       current diagnostic cycle. A reference is used because references 
+            ///                                       can't be NULL and thus no concerns about de-referencing a NULL 
+            ///                                       pointer.
             ///                               
             /// @return                       TRUE when a test is completed for 
             ///                               the current diagnostic cycle.
             ///                             
-            ////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
             BOOL IsTestingCompleteForDiagCycle( T * & rpPbdt );            
+
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///	METHOD NAME: DiagnositcScheduler: IsTestScheduledToRun
+            ///
+            /// @par Full Description
+            ///      Returns true when a test is scheduled to run and returns a pointer to the test to be run.
+            ///      
+            ///
+            /// @param                         rpPbdt: Reference to a pointer when a test is scheduled to be run for 
+            ///                                        the current iteration.
+            ///                               
+            /// @return                        TRUE when a test iteration is ready 
+            ///                                to be run by the scheduler.
+            ///                             
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+        	BOOL IsTestScheduledToRun( T * & rpPbdt );
+
     };
 };
 #endif  // if !defined(DIAGNOSTIC_SCHEDULER_HPP)
