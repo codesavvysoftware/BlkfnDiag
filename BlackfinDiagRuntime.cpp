@@ -54,7 +54,7 @@ namespace BlackfinDiagRuntimeEnvironment
     #define DFLT_INITIAL_ELAPSED_TIME             0           
     #define DFLT_NBR_TIMES_TO_RUN_PER_DIAG_CYCLE  1 
     #define DFLT_NBR_TIMES_RAN_THIS_DIAG_CYCLE    1
-    #define DFLT_INITIAL_TEST_EXECUTION_STATE     TEST_IDLE
+    #define DFLT_INITIAL_TEST_EXECUTION_STATE     BlackfinDiagTest::TEST_IDLE
 
 
     //***************************************************************************
@@ -236,10 +236,10 @@ namespace BlackfinDiagRuntimeEnvironment
 
             static BlackfinDiagTest * pDiagnosticTests[]    = 
                                                      {
-                                                         &m_RegisterTest,
-                                                         &m_DataRamTest, 
-                                                         &m_TimerTest,
-                                                         &m_InstructionRamTest,
+                                                         //&m_RegisterTest,
+                                                         //&m_DataRamTest, 
+                                                         //&m_TimerTest,
+                                                         //&m_InstructionRamTest,
                                                          &m_InstructionsTest,
                                                      };
      
@@ -253,8 +253,6 @@ namespace BlackfinDiagRuntimeEnvironment
     											FALSE,    // m_MonitorIndividualTotalTestingTime
     											FALSE,    // m_MonitorIndividualTestIterationTimes
     											BlackfinDiagTest::DIAG_SCHEDULER_TEST_TYPE,
-    											DIAG_ERROR_MASK,
-                                                DIAG_ERROR_TYPE_BIT_POS,
                                                 CORRUPTED_DIAG_TEST_VECTOR_ERR,
                                                 CORRUPTED_DIAG_TEST_MEMORY_ERR,
                                                 TEST_TOOK_TOO_LONG_ERR,

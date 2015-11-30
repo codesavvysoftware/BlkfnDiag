@@ -29,7 +29,6 @@
 
 // C PROJECT INCLUDES
 #include "Defs.h"
-#include "DiagnosticDefs.h"
  
 // C++ PROJECT INCLUDES
 // (none)
@@ -43,8 +42,22 @@ namespace BlackfinDiagTesting
     {
         public:
 
-
-	        // Test type enumeration.  Each diagnostic has a unique test type
+            enum
+            {
+                DIAG_ERROR_MASK         = 0x7fffffff,
+                DIAG_ERROR_TYPE_BIT_POS = 26
+            };
+                
+            typedef enum _TestState 
+            {
+                TEST_LOOP_COMPLETE,
+                TEST_IN_PROGRESS,
+                TEST_FAILURE,
+                TEST_IDLE
+            } 
+            TestState;
+	        
+            // Test type enumeration.  Each diagnostic has a unique test type
 	        typedef enum _DiagnosticTestTypes 
 	        {
 		        DIAG_DATA_RAM_TEST_TYPE       = 1,
@@ -347,7 +360,7 @@ namespace BlackfinDiagTesting
             /// @return                           None
             ///
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-            virtual TestState                                RunTest( UINT32 & rErrorCode ) = 0;
+            virtual BlackfinDiagTest::TestState                                RunTest( UINT32 & rErrorCode ) = 0;
 
         protected:
 
@@ -405,3 +418,7 @@ namespace BlackfinDiagTesting
 };
 
 #endif // if !defined(BLACKFIN_DIAG_TEST_HPP)
+
+
+
+

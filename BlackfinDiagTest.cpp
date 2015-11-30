@@ -84,7 +84,7 @@ namespace BlackfinDiagTesting
     ///      
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TestState BlackfinDiagTest::GetCurrentTestState() 
+    BlackfinDiagTest::TestState BlackfinDiagTest::GetCurrentTestState() 
     {
         return m_TestExecutionData.m_CurrentTestState;
     }	
@@ -280,8 +280,8 @@ namespace BlackfinDiagTesting
     void BlackfinDiagTest::ConfigForAnyNewDiagCycle( BlackfinDiagTest * btd ) 
     {
 		if ( 
-		        (TEST_LOOP_COMPLETE == m_TestExecutionData.m_CurrentTestState)
-		     || (TEST_IDLE == m_TestExecutionData.m_CurrentTestState)
+		        (BlackfinDiagTest::TEST_LOOP_COMPLETE == m_TestExecutionData.m_CurrentTestState)
+		     || (BlackfinDiagTest::TEST_IDLE == m_TestExecutionData.m_CurrentTestState)
 		   ) 
 	    {
 			m_TestExecutionData.m_NmbrTimesRanThisDiagCycle = 0;

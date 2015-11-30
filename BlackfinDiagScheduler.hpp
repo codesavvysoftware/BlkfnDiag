@@ -27,7 +27,6 @@
 
 // C PROJECT INCLUDES
 #include "Defs.h"
-#include "DiagnosticDefs.h"
  
 // C++ PROJECT INCLUDES
 // (none)
@@ -71,11 +70,6 @@ namespace DiagnosticScheduling
         // Type of test that is associated with the scheduler.  Used to configure error codes for errors in diagnotics
         // the scheduler detects;
         UINT32                                                  m_SchedulerTestType;
-            	
-        // For configuring error information.
-        UINT32                                                  m_ErrorTypeMask;
-            	
-        UINT32                                                  m_ErrorTypeBitPos;
             	
         // Error number associated with a corrupted pointer to a test to run.
         UINT32                                                  m_CorruptedVectorErr;

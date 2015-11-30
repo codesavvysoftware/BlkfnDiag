@@ -8,7 +8,7 @@
 namespace BlackfinDiagTesting 
 {
 	
-    TestState BlackfinDiagTimerTest::RunTest( UINT32 & errorCode ) 
+    BlackfinDiagTest::TestState BlackfinDiagTimerTest::RunTest( UINT32 & errorCode ) 
     {
 	
     	ConfigForAnyNewDiagCycle( this );
@@ -30,7 +30,7 @@ namespace BlackfinDiagTesting
             
             SetIterationPeriod( TIMER_TIMING_PERIOD_MS );  //
         
-            return ( TEST_IN_PROGRESS );
+            return ( BlackfinDiagTest::TEST_IN_PROGRESS );
         }
 
         // Read the current Apex2 System Time Register value.
@@ -79,7 +79,7 @@ namespace BlackfinDiagTesting
         SetIterationPeriod( m_PeriodAfterStartToBeginTiming );  
         
         // If we get this far, the diagnostic has completed so return DGN_TEST_LOOP_COMPLETE.
-        return ( TEST_LOOP_COMPLETE );
+        return ( BlackfinDiagTest::TEST_LOOP_COMPLETE );
     }
 
     void BlackfinDiagTimerTest::ConfigureForNextTestCycle() 

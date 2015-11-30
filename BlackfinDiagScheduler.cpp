@@ -172,8 +172,8 @@ namespace DiagnosticScheduling
     {
 		
     	UINT32 ui32        = testTypeCurrent;
-    	returnedErrorCode &= DIAG_ERROR_MASK;
-    	returnedErrorCode |= (ui32 << DIAG_ERROR_TYPE_BIT_POS); 
+    	returnedErrorCode &= T::DIAG_ERROR_MASK;
+    	returnedErrorCode |= (ui32 << T::DIAG_ERROR_TYPE_BIT_POS); 
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -310,16 +310,16 @@ namespace DiagnosticScheduling
 		
     		if ( !IsTestScheduledToRun(pCurrentDiagTest) ) continue;
 									
-    		TestState CurrentState = pCurrentDiagTest->GetCurrentTestState();
+    		T::TestState CurrentState = pCurrentDiagTest->GetCurrentTestState();
     		    
-    		if ( CurrentState == TEST_LOOP_COMPLETE )
+    		if ( CurrentState == T::TEST_LOOP_COMPLETE )
     		{
     		    pCurrentDiagTest->SetTestStartTime( m_TimestampCurrent );
     		}    		    
     		    
     		UINT32	returnedErrorCode;
 
-    		TestState testResult = pCurrentDiagTest->RunTest( returnedErrorCode );
+    		T::TestState testResult = pCurrentDiagTest->RunTest( returnedErrorCode );
 
         	pCurrentDiagTest->SetCurrentTestState( testResult );
     
@@ -327,7 +327,7 @@ namespace DiagnosticScheduling
 		
     		switch (testResult)
     		{
-    		    case TEST_LOOP_COMPLETE: 
+    		    case T::TEST_LOOP_COMPLETE: 
         			{
         			    if ( m_RuntimeData.m_MonitorIndividualTotalTestingTime ) 
         			    {
@@ -355,7 +355,7 @@ namespace DiagnosticScheduling
     					
         			break;
 			
-    			case TEST_IN_PROGRESS:
+    			case T::TEST_IN_PROGRESS:
     				
     			    if ( m_RuntimeData.m_MonitorIndividualTestIterationTimes )
     				{
