@@ -1,23 +1,23 @@
 #include "BlackfinDiagInstructionsTest.hpp"
 #include "Os_iotk.h"
 #include "Hw.h"
-namespace BlackfinDiagTesting 
+namespace BlackfinDiagnosticTesting 
 {
 	
-    BlackfinDiagTest::TestState BlackfinDiagInstructionsTest::RunTest( UINT32 & rErrorCode ) 
+    DiagnosticTesting::DiagnosticTest::TestState BlackfinDiagInstructionsTest::RunTest( UINT32 & rErrorCode ) 
     {
         UINT32 error = BlackfinDiagInstrTest();
         
         if ( error )
         {
-    	    error &= BlackfinDiagTest::DIAG_ERROR_MASK;
+    	    error &= DiagnosticTesting::DiagnosticTest::DIAG_ERROR_MASK;
 			
-    		error |= ( GetTestType() << BlackfinDiagTest::DIAG_ERROR_TYPE_BIT_POS );
+    		error |= ( GetTestType() << DiagnosticTesting::DiagnosticTest::DIAG_ERROR_TYPE_BIT_POS );
 			
     	    OS_Assert( error );
         }
         
-    	return BlackfinDiagTest::TEST_LOOP_COMPLETE;
+    	return DiagnosticTesting::DiagnosticTest::TEST_LOOP_COMPLETE;
     }
     
     void BlackfinDiagInstructionsTest::ConfigureForNextTestCycle() 

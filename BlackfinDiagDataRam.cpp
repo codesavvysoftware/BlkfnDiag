@@ -2,19 +2,19 @@
 #include "Os_iotk.h"
 #include "Hw.h"
 
-namespace BlackfinDiagTesting 
+namespace BlackfinDiagnosticTesting 
 {
 	
 	extern "C" BOOL TestAByteOfRam( BlackfinDiagDataRam::ByteTestParameters * pbtp );
 
-    BlackfinDiagTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & rErrorCode ) 
+    DiagnosticTesting::DiagnosticTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & rErrorCode ) 
     {
 	
 	    ConfigForAnyNewDiagCycle( this );
 					
 	    BOOL errorExists = TRUE;
 	
-		BlackfinDiagTest::TestState ts = BlackfinDiagTest::TEST_LOOP_COMPLETE;
+		DiagnosticTesting::DiagnosticTest::TestState ts = DiagnosticTesting::DiagnosticTest::TEST_LOOP_COMPLETE;
 	
 	    UINT32 offsetFromBankStart = 0;
 	
@@ -32,7 +32,7 @@ namespace BlackfinDiagTesting
 		 	    OS_Assert( rErrorCode );
 		     }
 		 
-		     ts = BlackfinDiagTest::TEST_IN_PROGRESS;
+		     ts = DiagnosticTesting::DiagnosticTest::TEST_IN_PROGRESS;
 		
 	    }
 	    else if ( !m_BankB.m_TestCompleted ) 
@@ -47,7 +47,7 @@ namespace BlackfinDiagTesting
 		 	    OS_Assert( rErrorCode );
 		     }
 		 
-		    ts = BlackfinDiagTest::TEST_IN_PROGRESS;
+		    ts = DiagnosticTesting::DiagnosticTest::TEST_IN_PROGRESS;
 		
 	    }
 	    else if ( !m_BankC.m_TestCompleted ) 
@@ -62,7 +62,7 @@ namespace BlackfinDiagTesting
 		 	    OS_Assert( rErrorCode );
 		    }
 		 
-		    ts = BlackfinDiagTest::TEST_IN_PROGRESS;
+		    ts = DiagnosticTesting::DiagnosticTest::TEST_IN_PROGRESS;
 	   }
 
 	   return ts;

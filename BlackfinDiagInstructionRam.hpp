@@ -1,8 +1,8 @@
 #pragma once
 
-#include "BlackfinDiagTest.hpp"
+#include "DiagnosticTesting.hpp"
 
-namespace BlackfinDiagTesting 
+namespace BlackfinDiagnosticTesting 
 {
     #define BAD_BOOTSTREAM_ERR                    0xffd00000
     #define EMULATION_ACTIVE                      TRUE
@@ -11,24 +11,24 @@ namespace BlackfinDiagTesting
     #define BOOT_STREAM_START                     reinterpret_cast<UINT8 *>(0x20040000L)
     #define INSTR_START_ADDR                      reinterpret_cast<const void *>(0xffa00000)
     
-    class BlackfinDiagInstructionRam : public BlackfinDiagTest 
+    class BlackfinDiagInstructionRam : public DiagnosticTesting::DiagnosticTest 
     {
 	    public:
 	        
-	        BlackfinDiagInstructionRam( BlackfinExecTestData &     rTestData) 
-		            		         :  BlackfinDiagTest           ( rTestData ),
+	        BlackfinDiagInstructionRam( DiagnosticTesting::DiagnosticTest::ExecuteTestData &     rTestData) 
+		            		         :  DiagnosticTest              ( rTestData ),
                                         m_pBootStreamStartAddr      ( BOOT_STREAM_START ),
-                                        m_pInstructionRamStartAddr ( INSTR_START_ADDR ),
-							            m_EmulationActive     ( EMULATION_ACTIVE ) 
+                                        m_pInstructionRamStartAddr  ( INSTR_START_ADDR ),
+							            m_EmulationActive           ( EMULATION_ACTIVE ) 
 	        {
 	        }
 	
 	
-            virtual BlackfinDiagTest::TestState RunTest( UINT32 & ErrorCode );
+            DiagnosticTesting::DiagnosticTest::TestState RunTest( UINT32 & ErrorCode );
 
         protected:
 
-	        virtual void 		ConfigureForNextTestCycle();	
+	        void 		ConfigureForNextTestCycle();	
 
         private:
 
@@ -81,7 +81,7 @@ namespace BlackfinDiagTesting
 
             void                         GetBootStreamStartAddr( const UINT8 * & rpBootStreamStartAddr );
 
-			BlackfinDiagTest::TestState  RunInstructionRamTestIteration( InstructionCompareParams & rIcpCompare,
+			DiagnosticTest::TestState  RunInstructionRamTestIteration( InstructionCompareParams & rIcpCompare,
 									                                     UINT32 &                   rErrorCode	);
 																
 	        BOOL                         StartEnumeratingInstructionBootStreamHeaders(UINT32 & rHeaderOffset);

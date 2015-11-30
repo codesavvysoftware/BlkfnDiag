@@ -1,10 +1,9 @@
 #pragma once
-//#include "BlackfinDiag.hpp"
-#include "BlackfinDiagTest.hpp"
+#include "DiagnosticTesting.hpp"
 #include <ccblkfn.h>                              /* Added for ssync( ), cli/sti( ) */
 
 
-namespace BlackfinDiagTesting 
+namespace BlackfinDiagnosticTesting 
 {
     #define CORRUPTED_REG_TST 0xff
 	
@@ -14,25 +13,25 @@ namespace BlackfinDiagTesting
     extern "C" UINT32  BlackfinDiagRegSanityChk();
     extern "C" UINT32  BlackfinDiagRegChk();
 
-    class BlackfinDiagRegistersTest : public BlackfinDiagTest 
+    class BlackfinDiagRegistersTest : public DiagnosticTesting::DiagnosticTest 
     {
 
         public:
 
             typedef UINT32 (* const pRegisterTest)();
 	
-			BlackfinDiagRegistersTest( BlackfinExecTestData &  rTestData ) 
-		    		     		:	BlackfinDiagTest             ( rTestData ),
-									m_SanityTestRan              ( FALSE ),
-									m_RegisterTestRan            ( FALSE ) 
+			BlackfinDiagRegistersTest( DiagnosticTesting::DiagnosticTest::ExecuteTestData &  rTestData ) 
+		    		     		:	   DiagnosticTesting::DiagnosticTest ( rTestData ),
+									   m_SanityTestRan                   ( FALSE ),
+									   m_RegisterTestRan                 ( FALSE ) 
         	{
         	}
 
-        	virtual BlackfinDiagTest::TestState RunTest( UINT32 & rErrorCode );
+        	DiagnosticTesting::DiagnosticTest::TestState RunTest( UINT32 & rErrorCode );
 
         protected:
 
-        	virtual void ConfigureForNextTestCycle();
+        	void ConfigureForNextTestCycle();
 	
         private:
         	//

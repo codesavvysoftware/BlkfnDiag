@@ -1,10 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// @file BlackfinDiagTest.cpp
+/// @file DiagnosticTest.cpp
 ///
 /// Namespace that contains the class definitions, attributes and methods for the base class of Blackfin Diagnostic 
 /// testing. 
 ///
-/// @see BlackfinDiagTest.hpp for a detailed description of this class.
+/// @see DiagnosticTesting.hpp for a detailed description of this class.
 ///
 /// @if REVISION_HISTORY_INCLUDED
 /// @par Edit History
@@ -50,7 +50,7 @@
 
 
 // C++ PROJECT INCLUDES
-#include "BlackfinDiagTest.hpp"          // This file contains the Class definition 
+#include "DiagnosticTesting.hpp"          // This file contains the Class definition 
                                          // for this class.
 
 // FORWARD REFERENCES
@@ -58,211 +58,211 @@
 
 
 
-namespace BlackfinDiagTesting 
+namespace DiagnosticTesting 
 {
     //***************************************************************************
     // PUBLIC METHODS
     //***************************************************************************
             
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: BlackfinDiagTest
+    ///	METHOD NAME: DiagnosticTest: DiagnosticTest
     ///
     ///      Constructor that is used to construct the base class componenent of the inheriting test.
     ///      This the one and only method for instantiating the base class component..
     ///      
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    BlackfinDiagTest::BlackfinDiagTest( BlackfinExecTestData  newTestExecutionData ) 
+    DiagnosticTest::DiagnosticTest( ExecuteTestData  newTestExecutionData ) 
                                     : m_TestExecutionData ( newTestExecutionData )    
  	{
  	}
 	
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: GetCurrentTestState
+    ///	METHOD NAME: DiagnosticTest: GetCurrentTestState
     ///
     ///       Get the current TestState for the test
     ///      
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    BlackfinDiagTest::TestState BlackfinDiagTest::GetCurrentTestState() 
+    DiagnosticTest::TestState DiagnosticTest::GetCurrentTestState() 
     {
         return m_TestExecutionData.m_CurrentTestState;
     }	
 		
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: GetIterationCompletedTimestamp
+    ///	METHOD NAME: DiagnosticTest: GetIterationCompletedTimestamp
     ///
     ///       Get the timestamp for when the iteration completes
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    UINT64 BlackfinDiagTest::GetIterationCompletedTimestamp() 
+    UINT64 DiagnosticTest::GetIterationCompletedTimestamp() 
     {
 	    return m_TestExecutionData.m_IterationCompleteTimestamp;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: GetIterationPeriod
+    ///	METHOD NAME: DiagnosticTest: GetIterationPeriod
     ///
     ///       Get the period of time between individual test iterations for the test.  Some done run iteratively
     ///       though.
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    UINT32 BlackfinDiagTest::GetIterationPeriod() 
+    UINT32 DiagnosticTest::GetIterationPeriod() 
     {
 	    return m_TestExecutionData.m_IterationPeriod;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: GetMaxTimeBetweenTestCompletions
+    ///	METHOD NAME: DiagnosticTest: GetMaxTimeBetweenTestCompletions
     ///
     ///       Get the period of time that has been recorded for the maximum time period the test has run in
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    UINT32 BlackfinDiagTest::GetMaxTimeBetweenTestCompletions()
+    UINT32 DiagnosticTest::GetMaxTimeBetweenTestCompletions()
     {
         return m_TestExecutionData.m_MaximumTimeBetweenTestCompletions;
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: GetNumberOfTimesToRunPerDiagCycle
+    ///	METHOD NAME: DiagnosticTest: GetNumberOfTimesToRunPerDiagCycle
     ///
     ///       Get the number of times the test needs to run per diagnostic cycle
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    UINT32 BlackfinDiagTest::GetNumberOfTimesToRunPerDiagCycle() 
+    UINT32 DiagnosticTest::GetNumberOfTimesToRunPerDiagCycle() 
     {
 	    return m_TestExecutionData.m_NmbrTimesToRunPerDiagCycle;  
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: GetNumberOfTimesRanThisDiagCycle
+    ///	METHOD NAME: DiagnosticTest: GetNumberOfTimesRanThisDiagCycle
     ///
     ///       Get the number of times the test has completed during the current diagnostic cycle
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    UINT32 BlackfinDiagTest::GetNumberOfTimesRanThisDiagCycle() 
+    UINT32 DiagnosticTest::GetNumberOfTimesRanThisDiagCycle() 
     {
 	    return m_TestExecutionData.m_NmbrTimesRanThisDiagCycle;  
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: GetTestCompletedTimestamp
+    ///	METHOD NAME: DiagnosticTest: GetTestCompletedTimestamp
     ///
     ///       Get the timestamp of when the test completed for the diagnostic cycle
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    UINT64 BlackfinDiagTest::GetTestCompletedTimestamp()
+    UINT64 DiagnosticTest::GetTestCompletedTimestamp()
     {
         return m_TestExecutionData.m_TestCompleteTimestamp;
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: GetTestStartTime
+    ///	METHOD NAME: DiagnosticTest: GetTestStartTime
     ///
     ///       Get the timestamp of when the test started its first iteration in the diagnostic cycle
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    UINT64 BlackfinDiagTest::GetTestStartTime()
+    UINT64 DiagnosticTest::GetTestStartTime()
     {
         return m_TestExecutionData.m_TestStartTimestamp;
     }
      
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: GetTestType
+    ///	METHOD NAME: DiagnosticTest: GetTestType
     ///
     ///       Get DiagnosticTestType that is associated with the test
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    BlackfinDiagTesting::BlackfinDiagTest::DiagnosticTestTypes BlackfinDiagTest::GetTestType() 
+    DiagnosticTesting::DiagnosticTest::DiagnosticTestTypes DiagnosticTest::GetTestType() 
     {	
 	   return m_TestExecutionData.m_TestType; 
     }
 	
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: SetCurrentIterationDuration
+    ///	METHOD NAME: DiagnosticTest: SetCurrentIterationDuration
     ///
     ///       Set the elapsed time from the start of the test that this iteration has consummend
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void BlackfinDiagTest::SetCurrentIterationDuration( UINT32 duration )
+    void DiagnosticTest::SetCurrentIterationDuration( UINT32 duration )
     {
         m_TestExecutionData.m_CurrentIterationDuration = duration;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: SetCurrentTestState
+    ///	METHOD NAME: DiagnosticTest: SetCurrentTestState
     ///
     ///       Set the current TestState for the test
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void BlackfinDiagTest::SetCurrentTestState( TestState tsCurrent ) 
+    void DiagnosticTest::SetCurrentTestState( TestState tsCurrent ) 
     {
 	    m_TestExecutionData.m_CurrentTestState = tsCurrent;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: SetIterationCompletedTimestamp
+    ///	METHOD NAME: DiagnosticTest: SetIterationCompletedTimestamp
     ///
     ///        Saves the timestamp for when the iteration completes
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void BlackfinDiagTest::SetIterationCompletedTimestamp(UINT64 timestamp) 
+    void DiagnosticTest::SetIterationCompletedTimestamp(UINT64 timestamp) 
     {
 	    m_TestExecutionData.m_IterationCompleteTimestamp = timestamp;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: SetIterationPeriod
+    ///	METHOD NAME: DiagnosticTest: SetIterationPeriod
     ///
     ///        Set the period of time between individual test iterations for the test.  Some done run iteratively
     ///        though.
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void BlackfinDiagTest::SetIterationPeriod(UINT32 period) 
+    void DiagnosticTest::SetIterationPeriod(UINT32 period) 
     {
 	    m_TestExecutionData.m_IterationPeriod = period;
     }
 			
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: SetMaxTimeBetweenTestCompletions
+    ///	METHOD NAME: DiagnosticTest: SetMaxTimeBetweenTestCompletions
     ///
     ///        Set the period of time that has been recorded for the maximum time period the test has run in
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void BlackfinDiagTest::SetMaxTimeBetweenTestCompletions( UINT32 period )
+    void DiagnosticTest::SetMaxTimeBetweenTestCompletions( UINT32 period )
     {
         m_TestExecutionData.m_MaximumTimeBetweenTestCompletions = period;
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: SetNumberOfTimesRanThisDiagCycle
+    ///	METHOD NAME: DiagnosticTest: SetNumberOfTimesRanThisDiagCycle
     ///
     ///        Set the number of times the test has completed during the current diagnostic cycle
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void BlackfinDiagTest::SetNumberOfTimesRanThisDiagCycle(UINT32 nmberOfTimesRan) 
+    void DiagnosticTest::SetNumberOfTimesRanThisDiagCycle(UINT32 nmberOfTimesRan) 
     {
         m_TestExecutionData.m_NmbrTimesRanThisDiagCycle = nmberOfTimesRan;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: SetTestCompletedTimestamp
+    ///	METHOD NAME: DiagnosticTest: SetTestCompletedTimestamp
     ///
     ///        Set the timestamp of when the test completed for the diagnostic cycle
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void BlackfinDiagTest::SetTestCompletedTimestamp( UINT64 period )
+    void DiagnosticTest::SetTestCompletedTimestamp( UINT64 period )
     {
         m_TestExecutionData.m_TestCompleteTimestamp = period;
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///	METHOD NAME: BlackfinDiagTest: SetTestStartTime
+    ///	METHOD NAME: DiagnosticTest: SetTestStartTime
     ///
     ///        Set the timestamp of when the test started its first iteration in the diagnostic cycle
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void BlackfinDiagTest::SetTestStartTime( UINT64 time )
+    void DiagnosticTest::SetTestStartTime( UINT64 time )
     {
         m_TestExecutionData.m_TestStartTimestamp = time;
     }
@@ -272,16 +272,16 @@ namespace BlackfinDiagTesting
     //***************************************************************************
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// METHOD NAME: BlackfinDiagTest: ConfigForAnyNewDiagCycle
+    /// METHOD NAME: DiagnosticTest: ConfigForAnyNewDiagCycle
     /// 
     ///       This method is called at that start of testing by the scheduler for each test    
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void BlackfinDiagTest::ConfigForAnyNewDiagCycle( BlackfinDiagTest * btd ) 
+    void DiagnosticTest::ConfigForAnyNewDiagCycle( DiagnosticTest * btd ) 
     {
 		if ( 
-		        (BlackfinDiagTest::TEST_LOOP_COMPLETE == m_TestExecutionData.m_CurrentTestState)
-		     || (BlackfinDiagTest::TEST_IDLE == m_TestExecutionData.m_CurrentTestState)
+		        (DiagnosticTest::TEST_LOOP_COMPLETE == m_TestExecutionData.m_CurrentTestState)
+		     || (DiagnosticTest::TEST_IDLE == m_TestExecutionData.m_CurrentTestState)
 		   ) 
 	    {
 			m_TestExecutionData.m_NmbrTimesRanThisDiagCycle = 0;

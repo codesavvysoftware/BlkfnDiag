@@ -4,10 +4,10 @@
 #include "Os_iotk.h"
 #include "Hw.h"
 
-namespace BlackfinDiagTesting 
+namespace BlackfinDiagnosticTesting 
 {
 
-    BlackfinDiagTest::TestState BlackfinDiagInstructionRam::RunTest( UINT32 & rErrorCode ) 
+    DiagnosticTesting::DiagnosticTest::TestState BlackfinDiagInstructionRam::RunTest( UINT32 & rErrorCode ) 
     {
 	    ConfigForAnyNewDiagCycle( this );
 	    
@@ -15,10 +15,11 @@ namespace BlackfinDiagTesting
     }
     
     
-    BlackfinDiagTest::TestState BlackfinDiagInstructionRam::RunInstructionRamTestIteration(	InstructionCompareParams & rIcpCompare,
-                                                                                            UINT32 &                   rErrorCode ) 
+    DiagnosticTesting::DiagnosticTest::TestState 
+    BlackfinDiagInstructionRam::RunInstructionRamTestIteration(	InstructionCompareParams & rIcpCompare,
+                                                                UINT32 &                   rErrorCode ) 
     {
-		BlackfinDiagTest::TestState ts = BlackfinDiagTest::TEST_IN_PROGRESS;
+		DiagnosticTesting::DiagnosticTest::TestState ts = DiagnosticTesting::DiagnosticTest::TEST_IN_PROGRESS;
 
 	    BOOL hasError = TRUE;	  
 	
@@ -32,7 +33,7 @@ namespace BlackfinDiagTesting
 	    if (hasError) 
 	    {
 		
-   		    rErrorCode  = GetTestType() << DIAG_ERROR_TYPE_BIT_POS;
+   		    rErrorCode  = GetTestType() << DiagnosticTesting::DiagnosticTest::DIAG_ERROR_TYPE_BIT_POS;
     
    		    rErrorCode |= MISMATCH_ERR;
    		
@@ -40,7 +41,7 @@ namespace BlackfinDiagTesting
    		
    		    rErrorCode |= reinterpret_cast<UINT32>(pCurrentAddr) & 0xffffff;
    		
-   		    ts = BlackfinDiagTest::TEST_FAILURE;
+   		    ts = DiagnosticTesting::DiagnosticTest::TEST_FAILURE;
 	    }
 	
 	    rIcpCompare.m_CurrentBfrOffset += DMA_BFR_SZ;
@@ -50,19 +51,19 @@ namespace BlackfinDiagTesting
 		
 		    hasError = FALSE;
 	    	
-	        BOOL noMoreHeaders = 	!EnumerateNextInstructionBootStreamHeader( rIcpCompare.m_HeaderOffset, hasError );
+	        BOOL noMoreHeaders = !EnumerateNextInstructionBootStreamHeader( rIcpCompare.m_HeaderOffset, hasError );
 	    	
 	        if ( noMoreHeaders ) 
 	        {
-	        	ts = BlackfinDiagTest::TEST_LOOP_COMPLETE;
+	        	ts = DiagnosticTesting::DiagnosticTest::TEST_LOOP_COMPLETE;
 	        }
 	        else if ( hasError ) 
 	        {
-	    	    rErrorCode  = GetTestType() << DIAG_ERROR_TYPE_BIT_POS;
+	    	    rErrorCode  = GetTestType() << DiagnosticTesting::DiagnosticTest::DIAG_ERROR_TYPE_BIT_POS;
 	    	
 	    	    rErrorCode |= BAD_BOOTSTREAM_ERR;   		
 	
-	    	    ts = BlackfinDiagTest::TEST_FAILURE;
+	    	    ts = DiagnosticTesting::DiagnosticTest::TEST_FAILURE;
 	        }
 	    	
 	        rIcpCompare.m_CurrentBfrOffset = 0;
@@ -356,7 +357,7 @@ namespace BlackfinDiagTesting
 		    //
     	    // An error report it to scheduler
     	    //
-    	    UINT32 errorCode  = GetTestType() << DIAG_ERROR_TYPE_BIT_POS;
+    	    UINT32 errorCode  = GetTestType() << DiagnosticTesting::DiagnosticTest::DIAG_ERROR_TYPE_BIT_POS;
     
     	    errorCode |= UNABLE_TO_START_ERR;
     		

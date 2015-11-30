@@ -1,13 +1,13 @@
 #pragma once
-#include "BlackfinDiagTest.hpp"
+#include "DiagnosticTesting.hpp"
 #include <ccblkfn.h>                              /* Added for ssync( ), cli/sti( ) */
 	
-namespace BlackfinDiagTesting 
+namespace BlackfinDiagnosticTesting 
 {
     #define MEMORY_BANK_FAILURE_BIT_POS               30
     #define TEST_PATTERNS_ERROR_BIT_POS               16
 
-    class BlackfinDiagDataRam : public BlackfinDiagTest 
+    class BlackfinDiagDataRam : public DiagnosticTesting::DiagnosticTest 
     {
         public:
         
@@ -29,18 +29,18 @@ namespace BlackfinDiagTesting
 	                             const UINT8 *              pTestPatternsForRamTesting,
 	                             UINT32                     nmbrRamTestingPatterns,
 	                             UINT32                     nmbrBytesToTestPerIteration,
-		    		             BlackfinExecTestData &     rTestData )    
-						         :  BlackfinDiagTest              ( rTestData ),
-	                       	        m_BankA                       ( bankA ),
-	                       	        m_BankB                       ( bankB ),
-	                       	        m_BankC                       ( bankC ),
-	                       	        m_NmbrBytesToTestPerIteration ( nmbrBytesToTestPerIteration ),
-							        m_NmbrTestPatterns            ( nmbrRamTestingPatterns ),
-							        m_pTestPatternsRAM            ( pTestPatternsForRamTesting )//,
+		    		             DiagnosticTesting::DiagnosticTest::ExecuteTestData &     rTestData )    
+						         :  DiagnosticTesting::DiagnosticTest ( rTestData ),
+	                       	        m_BankA                           ( bankA ),
+	                       	        m_BankB                           ( bankB ),
+	                       	        m_BankC                           ( bankC ),
+	                       	        m_NmbrBytesToTestPerIteration     ( nmbrBytesToTestPerIteration ),
+							        m_NmbrTestPatterns                ( nmbrRamTestingPatterns ),
+							        m_pTestPatternsRAM                ( pTestPatternsForRamTesting )//,
 	        {
 	        }
 
-	        virtual BlackfinDiagTest::TestState RunTest( UINT32 & ErrorCode  );
+	        DiagnosticTest::TestState RunTest( UINT32 & ErrorCode  );
 
  	        typedef struct 
  	        {
@@ -53,7 +53,7 @@ namespace BlackfinDiagTesting
 	
         protected:
 
-	        virtual void ConfigureForNextTestCycle();
+	        void ConfigureForNextTestCycle();
 	
         private:
 

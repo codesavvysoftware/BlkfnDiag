@@ -1,14 +1,12 @@
 #include "BlackfinDiagTimerTest.hpp"
-//#include "ApxIcp.hpp"
-//#include "ApxParameters.hpp"          
 #include "Apex.h"
 #include "Hw.h"
 #include "Os_iotk.h"
 
-namespace BlackfinDiagTesting 
+namespace BlackfinDiagnosticTesting 
 {
 	
-    BlackfinDiagTest::TestState BlackfinDiagTimerTest::RunTest( UINT32 & errorCode ) 
+    DiagnosticTesting::DiagnosticTest::TestState BlackfinDiagTimerTest::RunTest( UINT32 & errorCode ) 
     {
 	
     	ConfigForAnyNewDiagCycle( this );
@@ -30,7 +28,7 @@ namespace BlackfinDiagTesting
             
             SetIterationPeriod( TIMER_TIMING_PERIOD_MS );  //
         
-            return ( BlackfinDiagTest::TEST_IN_PROGRESS );
+            return ( DiagnosticTesting::DiagnosticTest::TEST_IN_PROGRESS );
         }
 
         // Read the current Apex2 System Time Register value.
@@ -48,7 +46,7 @@ namespace BlackfinDiagTesting
         // Calculate the time elapsed according to the previous and current host timer values read.
         UINT32 hostTimeElapsed = hostTimerValueStop - m_HostTimerValueStart;
 
-        DiagnosticTestTypes ts  = GetTestType();
+        DiagnosticTesting::DiagnosticTest::DiagnosticTestTypes ts = GetTestType();
 
         // Check if either of the elapsed times are bad.
         if (
@@ -57,7 +55,7 @@ namespace BlackfinDiagTesting
            ) 
         {
        	
-           	UINT32 errorCode = (ts << DIAG_ERROR_TYPE_BIT_POS) | TIMER_TEST_APEX_TIMER_ERR;
+           	UINT32 errorCode = (ts << DiagnosticTesting::DiagnosticTest::DIAG_ERROR_TYPE_BIT_POS) | TIMER_TEST_APEX_TIMER_ERR;
 
         	OS_Assert( errorCode );
         }
@@ -79,7 +77,7 @@ namespace BlackfinDiagTesting
         SetIterationPeriod( m_PeriodAfterStartToBeginTiming );  
         
         // If we get this far, the diagnostic has completed so return DGN_TEST_LOOP_COMPLETE.
-        return ( BlackfinDiagTest::TEST_LOOP_COMPLETE );
+        return ( DiagnosticTesting::DiagnosticTest::TEST_LOOP_COMPLETE );
     }
 
     void BlackfinDiagTimerTest::ConfigureForNextTestCycle() 

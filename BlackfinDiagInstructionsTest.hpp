@@ -1,26 +1,25 @@
 #pragma once
-//#include "BlackfinDiag.hpp"
-#include "BlackfinDiagTest.hpp"
+#include "DiagnosticTesting.hpp"
 
 extern "C" UINT32  BlackfinDiagInstrTest();
 
-namespace BlackfinDiagTesting 
+namespace BlackfinDiagnosticTesting 
 {
-    class BlackfinDiagInstructionsTest : public BlackfinDiagTest 
+    class BlackfinDiagInstructionsTest : public DiagnosticTesting::DiagnosticTest 
     {
 
         public:
-            BlackfinDiagInstructionsTest( BlackfinExecTestData &  rTestData ) 
-		    		     		:	BlackfinDiagTest             	  ( rTestData )
+            BlackfinDiagInstructionsTest( DiagnosticTesting::DiagnosticTest::ExecuteTestData &  rTestData ) 
+		    		     		:	DiagnosticTesting::DiagnosticTest             	  ( rTestData )
 									
         	{
         	}
 
-        	virtual BlackfinDiagTest::TestState RunTest( UINT32 & rErrorCode );
+        	DiagnosticTesting::DiagnosticTest::TestState RunTest( UINT32 & rErrorCode );
 
         protected:
 
-        	virtual void ConfigureForNextTestCycle();
+        	void ConfigureForNextTestCycle();
 	
         private:
 	        BlackfinDiagInstructionsTest(const BlackfinDiagInstructionsTest &);

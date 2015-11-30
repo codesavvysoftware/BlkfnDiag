@@ -2,14 +2,14 @@
 #include "Os_iotk.h"
 #include "Hw.h"
 
-namespace BlackfinDiagTesting 
+namespace BlackfinDiagnosticTesting 
 {
 	
-    BlackfinDiagTest::TestState BlackfinDiagRegistersTest::RunTest( UINT32 & rErrorCode ) 
+    DiagnosticTesting::DiagnosticTest::TestState BlackfinDiagRegistersTest::RunTest( UINT32 & rErrorCode ) 
     {
         ConfigForAnyNewDiagCycle( this );
 					
-       	BlackfinDiagTest::TestState result = BlackfinDiagTest::TEST_IN_PROGRESS;
+       	DiagnosticTesting::DiagnosticTest::TestState result = DiagnosticTest::TEST_IN_PROGRESS;
     	
     	if ( !m_SanityTestRan ) 
     	{
@@ -20,9 +20,9 @@ namespace BlackfinDiagTesting
         	if ( rErrorCode ) 
         	{
   		
-    			rErrorCode &= BlackfinDiagTest::DIAG_ERROR_MASK;
+    			rErrorCode &= DiagnosticTesting::DiagnosticTest::DIAG_ERROR_MASK;
 			
-    			rErrorCode |= ( GetTestType() << BlackfinDiagTest::DIAG_ERROR_TYPE_BIT_POS );
+    			rErrorCode |= ( GetTestType() << DiagnosticTesting::DiagnosticTest::DIAG_ERROR_TYPE_BIT_POS );
 			
     			OS_Assert( rErrorCode );
         	}
@@ -37,14 +37,14 @@ namespace BlackfinDiagTesting
         	if ( rErrorCode ) 
         	{
   		
-    			rErrorCode &= BlackfinDiagTest::DIAG_ERROR_MASK;
+    			rErrorCode &= DiagnosticTesting::DiagnosticTest::DIAG_ERROR_MASK;
 			
-    			rErrorCode |= ( GetTestType() << BlackfinDiagTest::DIAG_ERROR_TYPE_BIT_POS );
+    			rErrorCode |= ( GetTestType() << DiagnosticTesting::DiagnosticTest::DIAG_ERROR_TYPE_BIT_POS );
 			
     			OS_Assert( rErrorCode );
         	}
        
-        	result = BlackfinDiagTest::TEST_LOOP_COMPLETE;
+        	result = DiagnosticTesting::DiagnosticTest::TEST_LOOP_COMPLETE;
        	}
        	
        	return result;

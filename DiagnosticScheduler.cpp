@@ -47,7 +47,7 @@
 // C PROJECT INCLUDES
 
 // C++ PROJECT INCLUDES
-#include "BlackfinDiagScheduler.hpp"     // This file contains the Class definition 
+#include "DiagnosticScheduler.hpp"     // This file contains the Class definition 
                                          // for this class.
 
 // FORWARD REFERENCES
