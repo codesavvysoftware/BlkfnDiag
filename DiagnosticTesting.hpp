@@ -42,12 +42,14 @@ namespace DiagnosticTesting
     {
         public:
 
+            // Mask and bit position for configuring error codes when errors are detected
             enum
             {
                 DIAG_ERROR_MASK         = 0x7fffffff,
                 DIAG_ERROR_TYPE_BIT_POS = 26
             };
                 
+            // Diagnostic test states
             typedef enum _TestState 
             {
                 TEST_LOOP_COMPLETE,
@@ -357,7 +359,7 @@ namespace DiagnosticTesting
             ///
             /// @param                            Reference to a possible error code returned from the scheduler.
             ///                               
-            /// @return                           None
+            /// @return                           Status of executing a test
             ///
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
             virtual DiagnosticTest::TestState                                RunTest( UINT32 & rErrorCode ) = 0;

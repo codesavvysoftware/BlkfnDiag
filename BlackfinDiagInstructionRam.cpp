@@ -1,12 +1,46 @@
-#include "BlackfinDiagInstructionRam.hpp"
-#include "Nvs_Obj.h"
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @file BlackfinDiagInstructionRam.cpp
+///
+/// Namespace that contains the class definitions, attributes and methods for the BlackfinDiagInstructionRam class. 
+///
+/// @see BlackfinDiagInstructionRam.hpp for a detailed description of this class.
+///
+/// @if REVISION_HISTORY_INCLUDED
+/// @par Edit History
+/// - [0]  thaley1  01-Dec-2015 Initial revision of file.
+/// @endif
+///
+/// @ingroup Diagnostics
+///
+/// @par Copyright (c) 2013 Rockwell Automation Technologies, Inc.  All rights reserved.
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SYSTEM INCLUDES
 #include <bfrom.h>
-#include "Os_iotk.h"
-#include "Hw.h"
 
+// C PROJECT INCLUDES
+#include "Defs.h"
+#include "Os_iotk.h"             // This file depends on Defs.h.  It should include that file
+#include "Hw.h"                  // Ditto 
+#include "Nvs_Obj.h"
+
+
+// C++ PROJECT INCLUDES
+#include "BlackfinDiagInstructionRam.hpp"
+
+
+// FORWARD REFERENCES
+// (none)
+//
 namespace BlackfinDiagnosticTesting 
 {
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagInstructioRam: RunTest
+    ///
+    ///      Provides interface specified by the pure virtual method in the base class.  The scheduler calls 
+    ///      this method to run iterations of the diagnostic test.
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     DiagnosticTesting::DiagnosticTest::TestState BlackfinDiagInstructionRam::RunTest( UINT32 & rErrorCode ) 
     {
 	    ConfigForAnyNewDiagCycle( this );
@@ -15,6 +49,12 @@ namespace BlackfinDiagnosticTesting
     }
     
     
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagInstructionRam: RunInstructionRamTestIteration
+    ///
+    ///      Run the next iteration of the instruction RAM test.
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     DiagnosticTesting::DiagnosticTest::TestState 
     BlackfinDiagInstructionRam::RunInstructionRamTestIteration(	InstructionCompareParams & rIcpCompare,
                                                                 UINT32 &                   rErrorCode ) 
@@ -74,6 +114,13 @@ namespace BlackfinDiagnosticTesting
     }
 
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagInstructionRam: DmaXferMDMA0
+    ///
+    ///      Perform DMA transfer of instruction RAM.  The MDMA0 is used to match up with the convention that
+    ///      the AnalogDevices library uses for DMA operations in their sample code..
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     void BlackfinDiagInstructionRam::DmaXferMDMA0(void * pReadFromAddress, void * pWriteToAddress)
     {
         UINT nmbrOf16BitUnitsToDMA = (DMA_BFR_SZ >> 1);
@@ -125,6 +172,12 @@ namespace BlackfinDiagnosticTesting
 	    statusD0 = *pMDMA_D0_IRQ_STATUS; 
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagInstructionRam: StartEnumeratingInstructionBootStreamHeaders
+    ///
+    ///      Called at the start of a new diagnostic cycle.
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     BOOL BlackfinDiagInstructionRam::StartEnumeratingInstructionBootStreamHeaders( UINT32 & rHeaderOffset ) 
     {
 	    const UINT8        * pBootBase = NULL;
@@ -136,7 +189,7 @@ namespace BlackfinDiagnosticTesting
         BOOL    success         = FALSE; 
     
     
-        while (1) 
+        while (TRUE) 
         {    	
     	    if ( offset & (sizeof(UDINT) - 1) ) break; 
     	
@@ -179,6 +232,12 @@ namespace BlackfinDiagnosticTesting
     }
 
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagInstructionRam: ConfigureDMAReadOfInstructionMemory
+    ///
+    ///      Configure parameters for reading the next portion of instruction RAM memory to test.
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     BOOL BlackfinDiagInstructionRam::ConfigureDMAReadOfInstructionMemory( InstructionCompareParams & rIcp ) 
     {
         const UINT8     *pBootBase = NULL;
@@ -210,6 +269,14 @@ namespace BlackfinDiagnosticTesting
 	    return isPartialRead;
     }	
 		 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagInstructionRam: EnumerateNextInstructionBootStreamHeader
+    ///
+    ///      When the bootstream indicates that there is less than a DMA_BFR_SZ instruction memory left to read,
+    ///      this function is called to determine if there is another header with more data or that there is no
+    ///      more data to process.
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     BOOL BlackfinDiagInstructionRam::EnumerateNextInstructionBootStreamHeader( UINT32 & rHdrOffst, BOOL & rError ) 
     {  	
         const UINT8              * pBootBase = NULL;
@@ -258,6 +325,13 @@ namespace BlackfinDiagnosticTesting
     } 
 
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagInstructionRam: CompareInstructMemToBootStream
+    ///
+    ///      Compare the instruction RAM contents read via DMA to the contents read from the bootstream for the
+    ///      instruction RAM memory under test.
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     BOOL BlackfinDiagInstructionRam::CompareInstructMemToBootStream(InstructionCompareParams & rIcp )
     {
         const UINT8 * pBootStreamStartAddr = NULL;
@@ -331,6 +405,12 @@ namespace BlackfinDiagnosticTesting
         return success; 
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagInstructionRam: GetBootStreamStartAddr
+    ///
+    ///      Get the start address of the bootstream.
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     void BlackfinDiagInstructionRam::GetBootStreamStartAddr( const UINT8 * & rBootStreamStartAddr ) 
     {
 		rBootStreamStartAddr = m_pBootStreamStartAddr;
@@ -338,6 +418,14 @@ namespace BlackfinDiagnosticTesting
    
 
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagInstructionRam: ConfigureForNextTestCycle
+    ///
+    ///      Provides interface specified by the pure virtual method in the base class. This method is called 
+    ///      at that start of testing for the test during a new diagnostics cycle. The data that needs to be 
+    ///      initialized for an individual test is initialized.      
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     void BlackfinDiagInstructionRam::ConfigureForNextTestCycle() 
     {
         m_IcpCompare.m_HeaderOffset           = INITIAL_HDR_OFFSET;

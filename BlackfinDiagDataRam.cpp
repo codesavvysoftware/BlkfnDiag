@@ -1,12 +1,51 @@
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @file BlackfinDiagDataRam.cpp
+///
+/// Namespace that contains the class definitions, attributes and methods for the BlackfinDiagDataRam class. 
+///
+/// @see BlackfinDiagDataRam.hpp for a detailed description of this class.
+///
+/// @if REVISION_HISTORY_INCLUDED
+/// @par Edit History
+/// - [0]  thaley1  01-Dec-2015 Initial revision of file.
+/// @endif
+///
+/// @ingroup Diagnostics
+///
+/// @par Copyright (c) 2013 Rockwell Automation Technologies, Inc.  All rights reserved.
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SYSTEM INCLUDES
+// (none)
+//
+// C PROJECT INCLUDES
+#include "Defs.h"
+#include "Os_iotk.h"             // This file depends on Defs.h.  It should include that file
+#include "Hw.h"                  // Ditto 
+
+
+// C++ PROJECT INCLUDES
 #include "BlackfinDiagDataRam.hpp"
-#include "Os_iotk.h"
-#include "Hw.h"
+
+
+// FORWARD REFERENCES
 
 namespace BlackfinDiagnosticTesting 
 {
 	
+	// Linkage to the assembly language subrouting for testing a byte of RAM.
 	extern "C" BOOL TestAByteOfRam( BlackfinDiagDataRam::ByteTestParameters * pbtp );
 
+    //***************************************************************************
+    // PUBLIC METHODS
+    //***************************************************************************
+            
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagDataRam: RunTest
+    ///
+    ///      Provides interface specified by the pure virtual method in the base class.  The scheduler calls 
+    ///      this method to run iterations of the diagnostic test..
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     DiagnosticTesting::DiagnosticTest::TestState BlackfinDiagDataRam::RunTest( UINT32 & rErrorCode ) 
     {
 	
@@ -68,6 +107,13 @@ namespace BlackfinDiagnosticTesting
 	   return ts;
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagDataRam: RunRamTest
+    ///
+    ///      Tests an "iternation" amount of RAM.
+    ///
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     BOOL  BlackfinDiagDataRam::RunRamTest( DataRamTestDescriptor * pTestRAMDescriptor, 
                                            UINT32 &                rOffsetFromBankStart, 
                                            UINT32 &                rFailurePattern ) 
@@ -152,6 +198,12 @@ namespace BlackfinDiagnosticTesting
 		
 
 	
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagDataRam: TestAByte
+    ///
+    ///      Tests one byte of RAM
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     BOOL BlackfinDiagDataRam::TestAByte( ByteTestParameters * pbtp ) 
     {
         BOOL testPassed = FALSE;
@@ -165,6 +217,12 @@ namespace BlackfinDiagnosticTesting
 	    return testPassed; 
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagDataRam: EncodeErrorInfo
+    ///
+    ///      Encoding information about a test failure
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     void BlackfinDiagDataRam::EncodeErrorInfo( UINT32 &             errorInfo, 
                                                DataRamMemoryBanks   memoryBank, 
                                                UINT32               offsetFromBankStart, 
@@ -179,6 +237,14 @@ namespace BlackfinDiagnosticTesting
 	    errorInfo |= offsetFromBankStart; 
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagDataRam: ConfigureForNextTestCycle
+    ///
+    ///      Provides interface specified by the pure virtual method in the base class. This method is called 
+    ///      at that start of testing for the test during a new diagnostics cycle. The data that needs to be 
+    ///      initialized for an individual test is initialized.      
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     void BlackfinDiagDataRam::ConfigureForNextTestCycle() 
     {
 	    m_BankA.m_TestCompleted     = FALSE;
