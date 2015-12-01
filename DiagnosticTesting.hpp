@@ -93,20 +93,6 @@ namespace DiagnosticTesting
             // PUBLIC METHODS
             //***************************************************************************
             
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-            ///	METHOD NAME: DiagnosticTest: DiagnosticTest
-            ///
-            /// @par Full Description
-            ///      Construction that is used to construct the base class componenent of the inheriting test.
-            ///      This the one and only method for instantiating the base class component..
-            ///      
-            ///
-            /// @param newTestExec                Initial configuration data for the base class that the scheduler uses
-            ///                               
-            /// @return                           Base class component data initialized.
-            ///
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	        DiagnosticTest( ExecuteTestData  newTestExec );		
 			
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///	METHOD NAME: DiagnosticTest: GetCurrentTestState
@@ -370,6 +356,21 @@ namespace DiagnosticTesting
             // PROTECTED METHODS
             //***************************************************************************
             
+             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///	METHOD NAME: DiagnosticTest: DiagnosticTest
+            ///
+            /// @par Full Description
+            ///      Construction that is used to construct the base class componenent of the inheriting test.
+            ///      This the one and only method for instantiating the base class component..
+            ///      
+            ///
+            /// @param newTestExec                Initial configuration data for the base class that the scheduler uses
+            ///                               
+            /// @return                           Base class component data initialized.
+            ///
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	        DiagnosticTest( ExecuteTestData  newTestExec );		
+	        
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///	METHOD NAME: DiagnosticTest: ConfigureForNextTestCycle
             ///

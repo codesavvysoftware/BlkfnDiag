@@ -76,8 +76,9 @@ namespace DiagnosticScheduling
     		 	m_ppRunTimeDiagnostics           ( ppDiagnostics ),
     		 	m_NumberOfDiagTests              ( numberOfDiagnosticTests ),
     		 	m_RuntimeData                    ( runTimeData ),
-    			m_ppTestEnumeration                ( ppDiagnostics + numberOfDiagnosticTests ),
-    			m_TimestampCurrent               ( DEFAULT_INITIAL_TIMESTAMP )//,
+    			m_ppTestEnumeration              ( ppDiagnostics + numberOfDiagnosticTests ),
+    			m_TimestampCurrent               ( DEFAULT_INITIAL_TIMESTAMP ),
+    			m_NumberOfDiagCycles             ( 0 )
     {
 
     	// Number of timeslices between diagnostics completion time checks
@@ -229,6 +230,8 @@ namespace DiagnosticScheduling
     	if ( elapsedTimeInTestCycle >= m_RuntimeData.m_PeriodForAllDiagnosticsToCompleteInMS ) 
     	{	
     		m_TimeTestCycleStarted = m_TimestampCurrent;
+    		
+    		++m_NumberOfDiagCycles;
 		
     		if ( allTestsCompleted ) 
     		{

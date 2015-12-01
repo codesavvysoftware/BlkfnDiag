@@ -342,11 +342,17 @@ namespace BlackfinDiagnosticTesting
         
         UINT8   instrBootStream              = 0;
         UINT8   instrMemRead                 = 0;
-        BOOL    checkNextByteForEmulation    = FALSE;
-        UINT8 * pPrevInstrMemBootStreamAddr  = NULL;
 	    BOOL    success                      = TRUE;
 	    UINT8 * pCurrentInstrctnRead         = rIcp.m_InstrMemRead;
     
+// Emulator inserts trap instructions at key places to catch breakpoints and issues.
+// Instruction memory read from DMA will not compare.  Therefore to continue testing
+// with the emulator this flag was introduced for conditional compiling.  It is 
+// defined in the project settings when running with the emulator.
+#ifdef DOING_EMULATION
+        BOOL    checkNextByteForEmulation    = FALSE;
+        UINT8 * pPrevInstrMemBootStreamAddr  = NULL;
+#endif
         for (UINT32 ui32 = 0; ui32 < rIcp.m_NmbrOfBytesInBuffer; ++ui32 ) 
     	{
     	    instrBootStream = *pInstrMemBootStream;
@@ -357,47 +363,49 @@ namespace BlackfinDiagnosticTesting
     	        ++pCurrentInstrctnRead;    	
     	        ++pInstrMemBootStream;
     		
+#ifdef DOING_EMULATION
 			    checkNextByteForEmulation = FALSE;
-
+#endif
 			    continue;
     	    }
     	    else 
     	    {
     		    success = FALSE;
     		
-    		    if (rIcp.m_EmulationActive) 
-    		    {
-    			    if ( EMUEXCEPT_OPCODE == instrMemRead ) 
-    			    {
-    				    success                     = TRUE;
-    				    checkNextByteForEmulation   = TRUE;
-    				    pPrevInstrMemBootStreamAddr = pInstrMemBootStream;
-    				    success                     = TRUE;
-    				
-                        ++pCurrentInstrctnRead;    	
-                        ++pInstrMemBootStream;
+#ifdef DOING_EMULATION
+   			    if ( EMUEXCEPT_OPCODE == instrMemRead ) 
+   			    {
+   				    success                     = TRUE;
+   				    checkNextByteForEmulation   = TRUE;
+   				    pPrevInstrMemBootStreamAddr = pInstrMemBootStream;
+   				    success                     = TRUE;
+  				
+                    ++pCurrentInstrctnRead;    	
+                    ++pInstrMemBootStream;
     		
-    		
-    				    continue;
-    			    }
-    			    else if (checkNextByteForEmulation) 
-    			    {
-    				    if ( ( pPrevInstrMemBootStreamAddr + 1 ) == (pInstrMemBootStream) ) 
-    					{
-    					    checkNextByteForEmulation = FALSE;
-    					    success                   = TRUE;
+   				    continue;
+  			    }
+   			    else if (checkNextByteForEmulation) 
+   			    {
+   				    if ( ( pPrevInstrMemBootStreamAddr + 1 ) == (pInstrMemBootStream) ) 
+   					{
+   					    checkNextByteForEmulation = FALSE;
+   					    success                   = TRUE;
     					
-    	                    ++pCurrentInstrctnRead;
-             	            ++pInstrMemBootStream;
+   	                    ++pCurrentInstrctnRead;
+           	            ++pInstrMemBootStream;
     		
-    					    continue;
-    				    }
-    			    }   			
+   					    continue;
+   				    }
+   			    }
+   			    else
+   			    {
+   			        break;   			
     		    }   		    
-   		        else 
-   		        {
-   		        	break;
-   		        }
+#else
+
+   		        break;
+#endif   		        
             }
         }
     
@@ -435,8 +443,6 @@ namespace BlackfinDiagnosticTesting
         m_IcpCompare.m_NmbrOfBytesInBuffer    = INITIAL_NUM_BYTES_IN_BFR;
 	
 	    m_IcpCompare.m_pReadFromAddr          = NULL;
-	
-    	m_IcpCompare.m_EmulationActive        = m_EmulationActive;
 	
 	    BOOL enumerationNotStarted = !StartEnumeratingInstructionBootStreamHeaders( m_IcpCompare.m_HeaderOffset );
 	

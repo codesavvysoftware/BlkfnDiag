@@ -298,7 +298,7 @@ namespace BlackfinDiagRuntimeEnvironment
             // Register testing parameters, structures and definitions.                                                 *
             //                                                                                                          *
             //***********************************************************************************************************
-            #define  REGISTER_TEST_ITERATION_PERIOD_MS 2000          // Every Two Seconds	
+            #define  REGISTER_TEST_ITERATION_PERIOD_MS 120000          // Every Two Minutes	
 	
             execTestData.m_IterationPeriod                   = REGISTER_TEST_ITERATION_PERIOD_MS;
        		execTestData.m_TestType                          = DiagnosticTesting::DiagnosticTest::DIAG_REGISTER_TEST_TEST_TYPE;
@@ -314,7 +314,7 @@ namespace BlackfinDiagRuntimeEnvironment
             // Instruction RAM testing parameters, structures and definitions.                                          *
             //                                                                                                          *
             //***********************************************************************************************************
-            #define INSTRCTN_RAM_TEST_ITERATION_PERIOD_MS 2000          // 2 second for now
+            #define INSTRCTN_RAM_TEST_ITERATION_PERIOD_MS 15000          // 15 seconds for now
     
             execTestData.m_IterationPeriod                   = INSTRCTN_RAM_TEST_ITERATION_PERIOD_MS;
             execTestData.m_TestType                          = DiagnosticTesting::DiagnosticTest::DIAG_INTRUCTION_RAM_TEST_TYPE;
@@ -328,7 +328,7 @@ namespace BlackfinDiagRuntimeEnvironment
             // Timer testing parameters, structures and definitions.                                                    *
             //                                                                                                          *
             //***********************************************************************************************************
-            #define TIMER_TEST_ITERATION_PERIOD_MS   1000  // Every second.
+            #define TIMER_TEST_ITERATION_PERIOD_MS   10000  // Start after 10 seconds.
             execTestData.m_IterationPeriod                   = TIMER_TEST_ITERATION_PERIOD_MS;
        		execTestData.m_TestType                          = DiagnosticTesting::DiagnosticTest::DIAG_TIMER_TEST_TYPE;
 
@@ -369,16 +369,16 @@ namespace BlackfinDiagRuntimeEnvironment
             //
             // Requirement:  All Diagnostic Tests Complete in 4 Hours.
             //
-            #define PERIOD_FOR_ALL_DIAGNOSTICS_COMPLETED_MS     4 * 60 * 60 * 1000 // 4 hours, number of milleseconds in 4 hours
+            #define PERIOD_FOR_ALL_DIAGNOSTICS_COMPLETED_MS     2 * 60 * 60 * 1000 // 2 hours for now, number of milleseconds in 4 hours
     
             #define PERIOD_FOR_ONE_DIAGNOSTIC_TEST_ITERATION_MS 50 // Milleseconds
 
             static DiagnosticTesting::DiagnosticTest * pDiagnosticTests[]    = 
                                                      {
-                                                         //&m_RegisterTest,
-                                                         //&m_DataRamTest, 
-                                                         //&m_TimerTest,
-                                                         //&m_InstructionRamTest,
+                                                         &m_RegisterTest,
+                                                         &m_DataRamTest, 
+                                                         &m_TimerTest,
+                                                         &m_InstructionRamTest,
                                                          &m_InstructionsTest,
                                                      };
      

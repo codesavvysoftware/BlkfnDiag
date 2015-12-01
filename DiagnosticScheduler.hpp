@@ -217,6 +217,7 @@ namespace DiagnosticScheduling
             // For determining if a new period within the total time to run all the tests has started.
             UINT64 m_TimeLastIterationPeriodExpired;
 
+            UINT32 m_NumberOfDiagCycles;
             //***************************************************************************
             // PRIVATE METHODS
             //***************************************************************************

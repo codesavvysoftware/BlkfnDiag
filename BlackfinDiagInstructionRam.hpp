@@ -36,7 +36,6 @@
 namespace BlackfinDiagnosticTesting 
 {
     #define BAD_BOOTSTREAM_ERR                    0xffd00000
-    #define EMULATION_ACTIVE                      TRUE
     #define UNABLE_TO_START_ERR                   0xfff00000
     #define MISMATCH_ERR                          0xffe00000
     #define BOOT_STREAM_START                     reinterpret_cast<UINT8 *>(0x20040000L)
@@ -66,8 +65,7 @@ namespace BlackfinDiagnosticTesting
 	        BlackfinDiagInstructionRam( DiagnosticTesting::DiagnosticTest::ExecuteTestData &     rTestData) 
 		            		         :  DiagnosticTest              ( rTestData ),
                                         m_pBootStreamStartAddr      ( BOOT_STREAM_START ),
-                                        m_pInstructionRamStartAddr  ( INSTR_START_ADDR ),
-							            m_EmulationActive           ( EMULATION_ACTIVE ) 
+                                        m_pInstructionRamStartAddr  ( INSTR_START_ADDR )
 	        {
 	        }
 	
@@ -138,17 +136,11 @@ namespace BlackfinDiagnosticTesting
                 UINT32         m_CurrentBfrOffset;            // Current Offset from begining of bootstream data for Instruction Ram comparisons
                 UINT32         m_NmbrOfBytesInBuffer;         // Number of Bytes to Compare
                 UINT8 *        m_pReadFromAddr;                // Address instruction RAM start for Current DMA buffer
-                BOOL           m_EmulationActive;             // Emulator inserts trap instructions at key places to catch breakpoints and issues.
-                                                              // Instruction memory read from DMA will not compare.  Therefore to continue testing
-                                                              // with the emulator this flag was introduced.
             } 
             InstructionCompareParams;
     
 	        // Current status data for testing instruction RAM
 	        InstructionCompareParams     m_IcpCompare;
-	
-	        // TRUE  when runing with the emulator.
-	        BOOL                         m_EmulationActive;
 	
             // Where the bootstream is located in FLASH
             const UINT8 *                m_pBootStreamStartAddr;
