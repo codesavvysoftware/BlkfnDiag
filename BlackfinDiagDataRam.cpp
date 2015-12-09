@@ -160,19 +160,6 @@ namespace BlackfinDiagnosticTesting
 		    ++nmbrBytesTestedThisIteration;
 		
 		    ++pCrrntRAMAddr;
-		
-		    if (!(nmbrBytesTestedThisIteration & 0xff))
-		    {
-			    int i = 0;
-			
-			    ++i;
-		    }
-		    else if (!(nmbrBytesTestedThisIteration & 0xf)) 
-		    {
-			    int i = 0;
-			
-			    ++i;
-		    }
 	    }
 
 	    if (testNotPassed) 

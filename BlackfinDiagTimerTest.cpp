@@ -32,6 +32,7 @@
 // (none)
 //
 
+extern "C" ULINT Apex_GetTime();
 
 namespace BlackfinDiagnosticTesting 
 {
@@ -55,13 +56,9 @@ namespace BlackfinDiagnosticTesting
 
             m_BeingInstantiated = FALSE;
         
-            UINT64 ullCurrentDspCycles;
-            
-            _GET_CYCLE_COUNT( ullCurrentDspCycles );
-             
-            m_HostTimerValueStart = CCLK_TO_US( ullCurrentDspCycles );
+            m_HostTimerValueStart = HostGetTime();
         
-            m_ApexTimerValueStart = 0; //pHI_ApexReg->SystemTime;
+            m_ApexTimerValueStart = Apex_GetTime(); //pHI_ApexReg->SystemTime;
             
             SetIterationPeriod( TIMER_TIMING_PERIOD_MS );  //
         
@@ -69,13 +66,9 @@ namespace BlackfinDiagnosticTesting
         }
 
         // Read the current Apex2 System Time Register value.
-        UINT32 apexTimerValueStop = 0;//pHI_ApexReg->SystemTime;
+        UINT32 apexTimerValueStop = Apex_GetTime();//pHI_ApexReg->SystemTime;
 
-        UINT64 ullCurrentDspCycles;
-            
-        _GET_CYCLE_COUNT( ullCurrentDspCycles );
-             
-        UINT32 hostTimerValueStop = CCLK_TO_US( ullCurrentDspCycles );
+        UINT32 hostTimerValueStop = HostGetTime();
         
         // Calculate the time elapsed according to the previous and current Apex2 System Time Register values read.
         UINT32 apexTimeElapsed = apexTimerValueStop - m_ApexTimerValueStart;
@@ -102,7 +95,7 @@ namespace BlackfinDiagnosticTesting
              || ( apexTimeElapsed > m_MaxElapsedTimeApex ) 
           )
         {
-           	//UINT32 errorCode = (ts << DIAG_ERROR_TYPE_BIT_POS) | TIMER_TEST_HOST_TIMER_ERR;
+           	UINT32 errorCode = (ts << DIAG_ERROR_TYPE_BIT_POS) | TIMER_TEST_HOST_TIMER_ERR;
 
         	//OS_Assert( errorCode );
         }
@@ -129,4 +122,22 @@ namespace BlackfinDiagnosticTesting
     {
         m_BeingInstantiated = TRUE;
     }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagTimerTest: HostGetTime
+    ///
+    /// @par Full Description
+    ///      Get system time for Blackfin Host in microseconds
+    ///      
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    UINT32 BlackfinDiagTimerTest::HostGetTime()
+    {
+        UINT64 ullCurrentDspCycles;
+            
+        _GET_CYCLE_COUNT( ullCurrentDspCycles );
+             
+        return CCLK_TO_US( ullCurrentDspCycles );
+    } 
+        
+
 };

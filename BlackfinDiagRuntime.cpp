@@ -20,6 +20,7 @@
 #include "Defs.h"
 #include "Os_iotk.h"
 #include "Hw.h"
+#include "Apex.h"
 
 // C++ PROJECT INCLUDES
 
@@ -56,114 +57,9 @@ namespace BlackfinDiagRuntimeEnvironment
     /// @return                             Elapsed time in milleseconds
     ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //*
-    //* The compiler generates much more effecient code both memory and execution speed wise by using constants here.
-    //* Originally I had a class that would compute the divisor and adjShift values based on the CLOCKS_PER_SEC 
-    //* constant during construction.  Here is how the algorithm works:
-    //* Find the most significant bit of the CLOCKS_PER_SECOND rate.  The divisor is most significant bit minus 1.
-    //* then use a known value like 1000 milleseconds per second to determine the closest adjustment factor. The 
-    //* algoriothm below works well.  I don't use it because a lot of code is generated for the Blackfin as a result.
-    //* Just computing the constants by hand and using them results in much better code but is not as generic of
-    //* a solution.  It is much better than doing divides though.
-    //* 
-    //*     void CalcShiftFactors( UINT32 & rShiftFactor, UINT32 & rShiftAdjustment ) 
-    //* 		{
-    //* 	    //
-    //* 	    // Find MSB of ClocksPerMillesecond
-	//*	        //
-	//* 	    UINT64 dtt = (CLOCKS_PER_SEC / 1000 );
-    //* 
-    //* 	    UINT32 bitpos = 0;
-    //*
-    //* 	    while (dtt != 0 ) 
-    //* 		{
-    //* 		    ++bitpos;
-    //*
-    //* 		    dtt >>= 1;
-    //* 	    }
-    //*
-    //* 	    // Scale to the seoond
-    //* 	    dtt = CLOCKS_PER_SEC;
-    //* 
-    //* 	    dtt >>= bitpos-1;
-    //* 
-    //* 	    UINT32 i = 1;
-    //* 
-    //* 	    UINT64 error = 0;
-    //* 
-    //* 	    //
-    //*         // Determine the best adjustment shift factor that yields the closest value to one second.
-    //*         //
-    //*         UINT64 prev_error = 0;
-    //* 
-    //* 	    for ( ; i < bitpos - 1; ++i ) 
-	//* 		{    	
-    //* 		    error = ( dtt - (dtt >> i ) );	
-    //*
-    //*             //
-    //*             // dtt is scaled to the second but we know it will be greater than one second because we've divided
-    //*             // by a value less than CLOCKS_PER_SECOND.  When we start off with i == 1 we're dividing by one half.
-    //*             // and subtracting that from the CLOCKS_PER_SECOND scaled to the second approximation.  That number
-    //*             // almost always will be less than 1000 milleseconds or a second.  We want to find the value of i 
-    //*             // where error is greater than 1 second.  Then by keeping track of the pervious error we know
-    //*             // the value of i where the threshold is crossed between less than a second and greater than a 
-    //*             // second for the adjmustment shift factor.  Then we pick the value that yields the lowest error IE
-    //*             // the value that comes closes to approximating one second.
-    //*             if ( error > 1000 )	break;
-    //*      
-    //*             prev_error = error;
-    //*  	    }
-    //* 
-    //* 	    //
-    //* 	    // Pick the adjustment that yiels the closest value to 1000 milleseconds/ 1 second
-    //* 	    //
-    //* 
-    //* 	    UINT64 lower = 1000 - prev_error;
-    //* 
-    //* 	    UINT64 upper = error - 1000;
-    //* 
-    //*		    if ( upper < lower ) 
-	//* 		{
-    //* 		    rShiftAdjustment = i;
-   	//* 	    }
-   	//* 	    else 
-	//* 		{
-   	//* 		    rShiftAdjustment = i-1;
-   	//* 	    }
-    //* 
-   	//* 	    rShiftFactor = bitpos -1;   
-	//*     }    
-        
-        
-    #define divisor 19
-    #define adjShift 3
-        
     static UINT32 ComputeElapsedTimeMS( UINT64 current, UINT64 previous ) 
 	{
-        UINT64 diff       = current - previous; // difference in clock cycles;
-	
-        // An approximation that is actually very close when CLOCKS_PER_SEC == 600000000
-        // avoiding a constant divide in the background
-		//
-		// Math for the approximation
-		//  CLOCKS_PER_SEC == 600000000
-		//  CLOCKS_PER_MILLESECOND = CLOCKS_PER_SEC * SECONDS_PER_MILLESECOND = 600000000 / 1000 = 600000
-		//  Elapsed time in milleseconds = difference in clock readings / CLOCKS_PER_MILLESECOND = diff / 600000;
-		//  600000 == 0x927c0
-		//  We're looking for a shift that is less which would be 0x80000 ==  524288.
-		//  600000 ~= 524288 * 1.14441
-		//  Elapsed time in millesconds ~= diff / (524288 * 1.1441) ~=  ( diff / 0x8000 ) * (1/1.1441) 
-		//                                                          ~=  ( diff >> 19 ) * (.8738 )
-		//                                                          ~=  ( diff >> 19 ) * ( 7/8 )
-		//                                                          ~=  ( diff >> 19 ) ( 1 - 1/8 )
-		//                                                          ~=  ( diff >> 19 ) - ( ( diff >> 19 ) * 1/8)
-		//                                                          ~=  ( diff >> 19 ) - ( ( diff >> 19 ) >> 3 );
-		//                                                        substitute  fast for ( diff >> 19 );
-	    UINT64   fast = diff >> divisor;
-			    
-        fast -= (fast >> adjShift );
-
-		return fast;  // difference in clock cycles times milleseconds per clock cycle
+        return ( CCLK_TO_US( current - previous ) / 1000 );
     }
 	   
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,11 +85,10 @@ namespace BlackfinDiagRuntimeEnvironment
     //
     // Default initial values for diagnostic data.
     //
-    #define DFLT_INITIAL_TIMESTAMP                0 
-    #define DFLT_INITIAL_ELAPSED_TIME             0           
-    #define DFLT_NBR_TIMES_TO_RUN_PER_DIAG_CYCLE  1 
-    #define DFLT_NBR_TIMES_RAN_THIS_DIAG_CYCLE    1
-    #define DFLT_INITIAL_TEST_EXECUTION_STATE     DiagnosticTesting::DiagnosticTest::TEST_IDLE
+    static const UINT64  DFLT_INITIAL_TIMESTAMP               = 0; 
+    static const UINT32  DFLT_INITIAL_ELAPSED_TIME            = 0;          
+    static const UINT32  DFLT_NBR_TIMES_TO_RUN_PER_DIAG_CYCLE = 1; 
+    static const UINT32  DFLT_NBR_TIMES_RAN_THIS_DIAG_CYCLE   = 0;
 
 
     //***************************************************************************
@@ -229,8 +124,8 @@ namespace BlackfinDiagRuntimeEnvironment
             //                                                                                                          *
             //***********************************************************************************************************
 
-            #define NMBR_DATA_RAM_BYTES_TESTED_PER_ITERATION  0x400 // Test 1k at a time for now
-            #define DATA_RAM_TEST_ITERATION_PERIOD_MS         1000 // 1 second for now
+            static const UINT32 NMBR_DATA_RAM_BYTES_TESTED_PER_ITERATION = 0x400; // Test 1k at a time for now
+            static const UINT32 DATA_RAM_TEST_ITERATION_PERIOD_MS        = 1000; // 1 second for now
 
             static UINT8 DATA_RAM_TEST_TEST_PATTERNS[]  = 
                                                     { 
@@ -250,7 +145,7 @@ namespace BlackfinDiagRuntimeEnvironment
                                                                     DFLT_NBR_TIMES_TO_RUN_PER_DIAG_CYCLE,
                                                                     DFLT_NBR_TIMES_RAN_THIS_DIAG_CYCLE,
                                                                     DiagnosticTesting::DiagnosticTest::DIAG_NO_TEST_TYPE,
-                                                                    DFLT_INITIAL_TEST_EXECUTION_STATE
+                                                                    DiagnosticTesting::DiagnosticTest::TEST_IDLE
                                                                 };	
 
         
@@ -298,7 +193,7 @@ namespace BlackfinDiagRuntimeEnvironment
             // Register testing parameters, structures and definitions.                                                 *
             //                                                                                                          *
             //***********************************************************************************************************
-            #define  REGISTER_TEST_ITERATION_PERIOD_MS 120000          // Every Two Minutes	
+            static const UINT32  REGISTER_TEST_ITERATION_PERIOD_MS = 120000;          // Every Two Minutes	
 	
             execTestData.m_IterationPeriod                   = REGISTER_TEST_ITERATION_PERIOD_MS;
        		execTestData.m_TestType                          = DiagnosticTesting::DiagnosticTest::DIAG_REGISTER_TEST_TEST_TYPE;
@@ -314,7 +209,7 @@ namespace BlackfinDiagRuntimeEnvironment
             // Instruction RAM testing parameters, structures and definitions.                                          *
             //                                                                                                          *
             //***********************************************************************************************************
-            #define INSTRCTN_RAM_TEST_ITERATION_PERIOD_MS 15000          // 15 seconds for now
+            static const UINT32 INSTRCTN_RAM_TEST_ITERATION_PERIOD_MS = 15000;          // 15 seconds for now
     
             execTestData.m_IterationPeriod                   = INSTRCTN_RAM_TEST_ITERATION_PERIOD_MS;
             execTestData.m_TestType                          = DiagnosticTesting::DiagnosticTest::DIAG_INTRUCTION_RAM_TEST_TYPE;
@@ -328,7 +223,7 @@ namespace BlackfinDiagRuntimeEnvironment
             // Timer testing parameters, structures and definitions.                                                    *
             //                                                                                                          *
             //***********************************************************************************************************
-            #define TIMER_TEST_ITERATION_PERIOD_MS   10000  // Start after 10 seconds.
+            static const UINT32 TIMER_TEST_ITERATION_PERIOD_MS =  10000;  // Start after 10 seconds.
             execTestData.m_IterationPeriod                   = TIMER_TEST_ITERATION_PERIOD_MS;
        		execTestData.m_TestType                          = DiagnosticTesting::DiagnosticTest::DIAG_TIMER_TEST_TYPE;
 
@@ -342,7 +237,7 @@ namespace BlackfinDiagRuntimeEnvironment
             // Instructions testing parameters, structures and definitions.                                             *
             //                                                                                                          *
             //***********************************************************************************************************
-            #define INSTRUCTIONS_TEST_ITERATION_PERIOD_MS 5000
+            static const UINT32 INSTRUCTIONS_TEST_ITERATION_PERIOD_MS = 5000;
 	
             execTestData.m_IterationPeriod                   = INSTRUCTIONS_TEST_ITERATION_PERIOD_MS;
        		execTestData.m_TestType                          = DiagnosticTesting::DiagnosticTest::DIAG_INSTRUCTIONS_TEST_TYPE;
@@ -358,20 +253,20 @@ namespace BlackfinDiagRuntimeEnvironment
             /// Create data structures defining runtime environment for the scheduler
             ///
             //////////////////////////////////////////////////////////////////////////////////////////////////////////
-            #define CORRUPTED_DIAG_TEST_VECTOR_ERR  1
+            static const UINT32 CORRUPTED_DIAG_TEST_VECTOR_ERR = 1;
 	
-            #define CORRUPTED_DIAG_TEST_MEMORY_ERR 2
+            static const UINT32 CORRUPTED_DIAG_TEST_MEMORY_ERR = 2;
         	
-            #define TEST_TOOK_TOO_LONG_ERR         3
+            static const UINT32 TEST_TOOK_TOO_LONG_ERR         = 3;
 	
-            #define ALL_DIAG_DID_NOT_COMPLETE_ERR  4
+            static const UINT32 ALL_DIAG_DID_NOT_COMPLETE_ERR  = 4;
         	
             //
             // Requirement:  All Diagnostic Tests Complete in 4 Hours.
             //
-            #define PERIOD_FOR_ALL_DIAGNOSTICS_COMPLETED_MS     2 * 60 * 60 * 1000 // 2 hours for now, number of milleseconds in 4 hours
+            static const UINT32 PERIOD_FOR_ALL_DIAGNOSTICS_COMPLETED_MS     = 2 * 60 * 60 * 1000; // 2 hours for now, number of milleseconds in 4 hours
     
-            #define PERIOD_FOR_ONE_DIAGNOSTIC_TEST_ITERATION_MS 50 // Milleseconds
+            static const UINT32 PERIOD_FOR_ONE_DIAGNOSTIC_TEST_ITERATION_MS = 50; // Milleseconds
 
             static DiagnosticTesting::DiagnosticTest * pDiagnosticTests[]    = 
                                                      {
@@ -387,6 +282,7 @@ namespace BlackfinDiagRuntimeEnvironment
     											&ReadTimestamp,
     											&ComputeElapsedTimeMS,
     											&BlackfinCrash,
+    											&Apex_WatchdogKick,
     											PERIOD_FOR_ALL_DIAGNOSTICS_COMPLETED_MS,
     											PERIOD_FOR_ONE_DIAGNOSTIC_TEST_ITERATION_MS,
     											FALSE,    // m_MonitorIndividualTotalTestingTime

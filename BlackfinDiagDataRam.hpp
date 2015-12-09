@@ -40,8 +40,8 @@
 	
 namespace BlackfinDiagnosticTesting 
 {
-    #define MEMORY_BANK_FAILURE_BIT_POS               30
-    #define TEST_PATTERNS_ERROR_BIT_POS               16
+    static const UINT32 MEMORY_BANK_FAILURE_BIT_POS = 30;
+    static const UINT32 TEST_PATTERNS_ERROR_BIT_POS = 16;
 
     class BlackfinDiagDataRam : public DiagnosticTesting::DiagnosticTest 
     {

@@ -25,7 +25,7 @@
 // SYSTEM INCLUDES
 
 // C PROJECT INCLUDES
-// (none)
+#include "Nvs_Obj.h"
  
 // C++ PROJECT INCLUDES
 #include "DiagnosticTesting.hpp"
@@ -35,11 +35,11 @@
 
 namespace BlackfinDiagnosticTesting 
 {
-    #define BAD_BOOTSTREAM_ERR                    0xffd00000
-    #define UNABLE_TO_START_ERR                   0xfff00000
-    #define MISMATCH_ERR                          0xffe00000
-    #define BOOT_STREAM_START                     reinterpret_cast<UINT8 *>(0x20040000L)
-    #define INSTR_START_ADDR                      reinterpret_cast<const void *>(0xffa00000)
+    static const UINT32  BAD_BOOTSTREAM_ERR  = 0xffd00000;
+    static const UINT32  UNABLE_TO_START_ERR = 0xfff00000;
+    static const UINT32  MISMATCH_ERR        = 0xffe00000;
+    static const UINT8 * BOOT_STREAM_START   = reinterpret_cast<UINT8 *>NVS_MAIN_START_ADDR;
+    static const void *  INSTR_START_ADDR    = reinterpret_cast<const void *>(0xffa00000);
     
     class BlackfinDiagInstructionRam : public DiagnosticTesting::DiagnosticTest 
     {

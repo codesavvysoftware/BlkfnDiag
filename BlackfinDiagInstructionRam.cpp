@@ -161,7 +161,10 @@ namespace BlackfinDiagnosticTesting
 	    {
 		    statusD0 = *pMDMA_D0_IRQ_STATUS;
 		
-		    if (!(statusD0 & DMA_COMPLETE_MASK )) break;
+		    if (!(statusD0 & DMA_COMPLETE_MASK )) 
+		    {
+		        break;
+		    }
 
 		    loopCntr--;
 	    }
@@ -191,11 +194,17 @@ namespace BlackfinDiagnosticTesting
     
         while (TRUE) 
         {    	
-    	    if ( offset & (sizeof(UDINT) - 1) ) break; 
+    	    if ( offset & (sizeof(UDINT) - 1) ) 
+    	    {
+    	        break; 
+    	    }
     	
     	    ADI_BOOT_HEADER * pHeader = (ADI_BOOT_HEADER *)(pBootBase + offset);
     	
-    	    if ( (pHeader->dBlockCode & HDRSGN) != 0xAD000000 ) break;
+    	    if ( (pHeader->dBlockCode & HDRSGN) != 0xAD000000 ) 
+    	    {
+    	        break;
+    	    }
     	
     	    // Is this the start of instruction memory 
     	    if ( pHeader->pTargetAddress == m_pInstructionRamStartAddr && pHeader->dByteCount ) 
@@ -225,7 +234,10 @@ namespace BlackfinDiagnosticTesting
             }
     	
     	    // Are there more headers to process 
-      	    if ( (pHeader->dBlockCode & BFLAG_FINAL) ) break; 
+      	    if ( (pHeader->dBlockCode & BFLAG_FINAL) ) 
+      	    {
+      	        break; 
+      	    }
         }
 
         return success; 
@@ -284,8 +296,8 @@ namespace BlackfinDiagnosticTesting
         GetBootStreamStartAddr( pBootBase );    
     
 	    UINT32             offset   = 0; 
-        BOOL               success = FALSE;    
-        rError                      = FALSE;
+        BOOL               success  = TRUE;    
+        rError  = FALSE;
     
         ADI_BOOT_HEADER * pHeader = (ADI_BOOT_HEADER *)(pBootBase + rHdrOffst);
 

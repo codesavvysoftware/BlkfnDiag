@@ -25,7 +25,6 @@ _TestAByteOfRam:
 	//
 	[--sp] = r4;			// Save non scratchpad registers
 	[--sp] = r3;
-	[--sp] = p4;
 	[--sp] = p3;
 	[--sp] = p2;
 	//
@@ -40,7 +39,6 @@ _TestAByteOfRam:
 	//
 	p0 = r1;				// Pointer to struct in p0 for indirect addressing
 	p1 = [p0];              // p1 = pByteToTest
-	p4 = p1;          		// Move it into p4 for restoring byte later.
 	p2 = [p0+4];        	// p2 = pPatternThatFailed, returned to caller upon failure
 	p3 = [p0+8];			// p3 = pTestPatterns
 	r2 = [p0+12];			// r2 = NumberOfTestPatters
@@ -53,24 +51,23 @@ CheckForMoreTestPatterns:
 	r0 = 1; 				// Finished with all the patterns, no errors found, return TRUE
 Exit:
        		
-	B [p4] = r1;			// Restore orignal memory contents
+	B [p1] = r1;			// Restore orignal memory contents
 	
 	p2 = [sp++];			// Save non scratchpad registers
 	p3 = [sp++];
-	p4 = [sp++];
 	r3 = [sp++];
 	r4 = [sp++];
 	unlink;
 	rts;
 NextPattern:
-	r0 = B [p3];        // Next test pattern in r0
+	r0 = B [p3];            // Next test pattern in r0
 	B [p1] = r0;
 	nop;
 	nop;
 	nop;
-	nop;            // Save test pattern in memory location being tested.
-	r4 = B [p1];        // Read it back
-	cc = r0 == r4;             // Did it read back correctly ?
+	nop;                    // Save test pattern in memory location being tested.
+	r4 = B [p1];            // Read it back
+	cc = r0 == r4;          // Did it read back correctly ?
 	if cc jump PrepareForNextPattern;
 	B [p2] = r0;     		// Save test pattern that failed
 	r0 = 0;                 // Indicate an error to the caller

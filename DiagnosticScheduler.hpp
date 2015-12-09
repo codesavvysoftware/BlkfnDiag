@@ -52,8 +52,11 @@ namespace DiagnosticScheduling
         // Calculate the elapsed time in milleseconds between timer tick readings;
         UINT32                                                  (*m_CalcElapsedTime)(UINT64 current, UINT64 previous);
             	
-        // When diagnostics occur, call this function to report the error.
+        // When diagnostics detect errors, call this function to report the error.
         void                                                    (*m_ExceptionError)(INT errorCode);
+        
+        // For "kicking" the watchdog timer
+        void                                                    (*m_KickWatchdogTimer)();
             	
         // All diagnostics must complete within this time period.
         UINT32                                                  m_PeriodForAllDiagnosticsToCompleteInMS;
@@ -177,7 +180,6 @@ namespace DiagnosticScheduling
 
             typedef enum 
         	{
-        		INITIAL_INSTANTIATION,
         		MAX_PERIOD_EXPIRED_ALL_TESTS_COMPLETE,
         		MAX_PERIOD_EXPIRED_INCOMPLETE_TESTING,
         		NO_NEW_SCHEDULING_PERIOD,
@@ -231,6 +233,20 @@ namespace DiagnosticScheduling
 
         	DiagnosticScheduler &operator=(const DiagnosticScheduler &);
 
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            ///	METHOD NAME: DiagnositcScheduler: AreAllTestsComplete
+            ///
+            /// @par Full Description
+            ///      Determine if all tests are complete for the diagnostic cycle.
+            ///      
+            ///
+            /// @param                        none
+            ///
+            /// @return                       TRUE when all tests have completed for a diagnostic cycle
+            ///
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            BOOL AreAllTestsComplete();
+            
             //////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///	METHOD NAME: DiagnositcScheduler: ConfigureErrorCode
             ///
@@ -267,6 +283,22 @@ namespace DiagnosticScheduling
         	void DetermineCurrentSchedulerState();
 
             //////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///	METHOD NAME: DiagnositcScheduler: DetermineIfIterationsAreScheduled
+            ///
+            /// @par Full Description
+            ///      Determines if test iterations are scheduled to run.  The state of the scheduler is configured 
+            ///      and a pointer to the next test to run is also configured..
+            ///      
+            ///
+            /// @param                        None.              
+            ///                                     
+            ///                               
+            /// @return                       m_CurrentScheduleState configured with current scheduler stated.
+            ///
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            void DetermineIfIterationsAreScheduled();
+            
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///	METHOD NAME: DiagnositcScheduler: DoMoreDiagnosticTesting
             ///
             /// @par Full Description
@@ -280,6 +312,34 @@ namespace DiagnosticScheduling
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
         	void DoMoreDiagnosticTesting();
 
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///	METHOD NAME: DiagnositcScheduler: IsDiagnosticCyleTimePeriodExpired
+            ///
+            /// @par Full Description
+            ///      Returns TRUE when a diagnostic cylcle time period has expired
+            ///      
+            ///
+            /// @param                        None.
+            ///                               
+            /// @return                       TRUE when the time period for a diagnostic cycle has expired
+            ///                             
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            BOOL IsDiagnosticCyleTimePeriodExpired();
+
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///	METHOD NAME: DiagnositcScheduler: IsIterationWithinDiagnosticCycleExpired
+            ///
+            /// @par Full Description
+            ///      Returns TRUE when an iternation period within a diagnostic cylcle time period has expired
+            ///      
+            ///
+            /// @param                        None.
+            ///                               
+            /// @return                       TRUE when an iternation period within a diagnostic cylcle time period 
+            ///                               has expired
+            ///                             
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            BOOL IsIterationWithinDiagnosticCycleExpired();
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///	METHOD NAME: DiagnositcScheduler: IsTestingCompleteForDiagCycle
             ///

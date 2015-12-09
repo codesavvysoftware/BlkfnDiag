@@ -39,7 +39,7 @@
 
 namespace BlackfinDiagnosticTesting 
 {
-    #define CORRUPTED_REG_TST 0xff
+    static const UINT32 CORRUPTED_REG_TST = 0xff;
 	
     class BlackfinDiagRegistersTest : public DiagnosticTesting::DiagnosticTest 
     {

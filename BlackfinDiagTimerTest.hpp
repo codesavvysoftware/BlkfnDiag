@@ -40,15 +40,15 @@ namespace BlackfinDiagnosticTesting
 {
 	
     // Test specific
-    #define TIMER_TEST_APEX_TIMER_ERR        1
-    #define TIMER_TEST_HOST_TIMER_ERR        2
-    #define TIMER_TIMING_PERIOD_US           30 * 60 * 1000000 // 30 minutes in microsecond;
-    #define TIMER_TIMING_PERIOD_MS           TIMER_TIMING_PERIOD_US / 1000
-    #define TIMER_MARGIN_OF_ERROR            TIMER_TIMING_PERIOD_US / 20  //5% of 30 minutes in microseconds 
-    #define MAX_TIMER_TEST_ELAPSED_TIME_APEX TIMER_TIMING_PERIOD_US + TIMER_MARGIN_OF_ERROR
-    #define MAX_TIMER_TEST_ELAPSED_TIME_HOST TIMER_TIMING_PERIOD_US + TIMER_MARGIN_OF_ERROR
-    #define MIN_TIMER_TEST_ELAPSED_TIME_APEX TIMER_TIMING_PERIOD_US - TIMER_MARGIN_OF_ERROR
-    #define MIN_TIMER_TEST_ELAPSED_TIME_HOST TIMER_TIMING_PERIOD_US - TIMER_MARGIN_OF_ERROR
+    static const UINT32 TIMER_TEST_APEX_TIMER_ERR        =  1;
+    static const UINT32 TIMER_TEST_HOST_TIMER_ERR        =  2;
+    static const UINT32 TIMER_TIMING_PERIOD_US           =  30 * 60 * 1000000; // 30 minutes in microsecond;
+    static const UINT32 TIMER_TIMING_PERIOD_MS           =  TIMER_TIMING_PERIOD_US / 1000L;
+    static const UINT32 TIMER_MARGIN_OF_ERROR            =  TIMER_TIMING_PERIOD_US / 20;  //5% of 30 minutes in microseconds 
+    static const UINT32 MAX_TIMER_TEST_ELAPSED_TIME_APEX =  TIMER_TIMING_PERIOD_US + TIMER_MARGIN_OF_ERROR;
+    static const UINT32 MAX_TIMER_TEST_ELAPSED_TIME_HOST =  TIMER_TIMING_PERIOD_US + TIMER_MARGIN_OF_ERROR;
+    static const UINT32 MIN_TIMER_TEST_ELAPSED_TIME_APEX =  TIMER_TIMING_PERIOD_US - TIMER_MARGIN_OF_ERROR;
+    static const UINT32 MIN_TIMER_TEST_ELAPSED_TIME_HOST =  TIMER_TIMING_PERIOD_US - TIMER_MARGIN_OF_ERROR;
 
     class BlackfinDiagTimerTest : public DiagnosticTesting::DiagnosticTest 
     {
@@ -115,7 +115,21 @@ namespace BlackfinDiagnosticTesting
 		
             BlackfinDiagTimerTest();
                         
-        	// True when being instantiated for the current diagnostic cycle.
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///	METHOD NAME: BlackfinDiagTimerTest: HostGetTime
+            ///
+            /// @par Full Description
+            ///      Get system time for Blackfin Host in microseconds
+            ///      
+            ///
+            /// @param                            None.
+            ///                               
+            /// @return                           System time in microseconds
+            ///
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            UINT32 HostGetTime();
+
+            // True when being instantiated for the current diagnostic cycle.
         	BOOL                                  m_BeingInstantiated;
  
         	// Maximum elapsed time value the Apex can have after 30 minutes.

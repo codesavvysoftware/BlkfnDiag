@@ -72,7 +72,7 @@ namespace DiagnosticScheduling
     DiagnosticScheduler<T>::DiagnosticScheduler( T **                          ppDiagnostics,
                                                  UINT32                        numberOfDiagnosticTests,
                                                  DiagnosticRunTimeParameters  runTimeData )
-    		  : m_CurrentSchedulerState          ( INITIAL_INSTANTIATION ),
+    		  : m_CurrentSchedulerState          ( MAX_PERIOD_EXPIRED_ALL_TESTS_COMPLETE ),
     		 	m_ppRunTimeDiagnostics           ( ppDiagnostics ),
     		 	m_NumberOfDiagTests              ( numberOfDiagnosticTests ),
     		 	m_RuntimeData                    ( runTimeData ),
@@ -87,6 +87,14 @@ namespace DiagnosticScheduling
     	// completion time diagnostic injected fault happen faster will be injected here.
     	//	static const DiagSlices_t DGN_COMPL_CHECK_INTERVAL_TIME_SLICE = 15 * DGN_INTERVALS_PER_MINUTE;
 
+    	m_TimestampCurrent = (*m_RuntimeData.m_SysTimestamp)();
+	
+    	//
+    	// Sync everything to the same timestamp upon initial instantiation.
+    	//
+    	m_TimeTestCycleStarted           = m_TimestampCurrent;
+		
+    	m_TimeLastIterationPeriodExpired = m_TimestampCurrent;		
     }
 
 
@@ -113,11 +121,12 @@ namespace DiagnosticScheduling
     	// Then check if it's time for generic diagnostic test (unsigned math handles roll-over)
     	//else if ((GetSystemTime() - m_LastDiagTime) > DiagnosticSlicePeriod_Microseconds)
     
+    	(*m_RuntimeData.m_KickWatchdogTimer)();
+    	
     	DetermineCurrentSchedulerState();	
 
     	switch (m_CurrentSchedulerState) 
         {
-    		case INITIAL_INSTANTIATION:
     		case MAX_PERIOD_EXPIRED_ALL_TESTS_COMPLETE:		
     		{
     			m_CurrentSchedulerState = NO_NEW_SCHEDULING_PERIOD;
@@ -162,6 +171,30 @@ namespace DiagnosticScheduling
     // PRIVATE METHODS
     //***************************************************************************
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: DiagnositcScheduler: AreAllTestsComplete
+    ///
+    ///      Determine if all tests are complete for the diagnostic cycle
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    BOOL DiagnosticScheduler<T>::AreAllTestsComplete()
+    { 
+    	BOOL allTestsCompleted = TRUE;
+    	
+    	for ( UINT32 ui = 0; ui < m_NumberOfDiagTests; ++ui )
+    	{
+            if ( !IsTestingCompleteForDiagCycle(m_ppRunTimeDiagnostics[ ui ]) )
+            {	
+            	allTestsCompleted = FALSE;
+		
+    			break;
+            }
+    	}
+    	
+    	return allTestsCompleted;
+    }
+
     /////////////////////////////////////////////////////////////////////////////
     ///	METHOD NAME: DiagnositcScheduler: ConfigureErrorCode
     ///
@@ -186,110 +219,92 @@ namespace DiagnosticScheduling
     template <typename T>
     void DiagnosticScheduler<T>::DetermineCurrentSchedulerState() 
     {	
-    	UINT32 elapsedTimeInTestCycle;
-	
-    	BOOL allTestsCompleted = TRUE;
-	
-    	UINT32 ui = 0;
-    		
-    	for ( ui = 0; ui < m_NumberOfDiagTests; ui++ )
-    	{
-            if ( !IsTestingCompleteForDiagCycle(m_ppRunTimeDiagnostics[ ui ]) )
-            {	
-            	allTestsCompleted = FALSE;
-		
-    			break;
-            }
-    	}
-	
     	m_TimestampCurrent = (*m_RuntimeData.m_SysTimestamp)();
 	
-    	// No state determination needed will get changed by caller
-    	if ( m_CurrentSchedulerState == INITIAL_INSTANTIATION ) 
-    	{		
-    		//
-    		// Sync everything to the same timestamp upon initial instantiation.
-    		//
-    		m_TimeTestCycleStarted           = m_TimestampCurrent;
-		
-    		m_TimeLastIterationPeriodExpired = m_TimestampCurrent;
-		
-    		UINT32 ui = 0;
-    		
-    		for ( ui = 0; ui < m_NumberOfDiagTests; ui++ )
-    		{
-    			m_ppRunTimeDiagnostics[ ui ]->SetIterationCompletedTimestamp( m_TimestampCurrent );		
-            }		
-		
-            return;
-    	}
-
-    	// Compute Elapsed Time in Current Diagnostic Test Period
-    	elapsedTimeInTestCycle = (*m_RuntimeData.m_CalcElapsedTime)( m_TimestampCurrent, m_TimeTestCycleStarted );
+    	BOOL   diagCycleTimePeriodExpired = IsDiagnosticCyleTimePeriodExpired();
+    	
+    	BOOL   allTestsCompleted = AreAllTestsComplete();
 	
-    	if ( elapsedTimeInTestCycle >= m_RuntimeData.m_PeriodForAllDiagnosticsToCompleteInMS ) 
-    	{	
-    		m_TimeTestCycleStarted = m_TimestampCurrent;
-    		
-    		++m_NumberOfDiagCycles;
-		
-    		if ( allTestsCompleted ) 
+    	if ( diagCycleTimePeriodExpired )
+    	{
+       		if ( allTestsCompleted ) 
     		{
+    		    m_TimeTestCycleStarted = m_TimestampCurrent;
+    		
+                ++m_NumberOfDiagCycles;
+		
     			m_CurrentSchedulerState = MAX_PERIOD_EXPIRED_ALL_TESTS_COMPLETE;
     		}
     		else 
     		{
     			m_CurrentSchedulerState = MAX_PERIOD_EXPIRED_INCOMPLETE_TESTING;
     		}
+    		
+    		return;
     	}
-    	else 
-    	{		
-    	    if ( NO_TESTS_TO_RUN_ALL_COMPLETED == m_CurrentSchedulerState ) 
-    	    {
-	    	    return;
-    	    	
-    	    }
-   	    	
-    	    UINT32 elapsedTimeForCurrentIteration = (*m_RuntimeData.m_CalcElapsedTime)( m_TimestampCurrent, m_TimeLastIterationPeriodExpired );
-	
-    	    if ( elapsedTimeForCurrentIteration > m_RuntimeData.m_PeriodForOneDiagnosticIteration ) 
-    	    {
-    	    	m_TimeLastIterationPeriodExpired = m_TimestampCurrent;
+    	
+    	if ( NO_TESTS_TO_RUN_ALL_COMPLETED == m_CurrentSchedulerState ) 
+        {
+	        return;
+    	}
+    	
+    	if ( allTestsCompleted )
+        {
+            m_CurrentSchedulerState = NO_TESTS_TO_RUN_ALL_COMPLETED;
+            
+            return;
+        }
+
+    	if ( IsIterationWithinDiagnosticCycleExpired() )
+    	{
+    	    m_TimeLastIterationPeriodExpired = m_TimestampCurrent;
 	    	
-    	    	if ( allTestsCompleted ) 
-    	    	{
-	    		    m_CurrentSchedulerState = NO_TESTS_TO_RUN_ALL_COMPLETED;
-    	    	}
-    	    	else 
-    	    	{
-   	    			m_CurrentSchedulerState = NO_TEST_ITERATIONS_SCHEDULED;
-                    
-   	    			UINT32 ui = 0;
-   	    			
-   	    			for ( ui = 0; ui < m_NumberOfDiagTests; ui++ )
-    	            {
-			
-    		            if ( 
-    		                    !IsTestingCompleteForDiagCycle(m_ppRunTimeDiagnostics[ ui ])
-    		                 && IsTestScheduledToRun(m_ppRunTimeDiagnostics[ ui ]) 
-    		               )
-    		            {
-		
-                            m_CurrentSchedulerState = TEST_ITERATIONS_SCHEDULED;
-                            
-                            break;
-    		            }
-    	            }
-    	            
-    	            m_ppTestEnumeration = m_ppRunTimeDiagnostics + ui;
-	   	    	}
-    	    }
-    	    else 
+    	    if ( allTestsCompleted ) 
     	    {
-    	    	m_CurrentSchedulerState = NO_NEW_SCHEDULING_PERIOD;
+    	       m_CurrentSchedulerState = NO_TESTS_TO_RUN_ALL_COMPLETED;
+    	       
+    	       return;
     	    }
+    	    
+    	    DetermineIfIterationsAreScheduled();
+    	    
+    	    return;
     	}
+    	
+    	m_CurrentSchedulerState = NO_NEW_SCHEDULING_PERIOD;
     }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: DiagnositcScheduler: DetermineIfIterationsAreScheduled
+    ///
+    ///      Determines if test iterations are scheduled to run.  The state of the scheduler is configured 
+    ///      and a pointer to the next test to run is also configured..
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    void DiagnosticScheduler<T>::DetermineIfIterationsAreScheduled() 
+    {
+   	    m_CurrentSchedulerState = NO_TEST_ITERATIONS_SCHEDULED;
+                    
+   	    UINT32 ui = 0;
+   	    			
+   	    for ( ui = 0; ui < m_NumberOfDiagTests; ui++ )
+    	{
+		    if ( 
+    		        !IsTestingCompleteForDiagCycle(m_ppRunTimeDiagnostics[ ui ])
+    		     && IsTestScheduledToRun(m_ppRunTimeDiagnostics[ ui ]) 
+    		   )
+    		{
+		
+                m_CurrentSchedulerState = TEST_ITERATIONS_SCHEDULED;
+                            
+                m_ppTestEnumeration = m_ppRunTimeDiagnostics + ui;
+                
+                break;
+    		}
+    	}
+    	            
+	}
 
     /////////////////////////////////////////////////////////////////////////////
     ///	METHOD NAME: DiagnositcScheduler: DoMoreDiagnosticTesting
@@ -382,6 +397,34 @@ namespace DiagnosticScheduling
     	}
     }    
 			
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: DiagnositcScheduler: IsDiagnosticCyleTimePeriodExpired
+    ///
+    ///      Returns TRUE when a diagnostic cylcle time period has expired
+    ///                             
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    BOOL DiagnosticScheduler<T>::IsDiagnosticCyleTimePeriodExpired()
+    {
+    	// Compute Elapsed Time in Current Diagnostic Test Period
+    	UINT32 elapsedTime = (*m_RuntimeData.m_CalcElapsedTime)( m_TimestampCurrent, m_TimeTestCycleStarted );
+	
+        return ( elapsedTime >= m_RuntimeData.m_PeriodForAllDiagnosticsToCompleteInMS );
+    } 
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: DiagnositcScheduler: IsIterationWithinDiagnosticCycleExpired
+    ///
+    ///      Returns TRUE when an iternation period within a diagnostic cylcle time period has expired
+    ///                             
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    BOOL DiagnosticScheduler<T>::IsIterationWithinDiagnosticCycleExpired()
+    {
+        UINT32 elapsedTime= (*m_RuntimeData.m_CalcElapsedTime)( m_TimestampCurrent, m_TimeLastIterationPeriodExpired );
+	
+    	return (elapsedTime >= m_RuntimeData.m_PeriodForOneDiagnosticIteration );
+    } 
     /////////////////////////////////////////////////////////////////////////////
     ///	METHOD NAME: DiagnositcScheduler: IsTestingCompleteForDiagCycle
     ///
