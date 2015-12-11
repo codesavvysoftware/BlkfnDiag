@@ -12,7 +12,7 @@
 ///
 /// @ingroup Diagnostics
 ///
-/// @par Copyright (c) 2013 Rockwell Automation Technologies, Inc.  All rights reserved.
+/// @par Copyright (c) 2015 Rockwell Automation Technologies, Inc.  All rights reserved.
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include <asm_sprt.h>                              /* Added for ssync( ), cli/sti( ) */
 

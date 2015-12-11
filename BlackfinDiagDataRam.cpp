@@ -12,7 +12,7 @@
 ///
 /// @ingroup Diagnostics
 ///
-/// @par Copyright (c) 2013 Rockwell Automation Technologies, Inc.  All rights reserved.
+/// @par Copyright (c) 2015 Rockwell Automation Technologies, Inc.  All rights reserved.
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SYSTEM INCLUDES
 // (none)

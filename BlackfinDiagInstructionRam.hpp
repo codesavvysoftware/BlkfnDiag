@@ -35,11 +35,11 @@
 
 namespace BlackfinDiagnosticTesting 
 {
-    static const UINT32  BAD_BOOTSTREAM_ERR  = 0xffd00000;
-    static const UINT32  UNABLE_TO_START_ERR = 0xfff00000;
-    static const UINT32  MISMATCH_ERR        = 0xffe00000;
-    static const UINT8 * BOOT_STREAM_START   = reinterpret_cast<UINT8 *>NVS_MAIN_START_ADDR;
-    static const void *  INSTR_START_ADDR    = reinterpret_cast<const void *>(0xffa00000);
+    static const UINT32  BAD_BOOTSTREAM_ERR          = 0xffd00000;
+    static const UINT32  UNABLE_TO_START_ERR         = 0xfff00000;
+    static const UINT32  MISMATCH_ERR                = 0xffe00000;
+    static const UINT8 * BOOT_STREAM_START           = reinterpret_cast<UINT8 *>NVS_MAIN_START_ADDR;
+    static const UINT32  PROGRAM_MEMORY_ADDRESS_MASK = 0xffa00000;
     
     class BlackfinDiagInstructionRam : public DiagnosticTesting::DiagnosticTest 
     {
@@ -64,8 +64,7 @@ namespace BlackfinDiagnosticTesting
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	        BlackfinDiagInstructionRam( DiagnosticTesting::DiagnosticTest::ExecuteTestData &     rTestData) 
 		            		         :  DiagnosticTest              ( rTestData ),
-                                        m_pBootStreamStartAddr      ( BOOT_STREAM_START ),
-                                        m_pInstructionRamStartAddr  ( INSTR_START_ADDR )
+                                        m_pBootStreamStartAddr      ( reinterpret_cast<UINT8 *>(0x20000000))//(NVS_MAIN_START_ADDR ))
 	        {
 	        }
 	
@@ -145,9 +144,6 @@ namespace BlackfinDiagnosticTesting
             // Where the bootstream is located in FLASH
             const UINT8 *                m_pBootStreamStartAddr;
             
-            // Contains address of where instruction RAM testing begins at.
-            const void *                 m_pInstructionRamStartAddr;
-                   	//
 	        // Inhibit copy construction and assignments of this class by putting the declarations in private portion.
 	        // If using C++ 11 and later use the delete keyword to do this.
 	        //
@@ -247,7 +243,7 @@ namespace BlackfinDiagnosticTesting
             ///
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 			DiagnosticTesting::DiagnosticTest::TestState RunInstructionRamTestIteration( InstructionCompareParams & rIcpCompare,
-							                                                                UINT32 &                   rErrorCode	);
+							                                                             UINT32 &                   rErrorCode	);
 																
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///	METHOD NAME: BlackfinDiagInstructionRam: StartEnumeratingInstructionBootStreamHeaders
@@ -262,6 +258,18 @@ namespace BlackfinDiagnosticTesting
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	        BOOL                                         StartEnumeratingInstructionBootStreamHeaders(UINT32 & rHeaderOffset);
 
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///	METHOD NAME: BlackfinDiagInstructionRam: IsAddrLocatedInInstrctnMmry
+            ///
+            /// @par Full Description
+            ///      Returns TRUE when the input address is located in the Blackfin Instruction Memory.
+            ///
+            /// @param        Address to check
+            ///
+            /// @return       TRUE when the input address is located in the Blackfin Instruction Memory.
+            ///
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            BOOL                                         IsAddrLocatedInInstrctnMmry( void * pAddress );
 	};
 
 };

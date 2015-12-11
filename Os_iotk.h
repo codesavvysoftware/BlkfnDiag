@@ -53,7 +53,11 @@
 ** Latest Revision:
 **  
 **     Rev 1.00   02 Aug 2011 DDM  Created from SOE
-**                20 Jul 2015 DDM  Use INLINE macro
+**     Rev 1.01   20 Jul 2015 DDM  Use INLINE macro
+**     Rev 1.02   05 Nov 2015 DDM  Add OS_ASSERT_APEXFAULT
+**     Rev 1.03   11 Dec 2015 TNH  Add extern "C" to provide linkage to C++
+**                                 code for OS_Assert();
+**
 **
 *****************************************************************************
 *****************************************************************************
@@ -149,7 +153,7 @@ struct STACK_STRUCT
         asm("%0=R6;" : "=d" ( preserved[2] ) : ); \
         asm("%0=R7;" : "=d" ( preserved[3] ) : ); \
         asm("%0=P3;" : "=d" ( preserved[4] ) : ); \
-        asm("%0=P4;" : "=d" ( preserved[5] ) : )
+        asm("%0=P4;" : "=d" ( preserved[5] ) : ); 
  
 
 #define SET_STACK( stack )    \
@@ -264,6 +268,7 @@ void * OS_REALLOC(void *ptr, size_t length)
 #define OS_ASSERT_WDOG           6      /* WatchDog assert */
 #define OS_ASSERT_HW_ERR         7      /* Hardware Error assert */
 #define OS_ASSERT_FW_ERR         8      /* Firmware Error assert */
+#define OS_ASSERT_APEXFAULT      9      /* Apex Fault assert */
 
 /* Define the descriptor block for the system queues.  Queues are internally */
 /* handled like ring buffers (circular queues), but this is transparent to   */
@@ -300,6 +305,8 @@ INT  OS_CreateTask( SINT process_id, USINT priority, UINT stack_size, void (* pr
 INT  OS_CreateQueue( USINT queue_id, UINT queue_size );
 void OS_GetQueue( USINT queue_id, void **message );
 INT  OS_PutQueue( USINT queue_id, void *message );
+
+/* coverity[+kill] */
 extern "C" void _OS_Assert( INT error_num, char *file, int line );
 
 /****************************************************************************

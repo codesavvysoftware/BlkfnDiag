@@ -12,7 +12,7 @@
 ///
 /// @ingroup Diagnostics
 ///
-/// @par Copyright (c) 2013 Rockwell Automation Technologies, Inc.  All rights reserved.
+/// @par Copyright (c) 2015 Rockwell Automation Technologies, Inc.  All rights reserved.
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,13 +80,6 @@ namespace DiagnosticScheduling
     			m_TimestampCurrent               ( DEFAULT_INITIAL_TIMESTAMP ),
     			m_NumberOfDiagCycles             ( 0 )
     {
-
-    	// Number of timeslices between diagnostics completion time checks
-    	// Start Fault Injection Point 3
-    	// Declaration of DGN_COMPL_CHECK_INTERVAL_TIME_SLICE constant with a smaller value to make
-    	// completion time diagnostic injected fault happen faster will be injected here.
-    	//	static const DiagSlices_t DGN_COMPL_CHECK_INTERVAL_TIME_SLICE = 15 * DGN_INTERVALS_PER_MINUTE;
-
     	m_TimestampCurrent = (*m_RuntimeData.m_SysTimestamp)();
 	
     	//
@@ -324,9 +317,15 @@ namespace DiagnosticScheduling
 				
     		++m_ppTestEnumeration;
 				
-    		if ( IsTestingCompleteForDiagCycle(pCurrentDiagTest) ) continue;
+    		if ( IsTestingCompleteForDiagCycle(pCurrentDiagTest) ) 
+    		{
+    		    continue;
+    		}
 		
-    		if ( !IsTestScheduledToRun(pCurrentDiagTest) ) continue;
+    		if ( !IsTestScheduledToRun(pCurrentDiagTest) ) 
+    		{
+    		    continue;
+    		}
 									
     		T::TestState CurrentState = pCurrentDiagTest->GetCurrentTestState();
     		    

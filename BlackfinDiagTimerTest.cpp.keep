@@ -12,7 +12,7 @@
 ///
 /// @ingroup Diagnostics
 ///
-/// @par Copyright (c) 2015 Rockwell Automation Technologies, Inc.  All rights reserved.
+/// @par Copyright (c) 2013 Rockwell Automation Technologies, Inc.  All rights reserved.
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SYSTEM INCLUDES
 // (none)
@@ -21,6 +21,7 @@
 #include "Defs.h"
 #include "Os_iotk.h"             // This file depends on Defs.h.  It should include that file
 #include "Hw.h"                  // Ditto 
+#include "Apex.h"
 
 
 // C++ PROJECT INCLUDES

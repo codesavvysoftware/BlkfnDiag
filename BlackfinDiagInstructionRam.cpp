@@ -12,7 +12,7 @@
 ///
 /// @ingroup Diagnostics
 ///
-/// @par Copyright (c) 2013 Rockwell Automation Technologies, Inc.  All rights reserved.
+/// @par Copyright (c) 2015 Rockwell Automation Technologies, Inc.  All rights reserved.
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SYSTEM INCLUDES
 #include <bfrom.h>
@@ -206,8 +206,15 @@ namespace BlackfinDiagnosticTesting
     	        break;
     	    }
     	
-    	    // Is this the start of instruction memory 
-    	    if ( pHeader->pTargetAddress == m_pInstructionRamStartAddr && pHeader->dByteCount ) 
+    	    //
+    	    // Is target address part of instruction memory.
+    	    //
+
+
+    
+       	    BOOL targetAddrInInstrctnMmry = IsAddrLocatedInInstrctnMmry( pHeader->pTargetAddress );
+       	      
+    	    if ( targetAddrInInstrctnMmry && pHeader->dByteCount ) 
     	    {	
     		    // Yes save the header offset and exit with a true condition 
     		    rHeaderOffset     = offset;
@@ -267,8 +274,11 @@ namespace BlackfinDiagnosticTesting
 	    bytesLeft                -= (rIcp.m_CurrentBfrOffset + DMA_BFR_SZ);
 	
 	
-	    if ( bytesLeft >= 0 ) isPartialRead = FALSE;
-	
+	    if ( bytesLeft > 0 ) 
+	    {
+	        isPartialRead = FALSE;
+	    }
+	    
 	    if ( isPartialRead ) 
 	    {
 		    rIcp.m_NmbrOfBytesInBuffer = pHeader->dByteCount - rIcp.m_CurrentBfrOffset;
@@ -312,6 +322,8 @@ namespace BlackfinDiagnosticTesting
 
             pHeader = (ADI_BOOT_HEADER *)(pBootBase + rHdrOffst);
 
+            BOOL targetAddrInInstrctnMmry = IsAddrLocatedInInstrctnMmry( pHeader->pTargetAddress );
+       	      
             if ( (pHeader->dBlockCode & HDRSGN) != 0xAD000000 ) 
             {
     	        rError = TRUE;
@@ -325,7 +337,7 @@ namespace BlackfinDiagnosticTesting
                 break;
             }
             else if (    
-                         ( pHeader->pTargetAddress >= m_pInstructionRamStartAddr ) 
+                         ( targetAddrInInstrctnMmry ) 
                       && ( pHeader->dByteCount > 0 ) 
                     )
             {
@@ -361,7 +373,7 @@ namespace BlackfinDiagnosticTesting
 // Instruction memory read from DMA will not compare.  Therefore to continue testing
 // with the emulator this flag was introduced for conditional compiling.  It is 
 // defined in the project settings when running with the emulator.
-#ifdef DOING_EMULATION
+#ifdef DEBUG_BUILD COMPILE_HOST
         BOOL    checkNextByteForEmulation    = FALSE;
         UINT8 * pPrevInstrMemBootStreamAddr  = NULL;
 #endif
@@ -370,12 +382,13 @@ namespace BlackfinDiagnosticTesting
     	    instrBootStream = *pInstrMemBootStream;
     	    instrMemRead    = *pCurrentInstrctnRead;
     	
-    	    if (instrBootStream == instrMemRead) {
+    	    if (instrBootStream == instrMemRead) 
+    	    {
 
     	        ++pCurrentInstrctnRead;    	
     	        ++pInstrMemBootStream;
     		
-#ifdef DOING_EMULATION
+#ifdef DEBUG_BUILD COMPILE_HOST
 			    checkNextByteForEmulation = FALSE;
 #endif
 			    continue;
@@ -384,7 +397,7 @@ namespace BlackfinDiagnosticTesting
     	    {
     		    success = FALSE;
     		
-#ifdef DOING_EMULATION
+#ifdef DEBUG_BUILD COMPILE_HOST
    			    if ( EMUEXCEPT_OPCODE == instrMemRead ) 
    			    {
    				    success                     = TRUE;
@@ -471,5 +484,26 @@ namespace BlackfinDiagnosticTesting
    	    }    	
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagInstructionRam: IsAddrLocatedInInstrctnMmry
+    ///
+    ///      Returns TRUE when the input address is located in the Blackfin Instruction Memory.
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    BOOL BlackfinDiagInstructionRam::IsAddrLocatedInInstrctnMmry( void * pAddress )
+    {
+        BOOL locatedInInstructionMemory = FALSE;
+    
+        UINT32 ui32 = reinterpret_cast<UINT32>(pAddress);
+    
+        ui32 &= PROGRAM_MEMORY_ADDRESS_MASK;
+    
+        if ( PROGRAM_MEMORY_ADDRESS_MASK == ui32 )
+        {
+            locatedInInstructionMemory = TRUE;
+        }
+    
+        return locatedInInstructionMemory;
+    }
 };
 

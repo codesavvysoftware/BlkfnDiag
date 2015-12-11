@@ -13,7 +13,7 @@
 ///
 /// @ingroup Diagnostics
 ///
-/// @par Copyright (c) 2013 Rockwell Automation Technologies, Inc.  All rights reserved.
+/// @par Copyright (c) 2015 Rockwell Automation Technologies, Inc.  All rights reserved.
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 /// template class was designed to implement the scheduling requirements.  Blackfin diagnostic scheduling is 
 /// implemented somewhat differently than Apex diagnostic scheduling.  Apex relies on a concept of a fixed period 
 /// timeslice to do timing.  The fixed period is measured in clock cycles which is based on processor speed.  Processor 
-/// speed varies from system to system.  For Blackfin timing, time values to do scheduling are in engineering unit.
+/// speed varies from system to system.  For Blackfin timing, time values to do scheduling are in engineering units.
 /// It is not precision timing as in real-time but it is close enough to satisfy the requirements.  
 /// 
 /////////////////////////////////////////////////////////////////////////////
