@@ -7,7 +7,7 @@
 ///
 /// @if REVISION_HISTORY_INCLUDED
 /// @par Edit History
-/// - [0]  thaley1  01-Dec-2015 Initial revision of file.
+/// - [0]  thaley1  13-Dec-2015 Initial revision of file.
 /// @endif
 ///
 /// @ingroup Diagnostics
