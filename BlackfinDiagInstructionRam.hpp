@@ -108,19 +108,19 @@ namespace BlackfinDiagnosticTesting
         private:
 
             // Size of DMA buffer
-            #define DMA_BFR_SZ               256	
+			const UINT32 DMA_BFR_SZ         = 256;
     
             // Exception Instruction Opcode
-            #define EMUEXCEPT_OPCODE         0x25
+			const UINT32 EMUEXCEPT_OPCODE   = 0x25;
     
             // For determining when DMA is complete
-            #define DMA_COMPLETE_MASK        8
+			const UINT32 DMA_COMPLETE_MASK  = 8;
             
             // For reading boot stream data
-            #define INITIAL_HDR_OFFSET       0
+			const UINT32 INITIAL_HDR_OFFSET = 0;
 	
 	        // For processing instruction ram via DMA
-	        #define INITIAL_BFR_OFFSET       0
+			const UINT32 INITIAL_BFR_OFFSET = 0;
 	
             #define INITIAL_NUM_BYTES_IN_BFR 0
                        

@@ -218,17 +218,7 @@ namespace BlackfinDiagnosticTesting
     	    {	
     		    // Yes save the header offset and exit with a true condition 
     		    rHeaderOffset     = offset;
-    		    success           = TRUE;    		
-    		    offsetLookahead   = offset;
-    	        offsetLookahead  += sizeof(ADI_BOOT_HEADER);
-    	    
-    	        if ( !(pHeader->dBlockCode & BFLAG_FILL) ) 
-    	        {
-                    offsetLookahead += pHeader->dByteCount;
-                }
-            
-                pHeader = (ADI_BOOT_HEADER *)(pBootBase + offsetLookahead);
-           
+    		    success           = TRUE;    		         
     		    break;
     	    }
     	    // Have not found the start of the program memory
@@ -272,8 +262,7 @@ namespace BlackfinDiagnosticTesting
 	    INT32 bytesLeft           = pHeader->dByteCount;	
 	
 	    bytesLeft                -= (rIcp.m_CurrentBfrOffset + DMA_BFR_SZ);
-	
-	
+		
 	    if ( bytesLeft > 0 ) 
 	    {
 	        isPartialRead = FALSE;
@@ -379,15 +368,22 @@ namespace BlackfinDiagnosticTesting
 #endif
         for (UINT32 ui32 = 0; ui32 < rIcp.m_NmbrOfBytesInBuffer; ++ui32 ) 
     	{
-    	    instrBootStream = *pInstrMemBootStream;
-    	    instrMemRead    = *pCurrentInstrctnRead;
-    	
-    	    if (instrBootStream == instrMemRead) 
-    	    {
+			instrMemRead = *pCurrentInstrctnRead;
+			++pCurrentInstrctnRead;
 
-    	        ++pCurrentInstrctnRead;    	
-    	        ++pInstrMemBootStream;
-    		
+			if (!(pHeader->dBlockCode & BFLAG_FILL))
+			{
+				instrBootStream = *pInstrMemBootStream;
+				++pInstrMemBootStream;
+			}
+			else
+			{
+				instrBootStream = pHeader->dArgument;
+			}
+
+       	    if (instrBootStream == instrMemRead) 
+    	    {
+		
 #ifdef DEBUG_BUILD COMPILE_HOST
 			    checkNextByteForEmulation = FALSE;
 #endif
