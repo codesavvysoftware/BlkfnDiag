@@ -21,7 +21,7 @@
 #include "Defs.h"
 #include "Os_iotk.h"             // This file depends on Defs.h.  It should include that file
 #include "Hw.h"                  // Ditto 
-
+#include "Apex.h"
 
 // C++ PROJECT INCLUDES
 #include "BlackfinDiagTimerTest.hpp"
@@ -35,6 +35,7 @@ extern "C" ULINT Apex_GetTime();
 
 namespace BlackfinDiagnosticTesting 
 {
+	UINT32 biasForTest = 0xff700000;
 	
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///	METHOD NAME: BlackfinDiagTimerTest: RunTest
@@ -55,46 +56,57 @@ namespace BlackfinDiagnosticTesting
 
             m_BeingInstantiated = FALSE;
         
+            m_ElapsedTimeHost = 0;
+            
+            m_ElapsedTimeApex = 0;
+            
             m_HostTimerValueStart = HostGetTime();
         
-            m_ApexTimerValueStart = Apex_GetTime(); //pHI_ApexReg->SystemTime;
+            m_ApexTimerValueStart = ApexGetTime();
+            
+            m_ApexValStart = Apex_GetTime();
+            
+            m_ApexValStop  = 0;
             
             SetIterationPeriod( TIMER_TIMING_PERIOD_MS );  //
         
             return ( DiagnosticTesting::DiagnosticTest::TEST_IN_PROGRESS );
         }
-
-        // Read the current Apex2 System Time Register value.
-        UINT32 apexTimerValueStop = Apex_GetTime();//pHI_ApexReg->SystemTime;
-
-        UINT32 hostTimerValueStop = HostGetTime();
         
-        // Calculate the time elapsed according to the previous and current Apex2 System Time Register values read.
-        UINT32 apexTimeElapsed = apexTimerValueStop - m_ApexTimerValueStart;
-
-        // Calculate the time elapsed according to the previous and current host timer values read.
-        UINT32 hostTimeElapsed = hostTimerValueStop - m_HostTimerValueStart;
-
+        ++m_TestExecutions;
+        
         DiagnosticTesting::DiagnosticTest::DiagnosticTestTypes ts = GetTestType();
 
+        // Read the current Apex2 System Time Register value.
+        UINT32 apexTimerValueStop = ApexGetTime();
+
+        m_ApexValStop  = Apex_GetTime();
+            
+        UINT32 hostTimerValueStop = HostGetTime();
+        
+        // Calculate the time elapsed according to the previous and current host timer values read.
+        m_ElapsedTimeHost = hostTimerValueStop - m_HostTimerValueStart;
+           
         // Check if either of the elapsed times are bad.
         if (
-                ( hostTimeElapsed < m_MinElapsedTimeHost ) 
-             || ( hostTimeElapsed > m_MaxElapsedTimeHost )
+                ( m_ElapsedTimeHost < m_MinElapsedTimeHost ) 
+             || ( m_ElapsedTimeHost > m_MaxElapsedTimeHost )
            ) 
         {
        	
-           	UINT32 errorCode = (ts << DiagnosticTesting::DiagnosticTest::DIAG_ERROR_TYPE_BIT_POS) | TIMER_TEST_APEX_TIMER_ERR;
+           	UINT32 errorCode = (ts << DiagnosticTesting::DiagnosticTest::DIAG_ERROR_TYPE_BIT_POS) | TIMER_TEST_HOST_TIMER_ERR;
 
         	OS_Assert( errorCode );
         }
        
+        m_ElapsedTimeApex = apexTimerValueStop - m_ApexTimerValueStart;
+
         if (
-                ( apexTimeElapsed < m_MinElapsedTimeApex ) 
-             || ( apexTimeElapsed > m_MaxElapsedTimeApex ) 
+                ( m_ElapsedTimeApex < m_MinElapsedTimeApex ) 
+             || ( m_ElapsedTimeApex > m_MaxElapsedTimeApex ) 
           )
         {
-           	UINT32 errorCode = (ts << DIAG_ERROR_TYPE_BIT_POS) | TIMER_TEST_HOST_TIMER_ERR;
+           	UINT32 errorCode = (ts << DIAG_ERROR_TYPE_BIT_POS) | TIMER_TEST_APEX_TIMER_ERR;
 
         	OS_Assert( errorCode );
         }
@@ -126,7 +138,7 @@ namespace BlackfinDiagnosticTesting
     ///	METHOD NAME: BlackfinDiagTimerTest: HostGetTime
     ///
     /// @par Full Description
-    ///      Get system time for Blackfin Host in microseconds
+    ///      Get system time for Blackfin Host in milleseconds
     ///      
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     UINT32 BlackfinDiagTimerTest::HostGetTime()
@@ -135,8 +147,18 @@ namespace BlackfinDiagnosticTesting
             
         _GET_CYCLE_COUNT( ullCurrentDspCycles );
              
-        return CCLK_TO_US( ullCurrentDspCycles );
-    } 
-        
-
+        return ( CCLK_TO_US( ullCurrentDspCycles ) / MICRO_TO_MILLESECOND_CONV_FACTOR );
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagTimerTest: HostGetTime
+    ///
+    ///      Get Apex system time in milleseconds
+    ///      
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    UINT32 BlackfinDiagTimerTest::ApexGetTime()
+    {     
+        return ( Apex_GetTime() / MICRO_TO_MILLESECOND_CONV_FACTOR );
+    }
+    
 };

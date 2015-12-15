@@ -7,7 +7,7 @@
 ///
 /// @if REVISION_HISTORY_INCLUDED
 /// @par Edit History
-/// - [0]  thaley1  13-Dec-2015 Initial revision of file.
+/// - [0]  thaley1  01-Dec-2015 Initial revision of file.
 /// @endif
 ///
 /// @ingroup Diagnostics
@@ -218,7 +218,17 @@ namespace BlackfinDiagnosticTesting
     	    {	
     		    // Yes save the header offset and exit with a true condition 
     		    rHeaderOffset     = offset;
-    		    success           = TRUE;    		         
+    		    success           = TRUE;    		
+    		    offsetLookahead   = offset;
+    	        offsetLookahead  += sizeof(ADI_BOOT_HEADER);
+    	    
+    	        if ( !(pHeader->dBlockCode & BFLAG_FILL) ) 
+    	        {
+                    offsetLookahead += pHeader->dByteCount;
+                }
+            
+                pHeader = (ADI_BOOT_HEADER *)(pBootBase + offsetLookahead);
+           
     		    break;
     	    }
     	    // Have not found the start of the program memory
@@ -262,7 +272,8 @@ namespace BlackfinDiagnosticTesting
 	    INT32 bytesLeft           = pHeader->dByteCount;	
 	
 	    bytesLeft                -= (rIcp.m_CurrentBfrOffset + DMA_BFR_SZ);
-		
+	
+	
 	    if ( bytesLeft > 0 ) 
 	    {
 	        isPartialRead = FALSE;
@@ -349,8 +360,33 @@ namespace BlackfinDiagnosticTesting
     {
         const UINT8 * pBootStreamStartAddr = NULL;
     
-        GetBootStreamStartAddr( pBootStreamStartAddr );    
-    
+        BOOL success = FALSE;
+
+	    GetBootStreamStartAddr( pBootStreamStartAddr ); 
+        
+   	    const ADI_BOOT_HEADER * pHeader = reinterpret_cast<const ADI_BOOT_HEADER *>(const_cast<UINT8 *>(pBootStreamStartAddr) + rIcp.m_HeaderOffset);
+   	    
+   	    if (pHeader->dBlockCode & BFLAG_FILL)
+   	    {
+   	        success = CompareFillBlockToInstrctnRam( pBootStreamStartAddr, rIcp );
+   	    }
+   	    else
+   	    {
+   	        success = CompareCodeBlocktoInstrctnRam( pBootStreamStartAddr, rIcp );
+   	    }   	    
+   	    
+   	    return success;    
+    }
+   	    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagInstructionRam: CompareCodeBlockToInstrctnRam
+    ///
+    ///      Compare the instruction RAM contents read via DMA to the contents of a block of code in the boot 
+    ///      stream to instruction RAM memory under test.
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    BOOL BlackfinDiagInstructionRam::CompareCodeBlocktoInstrctnRam( const UINT8 * pBootStreamStartAddr, InstructionCompareParams & rIcp )
+    {
         UINT8 * pInstrMemBootStream          = const_cast<UINT8 *>(pBootStreamStartAddr + rIcp.m_HeaderOffset + sizeof(ADI_BOOT_HEADER) + rIcp.m_CurrentBfrOffset);
         
         UINT8   instrBootStream              = 0;
@@ -362,29 +398,22 @@ namespace BlackfinDiagnosticTesting
 // Instruction memory read from DMA will not compare.  Therefore to continue testing
 // with the emulator this flag was introduced for conditional compiling.  It is 
 // defined in the project settings when running with the emulator.
-#ifdef DEBUG_BUILD COMPILE_HOST
+#ifdef DEBUG_BUILD
         BOOL    checkNextByteForEmulation    = FALSE;
         UINT8 * pPrevInstrMemBootStreamAddr  = NULL;
 #endif
         for (UINT32 ui32 = 0; ui32 < rIcp.m_NmbrOfBytesInBuffer; ++ui32 ) 
     	{
-			instrMemRead = *pCurrentInstrctnRead;
-			++pCurrentInstrctnRead;
-
-			if (!(pHeader->dBlockCode & BFLAG_FILL))
-			{
-				instrBootStream = *pInstrMemBootStream;
-				++pInstrMemBootStream;
-			}
-			else
-			{
-				instrBootStream = pHeader->dArgument;
-			}
-
-       	    if (instrBootStream == instrMemRead) 
+    	    instrBootStream = *pInstrMemBootStream;
+    	    instrMemRead    = *pCurrentInstrctnRead;
+    	
+    	    if (instrBootStream == instrMemRead) 
     	    {
-		
-#ifdef DEBUG_BUILD COMPILE_HOST
+
+    	        ++pCurrentInstrctnRead;    	
+    	        ++pInstrMemBootStream;
+    		
+#ifdef DEBUG_BUILD
 			    checkNextByteForEmulation = FALSE;
 #endif
 			    continue;
@@ -393,7 +422,7 @@ namespace BlackfinDiagnosticTesting
     	    {
     		    success = FALSE;
     		
-#ifdef DEBUG_BUILD COMPILE_HOST
+#ifdef DEBUG_BUILD
    			    if ( EMUEXCEPT_OPCODE == instrMemRead ) 
    			    {
    				    success                     = TRUE;
@@ -434,7 +463,44 @@ namespace BlackfinDiagnosticTesting
         return success; 
     }
 
+     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///	METHOD NAME: BlackfinDiagInstructionRam: CompareFillBlockToInstrctnRam
+    ///
+    ///      Compare the instruction RAM contents read via DMA to the contents of a fill block in the boot 
+    ///      stream to instruction RAM memory under test.
+    ///
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    BOOL BlackfinDiagInstructionRam::CompareFillBlockToInstrctnRam( const UINT8 * pBootStreamStartAddr, InstructionCompareParams & rIcp )
+    {
+         
+   	    const ADI_BOOT_HEADER * pHeader = reinterpret_cast<const ADI_BOOT_HEADER *>(const_cast<UINT8 *>(pBootStreamStartAddr) + rIcp.m_HeaderOffset);
+   	    
+        BOOL success = TRUE;
+
+        UINT32   instrMemRead                 = 0;
+	    UINT32 * pCurrentInstrctnRead         = reinterpret_cast<UINT32 *>(rIcp.m_InstrMemRead);
+
+	    for (UINT32 ui32 = 0; ui32 < rIcp.m_NmbrOfBytesInBuffer; ui32 += 4 ) 
+    	{
+    	    instrMemRead    = *pCurrentInstrctnRead;
+
+			++pCurrentInstrctnRead;
+
+			if (instrMemRead == pHeader->dArgument) 
+    	    {
+			    continue;
+    	    }
+    	    else 
+    	    {
+    		    success = FALSE;
+    		
+   		        break;
+            }
+        }
+    
+        return success; 
+    }
+   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///	METHOD NAME: BlackfinDiagInstructionRam: GetBootStreamStartAddr
     ///
     ///      Get the start address of the bootstream.

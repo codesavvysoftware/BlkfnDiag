@@ -42,14 +42,15 @@ namespace BlackfinDiagnosticTesting
     // Test specific
     static const UINT32 TIMER_TEST_APEX_TIMER_ERR        =  1;
     static const UINT32 TIMER_TEST_HOST_TIMER_ERR        =  2;
-    static const UINT32 TIMER_TIMING_PERIOD_US           =  30 * 60 * 1000000; // 30 minutes in microsecond;
-    static const UINT32 TIMER_TIMING_PERIOD_MS           =  TIMER_TIMING_PERIOD_US / 1000L;
-    static const UINT32 TIMER_MARGIN_OF_ERROR            =  TIMER_TIMING_PERIOD_US / 20;  //5% of 30 minutes in microseconds 
-    static const UINT32 MAX_TIMER_TEST_ELAPSED_TIME_APEX =  TIMER_TIMING_PERIOD_US + TIMER_MARGIN_OF_ERROR;
-    static const UINT32 MAX_TIMER_TEST_ELAPSED_TIME_HOST =  TIMER_TIMING_PERIOD_US + TIMER_MARGIN_OF_ERROR;
-    static const UINT32 MIN_TIMER_TEST_ELAPSED_TIME_APEX =  TIMER_TIMING_PERIOD_US - TIMER_MARGIN_OF_ERROR;
-    static const UINT32 MIN_TIMER_TEST_ELAPSED_TIME_HOST =  TIMER_TIMING_PERIOD_US - TIMER_MARGIN_OF_ERROR;
-
+    static const UINT32 TIMER_TIMING_PERIOD_MS           =  30 * 60 * 1000; // 30 minutes in milleseconds;
+    static const UINT32 TIMER_MARGIN_OF_ERROR            =  TIMER_TIMING_PERIOD_MS / 20;  //5% of 30 minutes in microseconds 
+    static const UINT32 MAX_TIMER_TEST_ELAPSED_TIME_APEX =  TIMER_TIMING_PERIOD_MS + TIMER_MARGIN_OF_ERROR;
+    static const UINT32 MAX_TIMER_TEST_ELAPSED_TIME_HOST =  TIMER_TIMING_PERIOD_MS + TIMER_MARGIN_OF_ERROR;
+    static const UINT32 MIN_TIMER_TEST_ELAPSED_TIME_APEX =  TIMER_TIMING_PERIOD_MS - TIMER_MARGIN_OF_ERROR;
+    static const UINT32 MIN_TIMER_TEST_ELAPSED_TIME_HOST =  TIMER_TIMING_PERIOD_MS - TIMER_MARGIN_OF_ERROR;
+    static const UINT64 APEX_TIMER_OVERFLOW_THRESHOLD    =  0x100000000;
+    static const UINT64 MICRO_TO_MILLESECOND_CONV_FACTOR =  1000;
+    
     class BlackfinDiagTimerTest : public DiagnosticTesting::DiagnosticTest 
     {
         public:
@@ -80,7 +81,10 @@ namespace BlackfinDiagnosticTesting
         						       m_MinElapsedTimeHost              ( MIN_TIMER_TEST_ELAPSED_TIME_HOST ),
         						       m_PeriodAfterStartToBeginTiming   ( rTestData.m_IterationPeriod ),
                                        m_ApexTimerValueStart             ( 0 ),
-        						       m_HostTimerValueStart             ( 0 )
+        						       m_HostTimerValueStart             ( 0 ),
+        						       m_ElapsedTimeApex                 ( 0 ),
+        						       m_ElapsedTimeHost                 ( 0 ),
+        						       m_TestExecutions                  ( 0 )
         	{
         	}
 
@@ -115,6 +119,19 @@ namespace BlackfinDiagnosticTesting
 		
             BlackfinDiagTimerTest();
                         
+             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///	METHOD NAME: BlackfinDiagTimerTest: HostGetTime
+            ///
+            /// @par Full Description
+            ///      Get Apex system time in milleseconds
+            ///
+            /// @param                            None.
+            ///                               
+            /// @return                           Apex ystem time in milleseconds
+              ///      
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            UINT32 ApexGetTime();
+            
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///	METHOD NAME: BlackfinDiagTimerTest: HostGetTime
             ///
@@ -124,11 +141,14 @@ namespace BlackfinDiagnosticTesting
             ///
             /// @param                            None.
             ///                               
-            /// @return                           System time in microseconds
+            /// @return                           System time in milleseconds
             ///
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
             UINT32 HostGetTime();
-
+            
+            // True when Apex Timer will overflow during the timer test
+            BOOL                                  m_ApexTimerWillOverflow;
+            
             // True when being instantiated for the current diagnostic cycle.
         	BOOL                                  m_BeingInstantiated;
  
@@ -151,6 +171,20 @@ namespace BlackfinDiagnosticTesting
             
             // Period after the diagnostic cycle starts to record the initial timestamps.
             UINT32                                m_PeriodAfterStartToBeginTiming;
+            
+            // Elapsed time for Host when running timer test
+            UINT32                                m_ElapsedTimeHost;
+            
+            // Elapsed time for Apex when running timer test
+            UINT32                                m_ElapsedTimeApex;
+            
+            UINT64                                m_ApexValStart;
+            
+            UINT64                                m_ApexValStop;
+            
+            UINT32                                m_TestExecutions;
+            
+
     };
 };
 

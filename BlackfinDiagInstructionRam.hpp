@@ -38,8 +38,23 @@ namespace BlackfinDiagnosticTesting
     static const UINT32  BAD_BOOTSTREAM_ERR          = 0xffd00000;
     static const UINT32  UNABLE_TO_START_ERR         = 0xfff00000;
     static const UINT32  MISMATCH_ERR                = 0xffe00000;
-    static const UINT8 * BOOT_STREAM_START           = reinterpret_cast<UINT8 *>NVS_MAIN_START_ADDR;
     static const UINT32  PROGRAM_MEMORY_ADDRESS_MASK = 0xffa00000;
+    // Size of DMA buffer
+	const UINT32 DMA_BFR_SZ         = 256;
+    
+    // Exception Instruction Opcode
+    const UINT32 EMUEXCEPT_OPCODE   = 0x25;
+    
+    // For determining when DMA is complete
+	const UINT32 DMA_COMPLETE_MASK  = 8;
+           
+    // For reading boot stream data
+	const UINT32 INITIAL_HDR_OFFSET = 0;
+	
+	// For processing instruction ram via DMA
+	const UINT32 INITIAL_BFR_OFFSET = 0;
+	
+    const UINT32 INITIAL_NUM_BYTES_IN_BFR = 0;
     
     class BlackfinDiagInstructionRam : public DiagnosticTesting::DiagnosticTest 
     {
@@ -107,22 +122,6 @@ namespace BlackfinDiagnosticTesting
 
         private:
 
-            // Size of DMA buffer
-			const UINT32 DMA_BFR_SZ         = 256;
-    
-            // Exception Instruction Opcode
-			const UINT32 EMUEXCEPT_OPCODE   = 0x25;
-    
-            // For determining when DMA is complete
-			const UINT32 DMA_COMPLETE_MASK  = 8;
-            
-            // For reading boot stream data
-			const UINT32 INITIAL_HDR_OFFSET = 0;
-	
-	        // For processing instruction ram via DMA
-			const UINT32 INITIAL_BFR_OFFSET = 0;
-	
-            #define INITIAL_NUM_BYTES_IN_BFR 0
                        
             // DMA data containing instruction RAM is read into this buffer.
             UINT8 *                      m_pDmaBfr[ DMA_BFR_SZ ];
@@ -157,6 +156,38 @@ namespace BlackfinDiagnosticTesting
             // PRIVATE METHODS
             //***************************************************************************
             
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///	METHOD NAME: BlackfinDiagInstructionRam: CompareCodeBlockToInstrctnRam
+            ///
+            /// @par Full Description
+            ///      Compare the instruction RAM contents read via DMA to the contents of a block of code in the boot 
+            ///      stream to instruction RAM memory under test.
+            ///
+            /// @param        pBootStreamStartAddr  Start address of the boot stream
+            ///               rIcpCompare           Data used to cycle through all of the Blackfin instruction RAM 
+            ///                                     iteratively.
+            ///                               
+            /// @return       TRUE when there are no miscomparisons between the bootstream and the instruction RAM
+            ///
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            BOOL CompareCodeBlocktoInstrctnRam( const UINT8 * pBootStreamStartAddr, InstructionCompareParams & rIcp );
+            
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///	METHOD NAME: BlackfinDiagInstructionRam: CompareFillBlockToInstrctnRam
+            ///
+            /// @par Full Description
+            ///      Compare the instruction RAM contents read via DMA to the contents of a fill block in the boot 
+            ///      stream to instruction RAM memory under test.
+            ///
+            /// @param        pBootStreamStartAddr  Start address of the boot stream
+            ///               rIcpCompare           Data used to cycle through all of the Blackfin instruction RAM 
+            ///                                     iteratively.
+            ///                               
+            /// @return       TRUE when there are no miscomparisons between the bootstream and the instruction RAM
+            ///
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            BOOL CompareFillBlockToInstrctnRam( const UINT8 * pBootStreamStartAddr, InstructionCompareParams & rIcp );
+
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///	METHOD NAME: BlackfinDiagInstructionRam: CompareInstructMemToBootStream
             ///
