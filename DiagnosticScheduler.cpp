@@ -114,8 +114,6 @@ namespace DiagnosticScheduling
     	// Then check if it's time for generic diagnostic test (unsigned math handles roll-over)
     	//else if ((GetSystemTime() - m_LastDiagTime) > DiagnosticSlicePeriod_Microseconds)
     
-    	(*m_RuntimeData.m_KickWatchdogTimer)();
-    	
     	DetermineCurrentSchedulerState();	
 
     	switch (m_CurrentSchedulerState) 
@@ -220,7 +218,9 @@ namespace DiagnosticScheduling
 	
     	if ( diagCycleTimePeriodExpired )
     	{
-       		if ( allTestsCompleted ) 
+			(*m_RuntimeData.m_KickWatchdogTimer)();
+
+			if ( allTestsCompleted ) 
     		{
     		    m_TimeTestCycleStarted = m_TimestampCurrent;
     		
@@ -236,22 +236,17 @@ namespace DiagnosticScheduling
     		return;
     	}
     	
-    	if ( NO_TESTS_TO_RUN_ALL_COMPLETED == m_CurrentSchedulerState ) 
-        {
-	        return;
-    	}
-    	
-    	if ( allTestsCompleted )
-        {
-            m_CurrentSchedulerState = NO_TESTS_TO_RUN_ALL_COMPLETED;
-            
-            return;
-        }
-
     	if ( IsIterationWithinDiagnosticCycleExpired() )
     	{
-    	    m_TimeLastIterationPeriodExpired = m_TimestampCurrent;
+			(*m_RuntimeData.m_KickWatchdogTimer)();
+
+ 			m_TimeLastIterationPeriodExpired = m_TimestampCurrent;
 	    	
+    	    if ( NO_TESTS_TO_RUN_ALL_COMPLETED == m_CurrentSchedulerState ) 
+            {
+	            return;
+    	    }
+    	
     	    if ( allTestsCompleted ) 
     	    {
     	       m_CurrentSchedulerState = NO_TESTS_TO_RUN_ALL_COMPLETED;

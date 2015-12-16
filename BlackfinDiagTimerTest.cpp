@@ -21,7 +21,6 @@
 #include "Defs.h"
 #include "Os_iotk.h"             // This file depends on Defs.h.  It should include that file
 #include "Hw.h"                  // Ditto 
-#include "Apex.h"
 
 // C++ PROJECT INCLUDES
 #include "BlackfinDiagTimerTest.hpp"
@@ -64,11 +63,7 @@ namespace BlackfinDiagnosticTesting
         
             m_ApexTimerValueStart = ApexGetTime();
             
-            m_ApexValStart = Apex_GetTime();
-            
-            m_ApexValStop  = 0;
-            
-            SetIterationPeriod( TIMER_TIMING_PERIOD_MS );  //
+            SetIterationPeriod( TIMER_TIMING_PERIOD_MS );  
         
             return ( DiagnosticTesting::DiagnosticTest::TEST_IN_PROGRESS );
         }
@@ -80,8 +75,6 @@ namespace BlackfinDiagnosticTesting
         // Read the current Apex2 System Time Register value.
         UINT32 apexTimerValueStop = ApexGetTime();
 
-        m_ApexValStop  = Apex_GetTime();
-            
         UINT32 hostTimerValueStop = HostGetTime();
         
         // Calculate the time elapsed according to the previous and current host timer values read.

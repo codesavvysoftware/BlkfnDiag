@@ -79,7 +79,11 @@ namespace BlackfinDiagnosticTesting
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	        BlackfinDiagInstructionRam( DiagnosticTesting::DiagnosticTest::ExecuteTestData &     rTestData) 
 		            		         :  DiagnosticTest              ( rTestData ),
-                                        m_pBootStreamStartAddr      ( reinterpret_cast<UINT8 *>(0x20000000))//(NVS_MAIN_START_ADDR ))
+#if defined(BLACKFIN_DIAG_DEBUG_INSTR_RAM_BUILD)       
+                                        m_pBootStreamStartAddr      ( reinterpret_cast<UINT8 *>(0x20000000))
+#else
+                                        m_pBootStreamStartAddr      ( reinterpret_cast<UINT8 *>(NVS_MAIN_START_ADDR ))
+#endif
 	        {
 	        }
 	

@@ -272,8 +272,21 @@ namespace BlackfinDiagRuntimeEnvironment
                                                      {
                                                          &m_RegisterTest,
                                                          &m_DataRamTest, 
+//
+// When debugging other system issues, if this conditional is FALSE then the timer test and the instruction ram test will fail probably
+// 
+// The timer test will fail because setting breakpoints, examining memory, examining registers, etc. that are part of normal debug activity
+// will affect the apex timer values read as the Apex is running asynchronously to the Blackfin system.
+//
+// The instuction ram test will fail if a new flash image is not written when source code changes are made.  As an aside running with the emulatr
+// affects what is in instruction memory as EMU trap instructions are inserted in the program memory.  The DEBUG_BUILD conditional is used in the
+// instruction RAM test.
+//
+
+#if !defined(BLACKFIN_DIAG_SYSTEM_DEBUG_ACTIVE)       
                                                          &m_TimerTest,
                                                          &m_InstructionRamTest,
+#endif
                                                          &m_InstructionsTest,
                                                      };
      

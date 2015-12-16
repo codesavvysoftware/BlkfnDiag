@@ -178,10 +178,7 @@ namespace BlackfinDiagnosticTesting
             // Elapsed time for Apex when running timer test
             UINT32                                m_ElapsedTimeApex;
             
-            UINT64                                m_ApexValStart;
-            
-            UINT64                                m_ApexValStop;
-            
+            // Number of times test has run
             UINT32                                m_TestExecutions;
             
 
